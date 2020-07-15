@@ -204,15 +204,23 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-
+    print(_messageBuffer);
     return Scaffold(
       appBar: AppBar(
-        title: Center(child: Text("Vibtch", textAlign: TextAlign.center,)),
+        title: Text("Setup", textAlign: TextAlign.center,),
       ),
       body: SingleChildScrollView(
         child: Center(
           heightFactor: 1.5,
-          child: Column(
+          child: isConnecting ? Text('Device not connected',
+            style: TextStyle(
+                fontSize: 25,
+                fontWeight: FontWeight.w500,
+                fontFamily: "Roboto"
+            ),
+          ) :
+          isConnected ?
+          Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               Padding(
@@ -278,7 +286,13 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
             ],
-          ),
+          )
+                : Text('Got disconnected',
+            style: TextStyle(
+        fontSize: 25,
+        fontWeight: FontWeight.w500,
+            fontFamily: "Roboto"
+        ),)
         ),
       ),
     );
