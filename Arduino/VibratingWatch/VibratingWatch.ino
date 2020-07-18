@@ -19,35 +19,21 @@
  included in any redistribution.
  **************************************************************************/
 #include <MPU6050_tockn.h>
-#include <SPI.h>
-#include <Wire.h>
-#include <Adafruit_GFX.h>
-#include <Adafruit_SSD1306.h>
 #include "RTClib.h"
+#include "U8glib.h"
+#define USE_ARDUINO_INTERRUPTS true // Set-up low-level interrupts for most acurate BPM math.
+#include <PulseSensorPlayground.h>
+
+PulseSensorPlayground pulseSensor;
+const int PulseWire = 0; // PulseSensor PURPLE WIRE connected to ANALOG PIN 0
+int Threshold = 550;
+
+U8GLIB_SSD1306_128X64 u8g(U8G_I2C_OPT_NONE|U8G_I2C_OPT_DEV_0);  // I2C / TWI 
+
 //rtc setup
 RTC_DS1307 rtc;
 
 char daysOfTheWeek[7][4] = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
-
-#define SCREEN_WIDTH 128 // OLED display width, in pixels
-#define SCREEN_HEIGHT 64 // OLED display height, in pixels
-
-// Declaration for SSD1306 display connected using software SPI (default case):
-#define OLED_MOSI  11
-#define OLED_CLK   13
-#define OLED_DC    9
-#define OLED_CS    10
-#define OLED_RESET 8
-Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT,
-  OLED_MOSI, OLED_CLK, OLED_DC, OLED_RESET, OLED_CS);
-
-/* Comment out above, uncomment this block to use hardware SPI
-#define OLED_DC     6
-#define OLED_CS     7
-#define OLED_RESET  8
-Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT,
-  &SPI, OLED_DC, OLED_RESET, OLED_CS);
-*/
 
 uint8_t ah = 3, am = 42, as = 0;
 
@@ -64,11 +50,17 @@ int beltmotor1 = 3;
 int beltmotor2 = 4;
 int status = 0;
 long state = 0;
+int pulseButton = 7;
 
 
 void setup() {
+  pulseSensor.begin();
+  pulseSensor.analogInput(PulseWire);
+  pulseSensor.setThreshold(Threshold);
+  pulseSensor.setThreshold(Threshold);
   pinMode(motor, OUTPUT);
   pinMode(beltswitch, INPUT);
+  pinMode(pulseButton, INPUT);
   pinMode(beltmotor1, OUTPUT);
   pinMode(beltmotor2, OUTPUT);
   Wire.begin();
@@ -95,63 +87,18 @@ void setup() {
   //OLED functions.
   Serial.begin(9600);
 
-  // SSD1306_SWITCHCAPVCC = generate display voltage from 3.3V internally
-  if(!display.begin(SSD1306_SWITCHCAPVCC)) {
-    Serial.println(F("SSD1306 allocation failed"));
-    for(;;); // Don't proceed, loop forever
-  }
-
-
-  // Show initial display buffer contents on the screen --
-  // the library initializes this with an Adafruit splash screen.
-  display.display();
-
-  // Clear the buffer
-  display.clearDisplay();
-
-  // Draw a single pixel in white
-
-  // Show the display buffer on the screen. You MUST call display() after
-  // drawing commands to make them visible on screen!
-  display.display();
-  delay(2000);
-  // display.display() is NOT necessary after every single drawing command,
-  // unless that's what you want...rather, you can batch up a bunch of
-  // drawing operations and then update the screen all at once by calling
-  // display.display(). These examples demonstrate both approaches... 
-  
-
-  // Invert and restore display, pausing in-between
-  display.invertDisplay(true);
-  delay(1000);
-  display.invertDisplay(false);
-  delay(1000);
-
- // testanimate(logo_bmp, LOGO_WIDTH, LOGO_HEIGHT); // Animate bitmaps
 }
 
 void loop() {
-  watch();
+  mpu6050.update();
+  u8g.firstPage();  
+  do {
+      watch();
+  } while( u8g.nextPage() );
   delay(1000);
 }
 
-
-void testdrawchar(String word) {
-  display.setTextColor(SSD1306_WHITE); // Draw white text
-  
-      // Start at top-left corner
-  display.cp437(true);         // Use full 256 char 'Code Page 437' font
-
-  // Not all the characters will fit on the display. This is normal.
-  // Library will draw what it can and the rest will be clipped.
-  for(int i=0; i < word.length(); i++) {
-    display.write(word[i]);
-  }
-}
-
-
 void watch (){
-  display.clearDisplay();
   DateTime now = rtc.now();
   DateTime future(now);
   if(ah == future.hour() && am == future.minute() && as == future.second()){
@@ -162,31 +109,10 @@ void watch (){
           ty = mpu6050.getAccAngleY();
           mpu6050.update();
           //timing
-          display.clearDisplay();
-          DateTime now = rtc.now();
-          DateTime future(now);
-          display.setTextSize(1);
-          display.setCursor(40,5); 
-          print2digits(future.day());
-          testdrawchar(String(future.day()));
-          testdrawchar("-");
-          print2digits(future.month());
-          testdrawchar(String(future.month()));
-          //testdrawchar("-");
-          //testdrawchar(String(future.year()));
-          testdrawchar(" ");
-          testdrawchar(String(daysOfTheWeek[now.dayOfTheWeek()]));
-          display.setCursor(40,40); 
-          //testdrawchar("       ");
-          print2digits(future.hour());
-          testdrawchar(String(future.hour()));
-          testdrawchar(":");
-          print2digits(future.minute());
-          testdrawchar(String(future.minute()));
-          testdrawchar(":");
-          print2digits(future.second());
-          testdrawchar(String(future.second())); 
-          display.display();
+          u8g.setFont(u8g_font_courB14);
+          u8g.drawStr(10,20, (String(future.day()) + "/" +String(future.month()) + "/" + String(future.year()) ).c_str() );
+          u8g.drawStr(0,40, ("Moves: " + String(moving)).c_str() );
+          u8g.drawStr(20,60, (String(future.hour()) + ":" +String(future.minute()) + ":" + String(future.second()) ).c_str() );
           //watch();
           delay(1000);
           if(abs(tx - mpu6050.getAccAngleX()) > 10 || abs(ty - mpu6050.getAccAngleY()) > 10) {
@@ -226,35 +152,23 @@ void watch (){
                 state = 0;
              } 
         }
-        display.setTextSize(1);
-        display.setCursor(40,5); 
-        print2digits(future.day());
-        testdrawchar(String(future.day()));
-        testdrawchar("-");
-        print2digits(future.month());
-        testdrawchar(String(future.month()));
-        //testdrawchar("-");
-        //testdrawchar(String(future.year()));
-        testdrawchar(" ");
-        testdrawchar(String(daysOfTheWeek[now.dayOfTheWeek()]));
-        display.setCursor(40,40); 
-        //testdrawchar("       ");
-        print2digits(future.hour());
-        testdrawchar(String(future.hour()));
-        testdrawchar(":");
-        print2digits(future.minute());
-        testdrawchar(String(future.minute()));
-        testdrawchar(":");
-        print2digits(future.second());
-        testdrawchar(String(future.second()));
-        display.display();
+        showTime();
     }
 }
 
-void print2digits(int number) {
-    if (number >= 0 && number < 10) {
-        testdrawchar("0");
-      }
+void showTime() {
+  DateTime now = rtc.now();
+  DateTime future(now);
+  int myBPM = pulseSensor.getBeatsPerMinute();
+  if(digitalRead(pulseButton) == HIGH) {
+      u8g.drawStr(0,40, ("Heart: " + String(myBPM)).c_str() );
+      Serial.println(String(myBPM).c_str());
+  }else {
+      u8g.drawStr(45,40, String(daysOfTheWeek[now.dayOfTheWeek()]).c_str() );
+    }
+  u8g.setFont(u8g_font_courB14);
+  u8g.drawStr(10,20, (String(future.day()) + "/" +String(future.month()) + "/" + String(future.year()) ).c_str() );
+  u8g.drawStr(20,60, (String(future.hour()) + ":" +String(future.minute()) + ":" + String(future.second()) ).c_str() );  
 }
 
 
