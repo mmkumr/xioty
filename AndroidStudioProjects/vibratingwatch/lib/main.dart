@@ -41,12 +41,12 @@ class HomePage extends StatefulWidget {
   final BluetoothDevice server;
 
   const HomePage({this.server});
+
   @override
   _HomePageState createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
-
   static final clientID = 0;
   static final maxMessageLength = 4096 - 3;
   BluetoothConnection connection;
@@ -81,8 +81,7 @@ class _HomePageState extends State<HomePage> {
         // If we didn't except this (no flag set), it means closing by remote.
         if (isDisconnecting) {
           print('Disconnecting locally!');
-        }
-        else {
+        } else {
           print('Disconnected remotely!');
         }
         if (this.mounted) {
@@ -107,7 +106,6 @@ class _HomePageState extends State<HomePage> {
     super.dispose();
   }
 
-
   DateTime _date = new DateTime.now();
   TimeOfDay _time = new TimeOfDay.now();
   String dateTime;
@@ -119,6 +117,7 @@ class _HomePageState extends State<HomePage> {
   String alarmDateTime;
   String alarmDateTimeShow;
   TimeOfDay alarmPicked;
+  bool alarm = true;
 
   Future _selectDateTime(BuildContext context) async {
     final DateTime datePicked = await showDatePicker(
@@ -140,10 +139,8 @@ class _HomePageState extends State<HomePage> {
             _time = timePicked;
           });
         }
-      } else{
-        timePicked = await showTimePicker(
-            context: context,
-            initialTime: _time);
+      } else {
+        timePicked = await showTimePicker(context: context, initialTime: _time);
         if (timePicked != null && timePicked != _time) {
           setState(() {
             _time = timePicked;
@@ -152,52 +149,43 @@ class _HomePageState extends State<HomePage> {
       }
       setState(() {
         _date = datePicked;
-        dateTime = "adateTime" + ":" + _date.day.toString() + ":" + _date.month.toString() + ":"
-            + _date.year.toString() + ":" + _time.hourOfPeriod.toString() + ":" + _time.minute.toString();
+        dateTime = "d" +
+            ":" +
+            _date.day.toString() +
+            ":" +
+            _date.month.toString() +
+            ":" +
+            _date.year.toString() +
+            ":" +
+            _time.hour.toString() +
+            ":" +
+            _time.minute.toString();
         _sendMessage(dateTime);
-        dateTimeShow = "\nDate: " + _date.day.toString() + "/" + _date.month.toString() + "/"
-            + _date.year.toString() + "\nTime: " + _time.hourOfPeriod.toString() + ":" + _time.minute.toString();
+        dateTimeShow = "Date: " +
+            _date.day.toString() +
+            "/" +
+            _date.month.toString() +
+            "/" +
+            _date.year.toString() +
+            "\nTime: " +
+            _time.hour.toString() +
+            ":" +
+            _time.minute.toString();
       });
     }
   }
 
   Future _selectAlarm(BuildContext context) async {
-    final DateTime alarmDatePicked = await showDatePicker(
-        context: context,
-        initialDate: _alarmDate,
-        firstDate: new DateTime(DateTime.now().year),
-        lastDate: new DateTime(DateTime.now().year + 1));
-
-    if (alarmDatePicked != null) {
-      if (alarmDatePicked.day == DateTime.now().day &&
-          alarmDatePicked.month == DateTime.now().month &&
-          alarmDatePicked.year == DateTime.now().year) {
-          alarmPicked = await showTimePicker(
-            context: context,
-            initialTime: TimeOfDay(
-                hour: TimeOfDay.now().hour, minute: TimeOfDay.now().minute));
-        if (alarmPicked != null && alarmPicked != _time) {
-          setState(() {
-            _alarmTime = alarmPicked;
-          });
-        }
-      } else{
-        alarmPicked = await showTimePicker(
-            context: context,
-            initialTime: _alarmTime);
-        if (alarmPicked != null && alarmPicked != _alarmTime) {
-          setState(() {
-            _alarmTime = alarmPicked;
-          });
-        }
-      }
+    alarmPicked =
+        await showTimePicker(context: context, initialTime: _alarmTime);
+    if (alarmPicked != null && alarmPicked != _alarmTime) {
       setState(() {
-        _alarmDate = alarmDatePicked;
-        alarmDateTime = "aalarm" + ":" + _alarmDate.day.toString() + ":" + _alarmDate.month.toString() + ":"
-            + _alarmDate.year.toString() + ":" + _alarmTime.hourOfPeriod.toString() + ":" + _alarmTime.minute.toString();
+        _alarmTime = alarmPicked;
+
+        alarmDateTime = "a" +
+            ":" + "0" + ":" + "0" + ":" + "0" + ":" + _alarmTime.hour.toString() + ":" + _alarmTime.minute.toString();
         _sendMessage(alarmDateTime);
-        alarmDateTimeShow = "\nDate: " + _alarmDate.day.toString() + "/" + _alarmDate.month.toString() + "/"
-            + _alarmDate.year.toString() + "\nTime: " + _alarmTime.hourOfPeriod.toString() + ":" + _alarmTime.minute.toString();
+        alarmDateTimeShow = "Time: " + _alarmTime.hour.toString() + ":" + _alarmTime.minute.toString();
       });
     }
   }
@@ -207,101 +195,153 @@ class _HomePageState extends State<HomePage> {
     print(_messageBuffer);
     return Scaffold(
       appBar: AppBar(
-        title: Text("Setup", textAlign: TextAlign.center,),
-      ),
-      body: SingleChildScrollView(
-        child: Center(
-          heightFactor: 1.5,
-          child: isConnecting ? Text('Device not connected',
-            style: TextStyle(
-                fontSize: 25,
-                fontWeight: FontWeight.w500,
-                fontFamily: "Roboto"
-            ),
-          ) :
-          isConnected ?
-          Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: ClipOval(
-                  child: Material(
-                    color: Colors.deepOrange,
-                    child: InkWell(
-                      child: SizedBox(
-                        width: MediaQuery.of(context).size.width/2,
-                        height: MediaQuery.of(context).size.width/2,
-                        child: dateTime == null? new Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: <Widget>[
-                            Icon(Icons.watch),
-                            Text("Set Time and date")
-                          ],
-                        ) :
-                        Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: <Widget>[
-                            Text("Date and Time", style: TextStyle(fontWeight: FontWeight.bold),),
-                            new Text(dateTimeShow),
-                          ],
-                        ),
-                      ),
-                      onTap: (){
-                        _selectDateTime(context);
-                      },
-                    ),
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: ClipOval(
-                  child: Material(
-                    color: Colors.deepOrange,
-                    child: InkWell(
-                      child: SizedBox(
-                        width: MediaQuery.of(context).size.width/2,
-                        height: MediaQuery.of(context).size.width/2,
-                        child: alarmDateTime == null? new Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: <Widget>[
-                            Icon(Icons.alarm),
-                            Text("Set Alarm")
-                          ],
-                        ) :
-                        Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: <Widget>[
-                            Text("Alarm", style: TextStyle(fontWeight: FontWeight.bold),),
-                            new Text(alarmDateTimeShow),
-                          ],
-                        ),
-                      ),
-                      onTap: (){
-                        _selectAlarm(context);
-                      },
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          )
-                : Text('Got disconnected',
-            style: TextStyle(
-        fontSize: 25,
-        fontWeight: FontWeight.w500,
-            fontFamily: "Roboto"
-        ),)
+        title: Text(
+          "Setup",
+          textAlign: TextAlign.center,
         ),
       ),
+      body: isConnecting ? Center(
+        child: Text('Device not connected',
+          style: TextStyle(
+              fontSize: 25,
+              fontWeight: FontWeight.w500,
+              fontFamily: "Roboto"
+          ),
+        ),
+      ) :
+      isConnected ? Container(
+        height: MediaQuery.of(context).size.height,
+        color: Colors.white,
+        child: SingleChildScrollView(
+          child: Center(
+              heightFactor: 1.2,
+              child:Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: ClipOval(
+                                child: Material(
+                                  color: Colors.deepOrange,
+                                  child: InkWell(
+                                    child: SizedBox(
+                                      width:
+                                          MediaQuery.of(context).size.width / 2,
+                                      height:
+                                          MediaQuery.of(context).size.width / 2,
+                                      child: new Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        children: <Widget>[
+                                          Image.asset("images/clock.png"),
+                                        ],
+                                      ),
+                                    ),
+                                    onTap: () {
+                                      _selectDateTime(context);
+                                    },
+                                  ),
+                                ),
+                              ),
+                            ),
+
+                            Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: dateTime == null
+                                    ? Container()
+                                    : Container(
+                                        color: Colors.white,
+                                        child: Text("${dateTimeShow}"),
+                                      )),
+                            Padding(
+                              padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
+                              child: ClipOval(
+                                child: Material(
+                                  color: Colors.white,
+                                  child: InkWell(
+                                    child: SizedBox(
+                                      width: MediaQuery.of(context).size.width /
+                                              2 +
+                                          70,
+                                      height:
+                                          MediaQuery.of(context).size.width /
+                                                  2 +
+                                              70,
+                                      child: new Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: <Widget>[
+                                          Image.asset(
+                                            "images/alarm-clock.png",
+                                            height: MediaQuery.of(context)
+                                                    .size
+                                                    .width /
+                                                2,
+                                            width: MediaQuery.of(context)
+                                                    .size
+                                                    .width /
+                                                2,
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    onTap: alarm == false ? () {} : () {
+                                      _selectAlarm(context);
+                                    },
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: <Widget>[
+                                Checkbox(value: alarm, onChanged: (value) => changeAlarm(),),
+                                MaterialButton(
+                                  child: alarmDateTimeShow == null
+                                      ? Container()
+                                      : Container(
+                                    child: Text(alarmDateTimeShow),
+                                  ),
+                                  color: alarm == false ? Colors.red : Colors.green,
+                                  onPressed: () {
+                                      if(alarm == true){
+                                        setState(() {
+                                          alarm = false;
+                                          alarmDateTime = "a" +
+                                              ":" + "0" + ":" + "0" + ":" + "0" + ":" + "-1" + ":" + "-1";
+                                          _sendMessage(alarmDateTime);
+                                        });
+                                      } else if(alarm == false){
+                                          setState(() {
+                                              alarm = true;
+                                          });
+                                      }
+
+                                  },
+
+                                ),
+                              ],
+                            ),
+                          ],
+                        )
+
+        ),
+        ),
+      ): Center(
+        child: Text('Got disconnected',
+    style: TextStyle(
+          fontSize: 25,
+          fontWeight: FontWeight.w500,
+          fontFamily: "Roboto"
+    ),),
+      )
     );
   }
 
   void _sendMessage(String text) async {
     text = text.trim();
 
-    if (text.length > 0)  {
+    if (text.length > 0) {
       print(utf8.encode(text + "\r\n"));
       try {
         connection.output.add(utf8.encode(text + "\r\n"));
@@ -310,15 +350,28 @@ class _HomePageState extends State<HomePage> {
         setState(() {
 //          messages.add(_Message(clientID, text));
         });
-
-      }
-      catch (e) {
+      } catch (e) {
         // Ignore error, but notify state
         setState(() {});
       }
     }
   }
-
+  changeAlarm(){
+    if(alarm == true){
+      setState(() {
+        alarm = false;
+        alarmDateTime = "a" +
+            ":" + "0" + ":" + "0" + ":" + "0" + ":" + "-1" + ":" + "-1";
+        _sendMessage(alarmDateTime);
+      });
+    }
+    else if(alarm == false){
+      print("ok");
+      setState(() {
+        alarm = true;
+      });
+    }
+  }
   void _onDataReceived(Uint8List data) {
     // Allocate buffer for parsed data
     int backspacesCounter = 0;
@@ -335,12 +388,10 @@ class _HomePageState extends State<HomePage> {
     for (int i = data.length - 1; i >= 0; i--) {
       if (data[i] == 8 || data[i] == 127) {
         backspacesCounter++;
-      }
-      else {
+      } else {
         if (backspacesCounter > 0) {
           backspacesCounter--;
-        }
-        else {
+        } else {
           buffer[--bufferIndex] = data[i];
         }
       }
@@ -350,7 +401,8 @@ class _HomePageState extends State<HomePage> {
     String dataString = String.fromCharCodes(buffer);
     int index = buffer.indexOf(13);
 
-    if (~index != 0) { // \r\n
+    if (~index != 0) {
+      // \r\n
       setState(() {
         String received_data = _messageBuffer + dataString.substring(0, index);
         received_data = received_data.trim();
@@ -359,15 +411,11 @@ class _HomePageState extends State<HomePage> {
 //        print(received_data.length);
         _messageBuffer = dataString.substring(index);
       });
-    }
-    else {
-      _messageBuffer = (
-          backspacesCounter > 0
-              ? _messageBuffer.substring(0, _messageBuffer.length - backspacesCounter)
-              : _messageBuffer
-              + dataString
-      );
+    } else {
+      _messageBuffer = (backspacesCounter > 0
+          ? _messageBuffer.substring(
+              0, _messageBuffer.length - backspacesCounter)
+          : _messageBuffer + dataString);
     }
   }
-
 }

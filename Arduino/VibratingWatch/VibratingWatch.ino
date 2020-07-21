@@ -35,7 +35,7 @@ RTC_DS1307 rtc;
 
 char daysOfTheWeek[7][4] = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
 
-uint8_t ah = 3, am = 42, as = 0;
+uint8_t ah = -1, am = -1, as = -1;
 
 // Mpu6050 variables.
 
@@ -51,6 +51,7 @@ int beltmotor2 = 4;
 int status = 0;
 long state = 0;
 int pulseButton = 7;
+int t = 0;
 
 
 void setup() {
@@ -107,13 +108,17 @@ void watch (){
         for(int i = 0; i < 15; ++i) {
           tx = mpu6050.getAccAngleX();
           ty = mpu6050.getAccAngleY();
+          DateTime now = rtc.now();
+          DateTime future(now);
           mpu6050.update();
           //timing
-          u8g.setFont(u8g_font_courB14);
-          u8g.drawStr(10,20, (String(future.day()) + "/" +String(future.month()) + "/" + String(future.year()) ).c_str() );
-          u8g.drawStr(0,40, ("Moves: " + String(moving)).c_str() );
-          u8g.drawStr(20,60, (String(future.hour()) + ":" +String(future.minute()) + ":" + String(future.second()) ).c_str() );
-          //watch();
+          u8g.firstPage();  
+          do {
+            u8g.setFont(u8g_font_courB14);
+            u8g.drawStr(10,20, (twoChar(String(future.day())) + "/" + twoChar(String(future.month())) + "/" + String(future.year()) ).c_str() );
+            u8g.drawStr(0,40, ("Moves: " + String(moving) + "/" + "10").c_str() );
+            u8g.drawStr(20,60, (twoChar(String(future.hour())) + ":" + twoChar(String(future.minute())) + ":" + twoChar(String(future.second())) ).c_str() ); 
+          } while( u8g.nextPage() );  
           delay(1000);
           if(abs(tx - mpu6050.getAccAngleX()) > 10 || abs(ty - mpu6050.getAccAngleY()) > 10) {
             moving += 1;
@@ -123,7 +128,7 @@ void watch (){
               digitalWrite(motor, LOW); 
             }
         }
-        Serial.print(moving);
+        Serial.println(moving);
         if(moving < 10) { 
             digitalWrite(motor, HIGH);
         } else {
@@ -157,20 +162,50 @@ void watch (){
 }
 
 void showTime() {
+  int length = 13;
+  char buffer [6][14];
+  char termChar = ':';
+
+  if(Serial.available() > 0){
+    int numChars = Serial.readBytesUntil(termChar, buffer[t], length);
+    buffer[t][numChars]='\0';
+    if(t == 5){
+      if(buffer[0][0] == 'd') {
+        rtc.adjust(DateTime(String(buffer[3]).toInt(), String(buffer[2]).toInt(), String(buffer[1]).toInt(), String(buffer[4]).toInt(), String(buffer[5]).toInt(), 0));
+        Serial.print("Setting Time");
+      }
+      if(buffer[0][0] == 'a') {
+        ah = String(buffer[4]).toInt();
+        am = String(buffer[5]).toInt();
+        Serial.print("Setting Alarm");
+      }
+      t = 0;
+    }
+    else if(t < 5){
+      Serial.println(t);
+      ++t;
+    }
+  }
+  
   DateTime now = rtc.now();
   DateTime future(now);
   int myBPM = pulseSensor.getBeatsPerMinute();
   if(digitalRead(pulseButton) == HIGH) {
       u8g.drawStr(0,40, ("Heart: " + String(myBPM)).c_str() );
-      Serial.println(String(myBPM).c_str());
   }else {
       u8g.drawStr(45,40, String(daysOfTheWeek[now.dayOfTheWeek()]).c_str() );
     }
   u8g.setFont(u8g_font_courB14);
-  u8g.drawStr(10,20, (String(future.day()) + "/" +String(future.month()) + "/" + String(future.year()) ).c_str() );
-  u8g.drawStr(20,60, (String(future.hour()) + ":" +String(future.minute()) + ":" + String(future.second()) ).c_str() );  
+  u8g.drawStr(10,20, (twoChar(String(future.day())) + "/" + twoChar(String(future.month())) + "/" + String(future.year()) ).c_str() );
+  u8g.drawStr(20,60, (twoChar(String(future.hour())) + ":" + twoChar(String(future.minute())) + ":" + twoChar(String(future.second())) ).c_str() );  
 }
 
+String twoChar(String num){
+  if(num.length() == 1){
+      return "0" + num;
+   }  
+   return num;
+}
 
 
   
