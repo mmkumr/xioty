@@ -295,7 +295,6 @@ class _HomePageState extends State<HomePage> {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: <Widget>[
-                                Checkbox(value: alarm, onChanged: (value) => changeAlarm(),),
                                 MaterialButton(
                                   child: alarmDateTimeShow == null
                                       ? Container()

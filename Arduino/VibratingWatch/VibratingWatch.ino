@@ -35,7 +35,7 @@ RTC_DS1307 rtc;
 
 char daysOfTheWeek[7][4] = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
 
-uint8_t ah = -1, am = -1, as = -1;
+uint8_t ah = -1, am = -1, as = 00;
 
 // Mpu6050 variables.
 
@@ -182,7 +182,6 @@ void showTime() {
       t = 0;
     }
     else if(t < 5){
-      Serial.println(t);
       ++t;
     }
   }
