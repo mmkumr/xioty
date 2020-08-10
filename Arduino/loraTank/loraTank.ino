@@ -1,71 +1,71 @@
 #include <SPI.h>
 #include <LoRa.h>
 #include<math.h>
-String inString = "";    // string to hold input
-int start = 0;
+
+long t = 0;
+
 int D3 = 3;
-float t;
 
 void setup() {
   Serial.begin(9600);
-  pinMode(D3,INPUT);
-  digitalWrite(D3, HIGH);
   while (!Serial);
+  pinMode(D3, INPUT);
   Serial.println("Tank");
-  if (!LoRa.begin(433E6)) { // or 915E6
+
+  if (!LoRa.begin(433E6)) {
     Serial.println("Starting LoRa failed!");
     while (1);
   }
 }
 
 void loop() {
+  char buffer [1][14];
+  int length = 13;
+  char termChar = ':';
   // try to parse packet
-  while(true){
-      int packetSize = LoRa.parsePacket();
-      if(LoRa.available()) {
-          char inChar = LoRa.read();
-          Serial.println(inChar); 
-          LoRa.packetRssi();
-          t = millis();
-          if(inChar=='a' && digitalRead(D3) == LOW) {
-             while(digitalRead(D3) == LOW && inChar != 'b') {
-              LoRa.parsePacket();
-              if(LoRa.available()) {
-                inChar = LoRa.read();
-                Serial.println(inChar); 
-                LoRa.packetRssi();
-               }
-
-               if(inChar == 'a'){
-                  LoRa.beginPacket(); 
-                  Serial.println("m"); 
-                  LoRa.print('m');
-                  LoRa.endPacket();
-                  inChar = 's';
-                }
-               if(inChar == 'c') {
-                  LoRa.beginPacket();  
-                  LoRa.print('e');
-                  LoRa.endPacket(); 
-                }
-               if(round((millis() - t)/1000) == 30 && inChar == 's') {
-                LoRa.beginPacket(); 
-                Serial.println("m"); 
-                LoRa.print('m');
-                LoRa.endPacket(); 
-                t = millis(); 
-               }
-             }   
-          }
-          if(inChar=='b'){
-            LoRa.beginPacket(); 
-            Serial.println("o"); 
-            LoRa.print('o');
-            inChar = 's';
-            LoRa.endPacket();
-          }
+  int packetSize = LoRa.parsePacket();
+  if (packetSize) {
+    // received a packet
+    Serial.print("Received packet ");
+    // read packet
+    while (LoRa.available()) {
+      int numChars = LoRa.readBytesUntil(termChar, buffer[0], length);
+      buffer[0][numChars]='\0';
+      Serial.println(String(buffer[0]));
+    }
+    LoRa.packetRssi();
+    if(String(buffer[0]) == "water"){
+      LoRa.beginPacket();
+      LoRa.print("motor");
+      LoRa.endPacket();
+      t = millis();
+      while( (String(buffer[0]) != "waterStop") && (digitalRead(D3) == LOW) ) {
+        packetSize = LoRa.parsePacket();
+        if (packetSize) {
+            // read packet
+            while (LoRa.available()) {
+              int numChars = LoRa.readBytesUntil(termChar, buffer[0], length);
+              buffer[0][numChars]='\0';
+              Serial.println(buffer[0]);
+              if( String(buffer[0]).toFloat() != 0.0 ){
+                LoRa.beginPacket();
+                LoRa.print(buffer[0]);
+                LoRa.endPacket();
+              }
+            }
+            LoRa.packetRssi();
+        }
+        if( (millis() - t)/1000 == 30.0){
+          LoRa.beginPacket();
+          LoRa.print("motor");
+          LoRa.endPacket();
+          t = millis();          
+        }
       }
-  }  
-  
-  start = 0;
+      LoRa.beginPacket();
+      LoRa.print("motorStop");
+      LoRa.endPacket();
+      t = millis();  
+    }
+  }
 }

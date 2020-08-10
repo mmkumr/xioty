@@ -112,13 +112,7 @@ void watch (){
           DateTime future(now);
           mpu6050.update();
           //timing
-          u8g.firstPage();  
-          do {
-            u8g.setFont(u8g_font_courB14);
-            u8g.drawStr(10,20, (twoChar(String(future.day())) + "/" + twoChar(String(future.month())) + "/" + String(future.year()) ).c_str() );
-            u8g.drawStr(0,40, ("Moves: " + String(moving) + "/" + "10").c_str() );
-            u8g.drawStr(20,60, (twoChar(String(future.hour())) + ":" + twoChar(String(future.minute())) + ":" + twoChar(String(future.second())) ).c_str() ); 
-          } while( u8g.nextPage() );  
+          
           delay(1000);
           if(abs(tx - mpu6050.getAccAngleX()) > 10 || abs(ty - mpu6050.getAccAngleY()) > 10) {
             moving += 1;

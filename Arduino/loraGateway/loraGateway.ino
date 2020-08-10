@@ -37,6 +37,7 @@
 #include <BlynkSimpleEsp8266.h>
 #include <LoRa.h>
 
+
 // You should get Auth Token in the Blynk App.
 // Go to the Project Settings (nut icon).
 char auth[] = "8tBKb8ZJXgUbyERoeZSfINGEcsHP0jAm";
@@ -51,22 +52,27 @@ char inChar;
 #define ss 15
 #define rst 16
 #define dio0 2
+WidgetLCD lcd(V1);
+
 
 BLYNK_WRITE(V0)
 {
   int pinValue = param.asInt(); // assigning incoming value from pin V1 to a variable
+  Serial.println(param.asInt());
   if(pinValue == 1){
+    lcd.clear();
     LoRa.beginPacket();  
-    LoRa.print('a');
+    LoRa.print("water:");
     LoRa.endPacket();    
   } else {
+    lcd.clear();
+    lcd.print(0, 0, "OFF");
     LoRa.beginPacket();  
-    LoRa.print('b');
+    LoRa.print("waterStop:");
     LoRa.endPacket(); 
   }
 }
 
-WidgetLCD lcd(V1);
 
 void setup()
 {
@@ -85,12 +91,24 @@ void setup()
 void loop()
 {
   Blynk.run();
-  if(LoRa.available()) {
-    inChar = LoRa.read();
-    Serial.println(inChar); 
+  char buffer [1][14];
+  int length = 13;
+  char termChar = ':';
+  // try to parse packet
+  int packetSize = LoRa.parsePacket();
+  if (packetSize) {
+    // received a packet
+    Serial.print("Received packet ");
+    // read packet
+    while (LoRa.available()) {
+      int numChars = LoRa.readBytesUntil(termChar, buffer[0], length);
+      buffer[0][numChars]='\0';
+      Serial.println(String(buffer[0]));
+    }
     LoRa.packetRssi();
-    if(inChar == 'e') {
-      lcd.print(0, 0, inChar);
+    if( String(buffer[0]).toFloat() != 0.0 ){
+      Serial.println(buffer[0]);
+      lcd.print(0, 10, buffer[0]);
     }
   }
 }
