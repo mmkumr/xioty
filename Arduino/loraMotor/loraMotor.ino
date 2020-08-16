@@ -1,24 +1,32 @@
 #include <SPI.h>
 #include <LoRa.h>
-#include "EmonLib.h"
+#include <Wire.h>
 
-#define VOLT_CAL 148.7
-#define CURRENT_CAL 4.3
-EnergyMonitor emon1;
-float currentDraw; 
-float supplyVoltage;
+float current = 0;
 
 int D3 = 3;
 int D7 = 7;
+int D5 = 5;
+
+int i = 0;
+
+String id = "1234";
+
+int length = 25;
+char buffer [3][25];
+char termChar = ':';
 
 long t;
 
 void setup() {
+  
   pinMode(D3, OUTPUT);
   pinMode(D7, OUTPUT);
+  pinMode(D5, INPUT);
+  digitalWrite(D7, 0);
   Serial.begin(9600);
-  emon1.voltage(1, VOLT_CAL, 1.7);  // Voltage: input pin, calibration, phase_shift
-  emon1.current(0, CURRENT_CAL);
+  Wire.begin();        // join i2c bus (address optional for master)
+
   while (!Serial);
 
   Serial.println("Motor");
@@ -27,57 +35,85 @@ void setup() {
     Serial.println("Starting LoRa failed!");
     while (1);
   }
-  emon1.calcVI(20,2000);         
-  currentDraw = emon1.Irms;             
-  supplyVoltage = emon1.Vrms;
 }
 
 
 void loop() {
-  char buffer [1][14];
-  int length = 13;
-  char termChar = ':';
-  // try to parse packet
   int packetSize = LoRa.parsePacket();
-  if (packetSize) {
-    // received a packet
-    Serial.print("Received packet ");
-    // read packet
-    while (LoRa.available()) {
-      int numChars = LoRa.readBytesUntil(termChar, buffer[0], length);
-      buffer[0][numChars]='\0';
-      Serial.println(String(buffer[0]));
-    }
-    LoRa.packetRssi();
-    if(String(buffer[0]) == "motor"){
+  if(packetSize) {
+    getLora();  
+    if( (String(buffer[2]) == "motor" && String(buffer[1]) == "state") && String(buffer[0]) == id ){
       digitalWrite(D3, HIGH);
       digitalWrite(D7, HIGH);
-      t = millis();
-      while( (String(buffer[0]) != "motorStop") && ( (millis() - t)/1000 != 35.0) ) {
+      t = millis() * 1.000;
+      int cont = 0;
+      while((millis() - t)/1000 != 35.0) {
         packetSize = LoRa.parsePacket();
         if (packetSize) {
-            // read packet
-            while (LoRa.available()) {
-              int numChars = LoRa.readBytesUntil(termChar, buffer[0], length);
-              buffer[0][numChars]='\0';
-              Serial.println(buffer[0]);
-            }
-            LoRa.packetRssi();
-            if( (String(buffer[0]) == "motor") ){
-              t = millis();          
-            }
+          getLora();
+          if( (String(buffer[2]) == "motor" && String(buffer[1]) == "state") && String(buffer[0]) == id ){
+              t = millis();               
+          }
+          if( (String(buffer[2]) == "motorStop" && String(buffer[1]) == "state") && String(buffer[0]) == id ) {
+            break;  
+          }
+        } else if(cont == 1){
+          Wire.requestFrom(8, 1);
+          while (Wire.available()) { // slave may send less than requested
+            int c = Wire.read(); // receive a byte as character
+            current = c/100.0;
+          }
+          if(digitalRead(D5) == LOW){
+            break;
+          }
+          
         }
-        if((millis() - t)/1000 == 15.0){
-          emon1.calcVI(20,2000);         
-          currentDraw = emon1.Irms;             
-          supplyVoltage = emon1.Vrms;
+        if((millis() - t)/1000.00 == 12.00){ 
+          Wire.requestFrom(8, 1);
+          while (Wire.available()) { // slave may send less than requested
+            int c = Wire.read(); // receive a byte as character
+            current = c/100.0;
+          }
+          Serial.println(current);
+          Serial.print(digitalRead(D5));
+          if(digitalRead(D5) == LOW){
+            break;
+          }else{
+            cont = 1;
+          }
           LoRa.beginPacket(); 
-          LoRa.print(String(currentDraw) + ":");  
+          LoRa.print(id + ":" + "motorCurrent:" + String(current) + ":");  
+          Serial.println(id + ":" + "motorCurrent:" + String(current) + ":");
           LoRa.endPacket(); 
         }
-      }  
+      } 
+      if(digitalRead(D5) == LOW){
+        LoRa.beginPacket(); 
+        LoRa.print(id + ":" + "motorCurrent:" + String(0.0) + ":");  
+        Serial.println(id + ":" + "motorCurrent:" + String(0.0) + ":");
+        LoRa.endPacket();
+        Serial.println("Stopping motor");
+      }
       digitalWrite(D3, LOW);
-      digitalWrite(D7, LOW);
+      digitalWrite(D7, 0);
     }
   }
+}
+
+
+void getLora(){
+  while(LoRa.available()) {
+    int numChars = LoRa.readBytesUntil(termChar, buffer[i], length);
+    buffer[i][numChars]='\0';
+    Serial.println(buffer[i]);
+    Serial.println(i);
+    if(i == 2 || String(buffer[0]) != id){
+      i = 0;
+    }
+    else if(i < 2){
+      ++i;
+    }
+  }
+  LoRa.packetRssi();  
+  Serial.println();
 }
