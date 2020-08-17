@@ -52,12 +52,28 @@ void loop() {
         if (packetSize) {
           getLora();
           if( (String(buffer[2]) == "motor" && String(buffer[1]) == "state") && String(buffer[0]) == id ){
+              Wire.requestFrom(8, 1);
+              while (Wire.available()) { // slave may send less than requested
+                int c = Wire.read(); // receive a byte as character
+                current = c/100.0;
+              }
+              Serial.println(current);
+              Serial.print(digitalRead(D5));
+              if(digitalRead(D5) == LOW){
+                break;
+              }else{
+                cont = 1;
+              }
+              LoRa.beginPacket(); 
+              LoRa.print(id + ":" + "motorCurrent:" + String(current) + ":");  
+              Serial.println(id + ":" + "motorCurrent:" + String(current) + ":");
+              LoRa.endPacket();  
               t = millis();               
           }
           if( (String(buffer[2]) == "motorStop" && String(buffer[1]) == "state") && String(buffer[0]) == id ) {
             break;  
           }
-        } else if(cont == 1){
+        }else if(cont == 1){
           Wire.requestFrom(8, 1);
           while (Wire.available()) { // slave may send less than requested
             int c = Wire.read(); // receive a byte as character
@@ -67,24 +83,6 @@ void loop() {
             break;
           }
           
-        }
-        if((millis() - t)/1000.00 == 12.00){ 
-          Wire.requestFrom(8, 1);
-          while (Wire.available()) { // slave may send less than requested
-            int c = Wire.read(); // receive a byte as character
-            current = c/100.0;
-          }
-          Serial.println(current);
-          Serial.print(digitalRead(D5));
-          if(digitalRead(D5) == LOW){
-            break;
-          }else{
-            cont = 1;
-          }
-          LoRa.beginPacket(); 
-          LoRa.print(id + ":" + "motorCurrent:" + String(current) + ":");  
-          Serial.println(id + ":" + "motorCurrent:" + String(current) + ":");
-          LoRa.endPacket(); 
         }
       } 
       if(digitalRead(D5) == LOW){

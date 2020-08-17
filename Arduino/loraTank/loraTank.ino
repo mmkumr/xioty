@@ -12,6 +12,7 @@ String area = "a1234"; //Unique area code.
 int length = 25;
 char buffer [3][25];
 char termChar = ':';
+int lowCurrent = 0;
 
 
 void setup() {
@@ -31,12 +32,12 @@ void loop() {
   if(packetSize) {
     getLora();
     if( ( (String(buffer[2]) == "water" && String(buffer[1]) == "state") && String(buffer[0]) == area ) && (digitalRead(D3) == LOW) ){
-      delay(2000);
       LoRa.beginPacket();
       LoRa.print(id + ":" + "state:" + "motor:");
       LoRa.endPacket();
       Serial.println("Sending...");
       t = millis();
+      lowCurrent = 0;
       while( (digitalRead(D3) == LOW) ){
         packetSize = LoRa.parsePacket();
         if (packetSize){
@@ -54,7 +55,7 @@ void loop() {
           break;
         }
       }
-      delay(2000);
+      Serial.println("Stopping...");
       LoRa.beginPacket();
       LoRa.print(id + ":" + "state:" + "motorStop:");
       LoRa.endPacket();
@@ -64,14 +65,13 @@ void loop() {
 }
 
 
-
 void getLora(){
   while(LoRa.available()) {
     int numChars = LoRa.readBytesUntil(termChar, buffer[i], length);
     buffer[i][numChars]='\0';
     Serial.println(buffer[i]);
     Serial.println(i);
-    if(i == 2){
+    if( i == 2 || (String(buffer[0]) != area && String(buffer[0]) != id) ){
       i = 0;
     }
     else if(i < 2){
@@ -79,6 +79,8 @@ void getLora(){
     }
   }
   LoRa.packetRssi();  
+  i = 0;
+  Serial.println();
 }
 
 void getType() {
@@ -87,6 +89,7 @@ void getType() {
       delay(2000);
       LoRa.beginPacket();
       LoRa.print( String(area) + ":" + String(id) + ":" + String(buffer[1]) + ":" + String(buffer[2]) + ":");
+      Serial.println("current");
       LoRa.endPacket();
     }
   }  

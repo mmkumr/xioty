@@ -19,6 +19,8 @@ Adafruit_BMP280 bmp280;
 int D3 = 3;
 String id = "1234";
 String area = "a1234"; //Unique area code.
+float voltage;
+int packetSize;
  
 void setup() {
   Serial.begin(9600);
@@ -45,21 +47,30 @@ char text[14];
 // main loop
 void loop()
 {
+  int sensorValue = analogRead(A0);
   // get temperature, pressure and altitude from library
   float temperature = bmp280.readTemperature();  // get temperature
   float pressure    = bmp280.readPressure();     // get pressure
   float altitude_   = bmp280.readAltitude(1013.25); // get altitude (this should be adjusted to your local forecast)
- 
+  voltage = sensorValue * (4.7 / 1023.0);
   Serial.print("Pressure    = ");
   Serial.print(round(pressure/100));
   Serial.println(" hPa");
-  if( round(pressure/100) > 1005 ){
+  if( round(pressure/100) > 1010){
+    int v ;
+    if(voltage < 4.0){
+      v = 0;
+    }else{
+      v = 1;
+    }
     LoRa.beginPacket();
-    LoRa.print( area + ":" + "pipePressure:" + String(pressure/100) + ":");
-    LoRa.endPacket();  
+    LoRa.print(area + ":" + "pipePressure:" + String(pressure/100) + ":" + String(v) + ":");
+    LoRa.endPacket();
+    while(round(pressure/100) < 1005) {
+      ;  
+    }
   }
   Serial.println();  // start a new line
   delay(2000);       // wait 2 seconds
   
 }
-// end of code.

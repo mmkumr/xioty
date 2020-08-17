@@ -43,6 +43,7 @@ int change = 0;
 FirebaseData firebaseData1;
 FirebaseData firebaseData2;
 FirebaseJson updateData;
+FirebaseJson pipeData;
 
 unsigned long sendDataPrevMillis = 0;
 
@@ -152,42 +153,45 @@ void getLora(){
       change = 1;
       
     }  
-    if(String(buffer[1]) == "pipePressure" && i == 3){
-          Serial.println(buffer[i]);
-          break;
-    }
+    
   }
-  LoRa.packetRssi();  
+  LoRa.packetRssi(); 
+  i = 0; 
   if(change == 1){
-    if((String(buffer[0]) == area && String(buffer[1]) == id) && (String(buffer[2]) == "motorCurrent") ){
-      updateData.set("motorCurrent", String(buffer[3]).toFloat() );
-      Firebase.updateNode(firebaseData1, "/", updateData);
-      Serial.println(firebaseData1.dataPath());
-      Serial.println(firebaseData1.dataType());
-      Serial.println(firebaseData1.jsonString());  
-      if( String(buffer[3]).toFloat() < 0.15){
+    if((String(buffer[0]) == area && String(buffer[1]) == id) && (String(buffer[2]) == "motorCurrent") ){  
+      if( String(buffer[3]).toFloat() == 0.0 ){ 
         Serial.println(buffer[3]);
         updateData.set("button", "0");
         Firebase.updateNode(firebaseData1, "/", updateData);
         updateData.set("motorCurrent", 0.001);
         Firebase.updateNode(firebaseData1, "/", updateData);
+      }else{
+        updateData.set("motorCurrent", String(buffer[3]).toFloat() );
+        Firebase.updateNode(firebaseData1, "/", updateData);
+        updateData.set("button", "1");
+        Firebase.updateNode(firebaseData1, "/", updateData);
+        Serial.println(firebaseData1.dataPath());
+        Serial.println(firebaseData1.dataType());
+        Serial.println(firebaseData1.jsonString());
+        value = -1;
       }
     }
 
-
-    else if((String(buffer[0]) == area && String(buffer[1]) == "pipePressure") ){
-      updateData.set("pipePressure",String(buffer[2]).toFloat() );
-      Firebase.updateNode(firebaseData1, "/", updateData);
+   if((String(buffer[0]) == area && String(buffer[1]) == "pipePressure") ){
+      pipeData.set("pipePressure",String(buffer[2]).toFloat());
+      pipeData.set("pipeBattery", atoi(buffer[3]) );
+      pipeData.set("button", "1");
+      pipeData.set("motorCurrent", 0.001);
+      Firebase.updateNode(firebaseData1, "/", pipeData);
       Serial.println(firebaseData1.dataPath());
       Serial.println(firebaseData1.dataType());
       Serial.println(firebaseData1.jsonString()); 
-      
-      updateData.set("button", "1");
-      Firebase.updateNode(firebaseData1, "/", updateData);
       Serial.println("water started");
     }  
+
     change = 0;
   }
+  
 }
 
 void printResult(FirebaseData &data)
