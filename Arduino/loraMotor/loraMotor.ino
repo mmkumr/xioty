@@ -68,6 +68,7 @@ void loop() {
               LoRa.print(id + ":" + "motorCurrent:" + String(current) + ":");  
               Serial.println(id + ":" + "motorCurrent:" + String(current) + ":");
               LoRa.endPacket();  
+              Serial.println((millis() - t)/1000);
               t = millis();               
           }
           if( (String(buffer[2]) == "motorStop" && String(buffer[1]) == "state") && String(buffer[0]) == id ) {

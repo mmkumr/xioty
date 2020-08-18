@@ -27,10 +27,11 @@ String id = "1234";
 String area = "a1234";
 
 int length = 20;
-char buffer [4][20];
+char buffer [5][20];
 char termChar = ':';
 int i = 0;
 int change = 0;
+float t = 0.0;
 
 
 #define FIREBASE_HOST "automoto-143.firebaseio.com"
@@ -52,6 +53,7 @@ String path = "button";
 uint16_t count = 0;
 
 volatile int value = -1;
+
 
 void printResult(FirebaseData &data);
 void printResult(StreamData &data);
@@ -128,15 +130,25 @@ void loop()
     LoRa.beginPacket();  
     LoRa.print(area + ":" + "state:" + "water:");
     LoRa.endPacket();
-    Serial.println("on");  
+    Serial.println("Motor on");  
+    t = millis();
     value = -1;
   } else if(value == 0){
     LoRa.beginPacket();  
     LoRa.print(area + ":" + "state:" + "waterStop:");
     LoRa.endPacket();
-    Serial.println("off");  
+    Serial.println("Motor off");  
     value = -1;
   }
+
+  if((millis() - t)/1000 == 25.0){
+    updateData.set("button", "0");  
+    updateData.set("motorCurrent", 0.001);
+    pipeData.set("pipePressure", 0.001);
+    Firebase.updateNode(firebaseData1, "/", updateData);
+    Firebase.updateNode(firebaseData1, "/", pipeData);
+  }
+    
 }
 
 void getLora(){
@@ -145,24 +157,27 @@ void getLora(){
     buffer[i][numChars]='\0';
     Serial.println(buffer[i]);
     Serial.println(i);
-    if(i == 3 || String(buffer[0]) != area){
+    if( (i == 3 && String(buffer[2]) != "motorCurrent") || String(buffer[0]) != area){
       i = 0;
     }
     else if(i < 3){
       ++i;
       change = 1;
       
-    }  
+    }else if((i == 3 && String(buffer[2]) == "motorCurrent")){
+      ++i;
+      Serial.println("ok");
+    }
     
   }
   LoRa.packetRssi(); 
   i = 0; 
+  Serial.println(i);
   if(change == 1){
     if((String(buffer[0]) == area && String(buffer[1]) == id) && (String(buffer[2]) == "motorCurrent") ){  
       if( String(buffer[3]).toFloat() == 0.0 ){ 
-        Serial.println(buffer[3]);
+        FirebaseJson tankData;
         updateData.set("button", "0");
-        Firebase.updateNode(firebaseData1, "/", updateData);
         updateData.set("motorCurrent", 0.001);
         Firebase.updateNode(firebaseData1, "/", updateData);
       }else{
@@ -170,16 +185,21 @@ void getLora(){
         Firebase.updateNode(firebaseData1, "/", updateData);
         updateData.set("button", "1");
         Firebase.updateNode(firebaseData1, "/", updateData);
+        FirebaseJson tankData;
+        tankData.set("tankBattery", String(buffer[4]).toFloat());
+        Firebase.updateNode(firebaseData1, "/", tankData);
         Serial.println(firebaseData1.dataPath());
         Serial.println(firebaseData1.dataType());
         Serial.println(firebaseData1.jsonString());
+        t = millis();
         value = -1;
       }
     }
 
+    
    if((String(buffer[0]) == area && String(buffer[1]) == "pipePressure") ){
       pipeData.set("pipePressure",String(buffer[2]).toFloat());
-      pipeData.set("pipeBattery", atoi(buffer[3]) );
+      pipeData.set("pipeBattery", String(buffer[3]).toFloat());
       pipeData.set("button", "1");
       pipeData.set("motorCurrent", 0.001);
       Firebase.updateNode(firebaseData1, "/", pipeData);
@@ -189,6 +209,8 @@ void getLora(){
       Serial.println("water started");
     }  
 
+    
+    
     change = 0;
   }
   

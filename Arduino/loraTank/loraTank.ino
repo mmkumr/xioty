@@ -19,6 +19,7 @@ void setup() {
   Serial.begin(9600);
   while (!Serial);
   pinMode(D3, INPUT);
+  pinMode(A0, INPUT);
   Serial.println("Tank");
 
   if (!LoRa.begin(433E6)) {
@@ -44,12 +45,13 @@ void loop() {
           getLora();
           getType();
         } 
-        if( (millis() - t)/1000 == 30.0){
+        if( (millis() - t)/1000 == 15.0){
+            Serial.println((millis() - t)/1000);
             LoRa.beginPacket();
             LoRa.print(id + ":" + "state:" + "motor:");
             LoRa.endPacket();
             t = millis(); 
-            Serial.println("Sending Signal....");    
+            Serial.println("Sending Signal....");  
         }
         if( (String(buffer[2]) == "waterStop" && String(buffer[1]) == "state") && String(buffer[0]) == area ){
           break;
@@ -86,11 +88,13 @@ void getLora(){
 void getType() {
   if( String(buffer[0]) == id ){
     if(String(buffer[1]) == "motorCurrent"){
+      int sensorValue = analogRead(A0);
+      float voltage = sensorValue * (4.15 / 1023.0);
       delay(2000);
       LoRa.beginPacket();
-      LoRa.print( String(area) + ":" + String(id) + ":" + String(buffer[1]) + ":" + String(buffer[2]) + ":");
+      LoRa.print( String(area) + ":" + String(id) + ":" + String(buffer[1]) + ":" + String(buffer[2]) + ":" + String(voltage) + ":");
       Serial.println("current");
-      LoRa.endPacket();
+      LoRa.endPacket();      
     }
   }  
 }
