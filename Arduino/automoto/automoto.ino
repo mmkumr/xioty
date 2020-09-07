@@ -1,4 +1,3 @@
-
 /*
  * Created by K. Suwatchai (Mobizt)
  * 
@@ -8,13 +7,9 @@
  * 
  * Copyright (c) 2020 mobizt
  * 
- * This example is for FirebaseESP32 Arduino library v 3.7.3 or later
+ * This example is for FirebaseESP8266 Arduino library v 3.7.3 or newer
  *
 */
-
-//This example shows how to set stream event callback functions.
-//Two events are available from Firebase's Real Time database HTTP stream connection, dataAvailable and streamTimeout.
-
 
 #include <WiFi.h>
 #include <FirebaseESP32.h>
@@ -33,42 +28,53 @@ int i = 0;
 int change = 0;
 float t = 0.0;
 
-
 #define FIREBASE_HOST "automoto-143.firebaseio.com"
 #define FIREBASE_AUTH "RgzejSsoAQpbkTg4OAkd2mMWtsJPm9VN1vpeB7dk"
-#define WIFI_SSID "dddd70"
-#define WIFI_PASSWORD "12345abcd"
+#define WIFI_SSID "mmkumr"
+#define WIFI_PASSWORD "244466666"
 
 
-//Define Firebase data object
+//Define FirebaseESP8266 data object
 FirebaseData firebaseData1;
 FirebaseData firebaseData2;
 FirebaseJson updateData;
 FirebaseJson pipeData;
 
-unsigned long sendDataPrevMillis = 0;
+volatile int value = -1;
 
-String path = "button";
+volatile int totalFlow = -1;
+
+
+String parentPath = "/";
+String childPath[1] = {"/button"};
+size_t childPathSize = 1;
 
 uint16_t count = 0;
 
-volatile int value = -1;
+void printResult(FirebaseData &data); 
 
-
-void printResult(FirebaseData &data);
-void printResult(StreamData &data);
-
-void streamCallback(StreamData data)
+void streamCallback(MultiPathStreamData stream)
 {
-
-  Serial.println("Stream Data1 available...");
-  Serial.println("STREAM PATH: " + data.streamPath());
-  Serial.println("EVENT PATH: " + data.dataPath());
-  Serial.println("DATA TYPE: " + data.dataType());
-  Serial.println("EVENT TYPE: " + data.eventType());
-  Serial.print("VALUE: ");
-  printResult(data);
   Serial.println();
+  Serial.println("Stream Data1 available...");
+
+  size_t numChild = sizeof(childPath)/sizeof(childPath[0]);
+
+  for(size_t i = 0;i< numChild;i++)
+  {
+    if (stream.get(childPath[i]))
+    {
+      String path = stream.dataPath;
+      String temp = stream.value;
+      //Serial.println("path: " + stream.dataPath + ", type: " + stream.type + ", value: " + stream.value);
+      if(path == "/button"){
+        value = temp.toInt();
+      }
+    }
+  }
+
+  Serial.println();
+  
 }
 
 void streamTimeoutCallback(bool timeout)
@@ -80,6 +86,29 @@ void streamTimeoutCallback(bool timeout)
     Serial.println();
   }
 }
+
+
+//int water = 0;
+//#define LED_BUILTIN 1
+//#define SENSOR  12
+//
+//long currentMillis = 0;
+//long previousMillis = 0;
+//int interval = 1000;
+//boolean ledState = LOW;
+//float calibrationFactor = 4.5;
+//volatile byte pulseCount;
+//byte pulse1Sec = 0;
+//float flowRate;
+//unsigned int flowMilliLitres;
+//unsigned long totalMilliLitres;
+//
+//void IRAM_ATTR pulseCounter()
+//{
+//  pulseCount++;
+//}
+
+
 
 void setup()
 {
@@ -93,7 +122,7 @@ void setup()
     Serial.println("Starting LoRa failed!");
     while (1);
   }
-
+  
   WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
   Serial.print("Connecting to Wi-Fi");
   while (WiFi.status() != WL_CONNECTED)
@@ -109,7 +138,9 @@ void setup()
   Firebase.begin(FIREBASE_HOST, FIREBASE_AUTH);
   Firebase.reconnectWiFi(true);
 
-  if (!Firebase.beginStream(firebaseData1, path))
+
+
+  if (!Firebase.beginMultiPathStream(firebaseData1, parentPath, childPath, childPathSize))
   {
     Serial.println("------------------------------------");
     Serial.println("Can't begin stream connection...");
@@ -118,7 +149,17 @@ void setup()
     Serial.println();
   }
 
-  Firebase.setStreamCallback(firebaseData1, streamCallback, streamTimeoutCallback);
+  Firebase.setMultiPathStreamCallback(firebaseData1, streamCallback, streamTimeoutCallback);
+//  pinMode(LED_BUILTIN, OUTPUT);
+//  pinMode(SENSOR, INPUT_PULLUP);
+//
+//  pulseCount = 0;
+//  flowRate = 0.0;
+//  flowMilliLitres = 0;
+//  totalMilliLitres = 0;
+//  previousMillis = 0;
+//
+//  attachInterrupt(digitalPinToInterrupt(SENSOR), pulseCounter, FALLING);
 }
 
 void loop()
@@ -133,22 +174,32 @@ void loop()
     Serial.println("Motor on");  
     t = millis();
     value = -1;
+//    water = 0;
   } else if(value == 0){
     LoRa.beginPacket();  
     LoRa.print(area + ":" + "state:" + "waterStop:");
     LoRa.endPacket();
-    Serial.println("Motor off");  
+    Serial.println("Motor off");
+//    water = 1;
     value = -1;
   }
+//  else if(water == 1){
+//    flow();  
+//  }
 
   if((millis() - t)/1000 == 25.0){
     updateData.set("button", "0");  
     updateData.set("motorCurrent", 0.001);
     pipeData.set("pipePressure", 0.001);
     Firebase.updateNode(firebaseData1, "/", updateData);
+    Serial.println(firebaseData1.dataPath());
+    Serial.println(firebaseData1.dataType());
+    Serial.println(firebaseData1.jsonString());
     Firebase.updateNode(firebaseData1, "/", pipeData);
+    Serial.println(firebaseData1.dataPath());
+    Serial.println(firebaseData1.dataType());
+    Serial.println(firebaseData1.jsonString());
   }
-    
 }
 
 void getLora(){
@@ -166,7 +217,6 @@ void getLora(){
       
     }else if((i == 3 && String(buffer[2]) == "motorCurrent")){
       ++i;
-      Serial.println("ok");
     }
     
   }
@@ -176,11 +226,14 @@ void getLora(){
   if(change == 1){
     if((String(buffer[0]) == area && String(buffer[1]) == id) && (String(buffer[2]) == "motorCurrent") ){  
       if( String(buffer[3]).toFloat() == 0.0 ){ 
+        Serial.println("stopping");
         FirebaseJson tankData;
         updateData.set("button", "0");
         updateData.set("motorCurrent", 0.001);
         Firebase.updateNode(firebaseData1, "/", updateData);
+        value = -1;
       }else{
+        Serial.println("continue");
         updateData.set("motorCurrent", String(buffer[3]).toFloat() );
         Firebase.updateNode(firebaseData1, "/", updateData);
         updateData.set("button", "1");
@@ -198,6 +251,7 @@ void getLora(){
 
     
    if((String(buffer[0]) == area && String(buffer[1]) == "pipePressure") ){
+      Serial.println("water in pipe");
       pipeData.set("pipePressure",String(buffer[2]).toFloat());
       pipeData.set("pipeBattery", String(buffer[3]).toFloat());
       pipeData.set("button", "1");
@@ -213,103 +267,51 @@ void getLora(){
     
     change = 0;
   }
-  
+  Serial.println(change);
+  updateData.clear();
+  pipeData.clear();
 }
 
-void printResult(FirebaseData &data)
-{
 
-  if (data.dataType() == "int")
-    Serial.println(data.intData());
-  else if (data.dataType() == "float")
-    Serial.println(data.floatData(), 5);
-  else if (data.dataType() == "double")
-    printf("%.9lf\n", data.doubleData());
-  else if (data.dataType() == "boolean")
-    Serial.println(data.boolData() == 1 ? "true" : "false");
-  else if (data.dataType() == "string")
-    Serial.println(data.stringData());
-  else if (data.dataType() == "json")
-  {
-    Serial.println();
-    FirebaseJson &json = data.jsonObject();
-    //Print all object data
-    Serial.println("Pretty printed JSON data:");
-    String jsonStr;
-    json.toString(jsonStr, true);
-    Serial.println(jsonStr);
-    Serial.println();
-    Serial.println("Iterate JSON data:");
-    Serial.println();
-    size_t len = json.iteratorBegin();
-    String key, value = "";
-    int type = 0;
-    for (size_t i = 0; i < len; i++)
-    {
-      json.iteratorGet(i, type, key, value);
-      Serial.print(i);
-      Serial.print(", ");
-      Serial.print("Type: ");
-      Serial.print(type == FirebaseJson::JSON_OBJECT ? "object" : "array");
-      if (type == FirebaseJson::JSON_OBJECT)
-      {
-        Serial.print(", Key: ");
-        Serial.print(key);
-      }
-      Serial.print(", Value: ");
-      Serial.println(value);
-    }
-    json.iteratorEnd();
-  }
-  else if (data.dataType() == "array")
-  {
-    Serial.println();
-    //get array data from FirebaseData using FirebaseJsonArray object
-    FirebaseJsonArray &arr = data.jsonArray();
-    //Print all array values
-    Serial.println("Pretty printed Array:");
-    String arrStr;
-    arr.toString(arrStr, true);
-    Serial.println(arrStr);
-    Serial.println();
-    Serial.println("Iterate array values:");
-    Serial.println();
-    for (size_t i = 0; i < arr.size(); i++)
-    {
-      Serial.print(i);
-      Serial.print(", Value: ");
-
-      FirebaseJsonData &jsonData = data.jsonData();
-      //Get the result data from FirebaseJsonArray object
-      arr.get(jsonData, i);
-      if (jsonData.typeNum == FirebaseJson::JSON_BOOL)
-        Serial.println(jsonData.boolValue ? "true" : "false");
-      else if (jsonData.typeNum == FirebaseJson::JSON_INT)
-        Serial.println(jsonData.intValue);
-      else if (jsonData.typeNum == FirebaseJson::JSON_FLOAT)
-        Serial.println(jsonData.floatValue);
-      else if (jsonData.typeNum == FirebaseJson::JSON_DOUBLE)
-        printf("%.9lf\n", jsonData.doubleValue);
-      else if (jsonData.typeNum == FirebaseJson::JSON_STRING ||
-               jsonData.typeNum == FirebaseJson::JSON_NULL ||
-               jsonData.typeNum == FirebaseJson::JSON_OBJECT ||
-               jsonData.typeNum == FirebaseJson::JSON_ARRAY)
-        Serial.println(jsonData.stringValue);
-    }
-  }
-}
-
-void printResult(StreamData &data)
-{
-
-  if (data.dataType() == "int")
-    Serial.println(data.intData());
-  else if (data.dataType() == "float")
-    Serial.println(data.floatData(), 5);
-  else if (data.dataType() == "double")
-    printf("%.9lf\n", data.doubleData());
-  else if (data.dataType() == "boolean")
-    Serial.println(data.boolData() == 1 ? "true" : "false");
-  else if (data.dataType() == "string" || data.dataType() == "null")
-    value = data.stringData().toInt();
-}
+//void flow()
+//{
+//  currentMillis = millis();
+//  if (currentMillis - previousMillis > interval && value == -1) {
+//    
+//    pulse1Sec = pulseCount;
+//    pulseCount = 0;
+//
+//    // Because this loop may not complete in exactly 1 second intervals we calculate
+//    // the number of milliseconds that have passed since the last execution and use
+//    // that to scale the output. We also apply the calibrationFactor to scale the output
+//    // based on the number of pulses per second per units of measure (litres/minute in
+//    // this case) coming from the sensor.
+//    flowRate = ((1000.0 / (millis() - previousMillis)) * pulse1Sec) / calibrationFactor;
+//    previousMillis = millis();
+//
+//    // Divide the flow rate in litres/minute by 60 to determine how many litres have
+//    // passed through the sensor in this 1 second interval, then multiply by 1000 to
+//    // convert to millilitres.
+//    flowMilliLitres = (flowRate / 60) * 1000;
+//
+//    // Add the millilitres passed in this second to the cumulative total
+//    totalMilliLitres += flowMilliLitres;
+//    
+//    // Print the flow rate for this second in litres / minute
+//    Serial.print("Flow rate: ");
+//    Serial.print(int(flowRate));  // Print the integer part of the variable
+//    Serial.print("L/min");
+//    Serial.print("\t");       // Print tab space
+//
+//    // Print the cumulative total of litres flowed since starting
+//    Serial.print("Output Liquid Quantity: ");
+//    Serial.print(totalMilliLitres);
+//    Serial.print("mL / ");
+//    Serial.print(totalMilliLitres / 1000);
+//    Serial.println("L");
+//    FirebaseJson water;
+//    water.set("totalFlow", round(totalMilliLitres));  
+//    water.set("flowRate", round(flowRate));
+//    Firebase.updateNode(firebaseData1, "/", water);
+//  }
+//}

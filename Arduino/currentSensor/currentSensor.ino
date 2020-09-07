@@ -33,7 +33,7 @@ void setup() {
 }
 
 void loop() {
-  emon1.calcVI(20,2000);         // Calculate all. No.of half wavelengths (crossings), time-out
+  emon1.calcVI(20,2000);           // Calculate all. No.of half wavelengths (crossings), time-out
   float currentDraw = emon1.Irms; //extract Irms into Variable
   float supplyVoltage = emon1.Vrms;
   current = round(currentDraw*100);
@@ -51,5 +51,4 @@ void loop() {
 void requestEvent() {
   Wire.write(current); // respond with message of 6 bytes
   // as expected by master
-  Serial.println(current);
 }

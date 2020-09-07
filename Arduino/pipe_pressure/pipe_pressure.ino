@@ -14,7 +14,16 @@
 
 // define device I2C address: 0x76 or 0x77 (0x77 is library default address)
 #define BMP280_I2C_ADDRESS  0x76
- 
+
+int X;
+int Y;
+float TIME = 0;
+float FREQUENCY = 0;
+float WATER = 0;
+float TOTAL = 0;
+float LS = 0;
+const int input = A2;
+
 Adafruit_BMP280 bmp280;
 int D3 = 3;
 String id = "1234";
@@ -26,6 +35,7 @@ void setup() {
   Serial.begin(9600);
   while (!Serial);
   pinMode(D3, INPUT);
+  pinMode(input,INPUT);
   Serial.println("pressure");
 
   if (!LoRa.begin(433E6)) {
@@ -71,6 +81,27 @@ void loop()
     }
   }
   Serial.println();  // start a new line
-  delay(2000);       // wait 2 seconds
-  
+  delay(2000);       // wait 2 seconds  
+}
+
+void waterFlow(){
+  X = pulseIn(input, HIGH);
+  Y = pulseIn(input, LOW);
+  TIME = X + Y;
+  FREQUENCY = 1000000/TIME;
+  WATER = FREQUENCY/7.5;
+  LS = WATER/60;
+  if(FREQUENCY >= 0) {
+    if(isinf(FREQUENCY)){
+      Serial.println("VOL.: 0.00 L\\M");
+      Serial.println("Total: " + String(TOTAL) + " L");
+    }
+    else{
+      TOTAL = TOTAL + LS;
+      Serial.println(FREQUENCY);
+      Serial.println("Volume: " + String(WATER) + " L\\M");
+      Serial.println("Total: " + String(TOTAL) + " L");
+
+    }
+  } 
 }

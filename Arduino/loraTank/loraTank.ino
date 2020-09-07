@@ -4,6 +4,7 @@
 
 long t = 0;
 int i = 0;
+int low = 0;
 
 int D3 = 3;
 String id = "1234";
@@ -53,7 +54,8 @@ void loop() {
             t = millis(); 
             Serial.println("Sending Signal....");  
         }
-        if( (String(buffer[2]) == "waterStop" && String(buffer[1]) == "state") && String(buffer[0]) == area ){
+        if(( (String(buffer[2]) == "waterStop" && String(buffer[1]) == "state") && String(buffer[0]) == area ) ){
+          low = 0;
           break;
         }
       }
@@ -93,8 +95,12 @@ void getType() {
       delay(2000);
       LoRa.beginPacket();
       LoRa.print( String(area) + ":" + String(id) + ":" + String(buffer[1]) + ":" + String(buffer[2]) + ":" + String(voltage) + ":");
-      Serial.println("current");
-      LoRa.endPacket();      
+      Serial.println(String(buffer[2]));
+      LoRa.endPacket(); 
+//      if(String(buffer[2]) == "0.00"){
+//       Serial.println("Current low");
+//       low = 1; 
+//      }
     }
   }  
 }
