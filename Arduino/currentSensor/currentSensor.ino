@@ -38,7 +38,6 @@ void loop() {
   float supplyVoltage = emon1.Vrms;
   current = round(currentDraw*100);
   Serial.println(currentDraw);
-  Serial.println(digitalRead(D5));
   if(currentDraw < 0.16){
     digitalWrite(D5, LOW);  
   }else{

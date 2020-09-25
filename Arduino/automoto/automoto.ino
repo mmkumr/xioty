@@ -31,7 +31,7 @@ float t = 0.0;
 #define FIREBASE_HOST "automoto-143.firebaseio.com"
 #define FIREBASE_AUTH "RgzejSsoAQpbkTg4OAkd2mMWtsJPm9VN1vpeB7dk"
 #define WIFI_SSID "mmkumr"
-#define WIFI_PASSWORD "244466666"
+#define WIFI_PASSWORD "P@$$w0rd"
 
 
 //Define FirebaseESP8266 data object
