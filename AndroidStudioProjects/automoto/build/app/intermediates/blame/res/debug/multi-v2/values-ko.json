@@ -1,7 +1,7 @@
 {
     "logs": [
         {
-            "outputFile": "/home/mmkumr/AndroidStudioProjects/automoto/build/app/intermediates/incremental/mergeDebugResources/merged.dir/values-ko/values-ko.xml",
+            "outputFile": "/home/mmkumr/Downloads/Eshwar_bhai_projects/AndroidStudioProjects/automoto/build/app/intermediates/incremental/mergeDebugResources/merged.dir/values-ko/values-ko.xml",
             "map": [
                 {
                     "source": "/home/mmkumr/.gradle/caches/transforms-2/files-2.1/3aaf6e5219b7f981ec263df919098c6f/core-1.1.0/res/values-ko/values-ko.xml",

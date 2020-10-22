@@ -136,6 +136,12 @@ void loop()
     Serial.println("off");
     value = -1;
   }
+  updateData.clear();
+  updateData.set("status", "ok");
+  Firebase.updateNode(firebaseData1, "/wirelessmotor", updateData);
+  Serial.println(firebaseData1.dataPath());
+  Serial.println(firebaseData1.dataType());
+  Serial.println(firebaseData1.jsonString());
   emon1.calcVI(20,2000);           // Calculate all. No.of half wavelengths (crossings), time-out
   float currentDraw = emon1.Irms; //extract Irms into Variable
   float supplyVoltage = emon1.Vrms;

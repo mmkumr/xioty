@@ -54,6 +54,7 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   DatabaseReference _firebase = FirebaseDatabase.instance.reference();
   String motor = "0";
+  int current = 0;
   double motorCurrent = 0.0;
   double pipePressure = 0.0;
   double tankBattery = 0;
@@ -140,7 +141,13 @@ class _MyHomePageState extends State<MyHomePage> {
                               ),
                             ),
                           ),
-                          onTap: () {},
+                          onTap: () {
+                            if(current == 0) {
+                              send(1);
+                            } else {
+                              send(0);
+                            }
+                          },
                         ),
                       ),
                     ),
@@ -305,6 +312,7 @@ class _MyHomePageState extends State<MyHomePage> {
     return _firebase.once().then((DataSnapshot value){
       setState(() {
         motor = value.value["button"];
+        current = value.value["send"];
         motorCurrent = value.value["motorCurrent"];
         pipePressure = value.value["pipePressure"];
         tankBattery = value.value["tankBattery"];
@@ -319,6 +327,12 @@ class _MyHomePageState extends State<MyHomePage> {
   void writeData(String data){
     _firebase.update({
       "button": data
+    });
+  }
+
+  void send(int data){
+    _firebase.update({
+      "send": data
     });
   }
 

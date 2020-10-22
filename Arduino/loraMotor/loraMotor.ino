@@ -1,97 +1,117 @@
+#include <Wire.h>
 #include <SPI.h>
 #include <LoRa.h>
-#include "EmonLib.h"             // Include Emon Library
+#include "ACS712.h"
 
-#define VOLT_CAL 151.0
-#define CURRENT_CAL 4.6
+#define ss 5
+#define rst 14
+#define dio0 2
 
-EnergyMonitor emon1;
+int s = 0;
+int current = 0;
 
-int D3 = 3;
-int D7 = 7;
-int D5 = 5;
+double Irms;
+
+// Arduino UNO has 5.0 volt with a max ADC value of 1023 steps
+// ACS712 5A  uses 185 mV per A
+// ACS712 20A uses 100 mV per A
+// ACS712 30A uses  66 mV per A
+
+ACS712  ACS(A0, 5.0, 1023, 185);
+// ESP 32 example (requires resistors to step down the logic voltage)
+//ACS712  ACS(25, 5.0, 4095, 185);
 
 int i = 0;
-
 String id = "1234";
-
 int length = 25;
-char buffer [3][25];
-char termChar = ':';
+char buffer[6][50]; //variable for storing the data received to lora
+char termChar = ':'; //Termination character for lora data.
 
-long t;
+long t; //variable for storing time.
 
-void setup() {
+int led = 3;
+int relay = 7;
+
+
+
+void setup(){
+  pinMode(led, OUTPUT);
+  pinMode(relay, OUTPUT);
   
-  pinMode(D3, OUTPUT);
-  pinMode(D7, OUTPUT);
-  pinMode(D5, INPUT);
-
-  emon1.voltage(1, VOLT_CAL, 1.7);  // Voltage: input pin, calibration, phase_shift
-  emon1.current(0, CURRENT_CAL);
-
   Serial.begin(9600);
-
+    
   while (!Serial);
-
+//  LoRa.setPins(ss, rst, dio0);
   Serial.println("Motor");
 
   if (!LoRa.begin(433E6)) {
     Serial.println("Starting LoRa failed!");
     while (1);
   }
-  emon1.calcVI(20,2000);           // Calculate all. No.of half wavelengths (crossings), time-out
-  float currentDraw = emon1.Irms; //extract Irms into Variable
-  float supplyVoltage = emon1.Vrms;
+  ACS.autoMidPoint();
+  Serial.print("MidPoint: ");
+  Serial.print(ACS.getMidPoint());
+  Serial.print(". Noise mV: ");
+  Serial.println(ACS.getNoisemV());  
 }
 
-
-void loop() {
+void loop(){
   int packetSize = LoRa.parsePacket();
   if(packetSize) {
-    getLora();  
+    getLora(); 
     if( (String(buffer[2]) == "motor" && String(buffer[1]) == "state") && String(buffer[0]) == id ){
-      digitalWrite(D3, HIGH);
-      digitalWrite(D7, HIGH);
+      digitalWrite(led, HIGH);
+      digitalWrite(relay, HIGH);
       t = millis() * 1.000;
-      int cont = 0;
-      while((millis() - t)/1000 != 35.0) {
+      delay(2000);
+      Serial.println(ACS.mA_AC()/1000.00);
+      Serial.println(id + ":" + "motorCurrent:" + String(ACS.mA_AC()/1000.00).c_str() + ":");
+      LoRa.beginPacket(); 
+      LoRa.print(id + ":" + "motorCurrent:" + String(ACS.mA_AC()/1000.00).c_str() + ":");  
+      LoRa.endPacket();  
+      t = millis();
+      s = 0;
+      current = 0;
+      while(s == 0){
         packetSize = LoRa.parsePacket();
         if (packetSize) {
           getLora();
-          if( (String(buffer[2]) == "motor" && String(buffer[1]) == "state") && String(buffer[0]) == id ){
-              emon1.calcVI(20,2000);           // Calculate all. No.of half wavelengths (crossings), time-out
-              float currentDraw = emon1.Irms; //extract Irms into Variable
-              float supplyVoltage = emon1.Vrms;
-              Serial.println(currentDraw);
-              if(currentDraw < 0.25){
-                Serial.println("low");
-                break;  
-              }
-              Serial.println(currentDraw);
-              LoRa.beginPacket(); 
-              LoRa.print(id + ":" + "motorCurrent:" + String(currentDraw) + ":");  
-              Serial.println(id + ":" + "motorCurrent:" + String(currentDraw) + ":");
-              LoRa.endPacket();  
-              t = millis();               
-          }
           if( (String(buffer[2]) == "motorStop" && String(buffer[1]) == "state") && String(buffer[0]) == id ) {
-            break;  
+            s = 1;  
+          }
+          else if( (String(buffer[2]) == "sendCurrent" && String(buffer[1]) == "state") && String(buffer[0]) == id ) {
+            current = 1;  
+            Serial.println("Calculating..");
           }
         }
-      } 
-      
+        else if((millis() - t)/1000 == 5.0){
+            if(current == 1){
+              Serial.println(id + ":" + "motorCurrent:" + String(ACS.mA_AC()/1000.00).c_str() + ":");
+              LoRa.beginPacket(); 
+              LoRa.print(id + ":" + "motorCurrent:" + String(ACS.mA_AC()/1000.00).c_str() + ":");  
+              LoRa.endPacket();
+              current = 0;
+            }
+            Serial.println("running");
+            if( (ACS.mA_AC()/1000.00) < 0.25){
+              Serial.println("low");
+              s = 1; 
+            }
+            t = millis();
+        }
+        
+      }
+      digitalWrite(led, LOW);
+      digitalWrite(relay, LOW);
+      delay(6000);
+      Serial.println(id + ":" + "motorCurrent:" + String(0.0) + ":");
       LoRa.beginPacket(); 
       LoRa.print(id + ":" + "motorCurrent:" + String(0.0) + ":");  
-      Serial.println(id + ":" + "motorCurrent:" + String(0.0) + ":");
       LoRa.endPacket();
       Serial.println("Stopping motor");
-      digitalWrite(D3, LOW);
-      digitalWrite(D7, 0);
     }
   }
 }
-
 
 void getLora(){
   while(LoRa.available()) {

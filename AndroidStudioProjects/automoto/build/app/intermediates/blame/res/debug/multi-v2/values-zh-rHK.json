@@ -1,7 +1,7 @@
 {
     "logs": [
         {
-            "outputFile": "/home/mmkumr/AndroidStudioProjects/automoto/build/app/intermediates/incremental/mergeDebugResources/merged.dir/values-zh-rHK/values-zh-rHK.xml",
+            "outputFile": "/home/mmkumr/Downloads/Eshwar_bhai_projects/AndroidStudioProjects/automoto/build/app/intermediates/incremental/mergeDebugResources/merged.dir/values-zh-rHK/values-zh-rHK.xml",
             "map": [
                 {
                     "source": "/home/mmkumr/.gradle/caches/transforms-2/files-2.1/9b806cc71296e01a86c2cbc5d704cc19/appcompat-1.0.0/res/values-zh-rHK/values-zh-rHK.xml",

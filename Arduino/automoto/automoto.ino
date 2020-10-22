@@ -1,17 +1,3 @@
-/*
- * Created by K. Suwatchai (Mobizt)
- * 
- * Email: k_suwatchai@hotmail.com
- * 
- * Github: https://github.com/mobizt
- * 
- * Copyright (c) 2020 mobizt
- * 
- * This example is for FirebaseESP8266 Arduino library v 3.7.3 or newer
- *
-*/
-
-#include <WiFi.h>
 #include <FirebaseESP32.h>
 #include <LoRa.h>
 
@@ -27,6 +13,7 @@ char termChar = ':';
 int i = 0;
 int change = 0;
 float t = 0.0;
+int prev;
 
 #define FIREBASE_HOST "automoto-143.firebaseio.com"
 #define FIREBASE_AUTH "RgzejSsoAQpbkTg4OAkd2mMWtsJPm9VN1vpeB7dk"
@@ -44,10 +31,12 @@ volatile int value = -1;
 
 volatile int totalFlow = -1;
 
+volatile int need = 0;
+
 
 String parentPath = "/";
-String childPath[1] = {"/button"};
-size_t childPathSize = 1;
+String childPath[2] = {"/button", "/send"};
+size_t childPathSize = 2;
 
 uint16_t count = 0;
 
@@ -69,6 +58,9 @@ void streamCallback(MultiPathStreamData stream)
       //Serial.println("path: " + stream.dataPath + ", type: " + stream.type + ", value: " + stream.value);
       if(path == "/button"){
         value = temp.toInt();
+      }
+      if(path == "/send"){
+        need = temp.toInt();
       }
     }
   }
@@ -160,6 +152,30 @@ void setup()
 //  previousMillis = 0;
 //
 //  attachInterrupt(digitalPinToInterrupt(SENSOR), pulseCounter, FALLING);
+
+  Firebase.getString(firebaseData1, "/button");
+  value = firebaseData1.stringData().toInt();
+  if(value == 1){
+    LoRa.beginPacket();  
+    LoRa.print(area + ":" + "state:" + "water:");
+    LoRa.endPacket();
+    Serial.println("Motor on");  
+    t = millis();
+    updateData.clear();
+    pipeData.clear();
+    updateData.set("motorCurrent", 0.001);
+    Firebase.updateNode(firebaseData2, "/", updateData);
+    Serial.println(firebaseData2.dataPath());
+    Serial.println(firebaseData2.dataType());
+    Serial.println(firebaseData2.jsonString());
+    prev = 1;
+  } else if(value == 0){
+    LoRa.beginPacket();  
+    LoRa.print(area + ":" + "state:" + "waterStop:");
+    LoRa.endPacket();
+    Serial.println("Motor off");
+    prev = 0;
+  }
 }
 
 void loop()
@@ -167,39 +183,36 @@ void loop()
   if(LoRa.parsePacket()) {
     getLora();
   }
-  else if(value == 1){
+  else if(value == 1 && prev == 0){
     LoRa.beginPacket();  
     LoRa.print(area + ":" + "state:" + "water:");
     LoRa.endPacket();
     Serial.println("Motor on");  
     t = millis();
-    value = -1;
-//    water = 0;
-  } else if(value == 0){
+    prev = 1;
+    updateData.clear();
+    pipeData.clear();
+    updateData.set("motorCurrent", 0.001);
+    Firebase.updateNode(firebaseData2, "/", updateData);
+  } 
+  else if(value == 0 && prev == 1){
     LoRa.beginPacket();  
     LoRa.print(area + ":" + "state:" + "waterStop:");
     LoRa.endPacket();
     Serial.println("Motor off");
-//    water = 1;
-    value = -1;
+    prev = 0;
   }
-//  else if(water == 1){
-//    flow();  
-//  }
-
-  if((millis() - t)/1000 == 25.0){
-    updateData.set("button", "0");  
-    updateData.set("motorCurrent", 0.001);
-    pipeData.set("pipePressure", 0.001);
-    Firebase.updateNode(firebaseData1, "/", updateData);
-    Serial.println(firebaseData1.dataPath());
-    Serial.println(firebaseData1.dataType());
-    Serial.println(firebaseData1.jsonString());
-    Firebase.updateNode(firebaseData1, "/", pipeData);
-    Serial.println(firebaseData1.dataPath());
-    Serial.println(firebaseData1.dataType());
-    Serial.println(firebaseData1.jsonString());
+  if(need == 1){
+    updateData.clear();
+    updateData.set("send", 0);
+    need = 0;
+    Firebase.updateNode(firebaseData2, "/", updateData);
+    LoRa.beginPacket();  
+    LoRa.print(area + ":" + "state:" + "sendCurrent:");
+    LoRa.endPacket();
+    Serial.println("send current");
   }
+  
 }
 
 void getLora(){
@@ -226,92 +239,63 @@ void getLora(){
   if(change == 1){
     if((String(buffer[0]) == area && String(buffer[1]) == id) && (String(buffer[2]) == "motorCurrent") ){  
       if( String(buffer[3]).toFloat() == 0.0 ){ 
+        updateData.clear();
+        pipeData.clear();
         Serial.println("stopping");
         FirebaseJson tankData;
         updateData.set("button", "0");
         updateData.set("motorCurrent", 0.001);
-        Firebase.updateNode(firebaseData1, "/", updateData);
-        value = -1;
+        Firebase.updateNode(firebaseData2, "/", updateData);
       }else{
-        Serial.println("continue");
+        updateData.clear();
+        pipeData.clear();
         updateData.set("motorCurrent", String(buffer[3]).toFloat() );
-        Firebase.updateNode(firebaseData1, "/", updateData);
-        updateData.set("button", "1");
-        Firebase.updateNode(firebaseData1, "/", updateData);
+        Firebase.updateNode(firebaseData2, "/", updateData);
         FirebaseJson tankData;
         tankData.set("tankBattery", String(buffer[4]).toFloat());
-        Firebase.updateNode(firebaseData1, "/", tankData);
-        Serial.println(firebaseData1.dataPath());
-        Serial.println(firebaseData1.dataType());
-        Serial.println(firebaseData1.jsonString());
+        Firebase.updateNode(firebaseData2, "/", tankData);
+        Serial.println(firebaseData2.dataPath());
+        Serial.println(firebaseData2.dataType());
+        Serial.println(firebaseData2.jsonString());
         t = millis();
-        value = -1;
       }
     }
 
     
    if((String(buffer[0]) == area && String(buffer[1]) == "pipePressure") ){
+      updateData.clear();
+      pipeData.clear();
       Serial.println("water in pipe");
       pipeData.set("pipePressure",String(buffer[2]).toFloat());
       pipeData.set("pipeBattery", String(buffer[3]).toFloat());
       pipeData.set("button", "1");
       pipeData.set("motorCurrent", 0.001);
-      Firebase.updateNode(firebaseData1, "/", pipeData);
-      Serial.println(firebaseData1.dataPath());
-      Serial.println(firebaseData1.dataType());
-      Serial.println(firebaseData1.jsonString()); 
+      Firebase.updateNode(firebaseData2, "/", pipeData);
+      Serial.println(firebaseData2.dataPath());
+      Serial.println(firebaseData2.dataType());
+      Serial.println(firebaseData2.jsonString()); 
       Serial.println("water started");
+      LoRa.beginPacket();  
+      LoRa.print(area + ":" + "state:" + "water:");
+      LoRa.endPacket();
+      Serial.println("Motor on");  
+      t = millis();
     }  
 
-    
-    
+    if((String(buffer[0]) == area && String(buffer[1]) == "pipeFlow") ){
+      updateData.clear();
+      pipeData.clear();
+      pipeData.set("flowRate", atoi(String(buffer[2]).c_str()) );
+      pipeData.set("totalFlow", atoi(String(buffer[3]).c_str()) );
+      Firebase.updateNode(firebaseData2, "/", pipeData);
+      Serial.println(firebaseData2.dataPath());
+      Serial.println(firebaseData2.dataType());
+      Serial.println(firebaseData2.jsonString()); 
+    }
+
     change = 0;
   }
   Serial.println(change);
   updateData.clear();
   pipeData.clear();
 }
-
-
-//void flow()
-//{
-//  currentMillis = millis();
-//  if (currentMillis - previousMillis > interval && value == -1) {
-//    
-//    pulse1Sec = pulseCount;
-//    pulseCount = 0;
-//
-//    // Because this loop may not complete in exactly 1 second intervals we calculate
-//    // the number of milliseconds that have passed since the last execution and use
-//    // that to scale the output. We also apply the calibrationFactor to scale the output
-//    // based on the number of pulses per second per units of measure (litres/minute in
-//    // this case) coming from the sensor.
-//    flowRate = ((1000.0 / (millis() - previousMillis)) * pulse1Sec) / calibrationFactor;
-//    previousMillis = millis();
-//
-//    // Divide the flow rate in litres/minute by 60 to determine how many litres have
-//    // passed through the sensor in this 1 second interval, then multiply by 1000 to
-//    // convert to millilitres.
-//    flowMilliLitres = (flowRate / 60) * 1000;
-//
-//    // Add the millilitres passed in this second to the cumulative total
-//    totalMilliLitres += flowMilliLitres;
-//    
-//    // Print the flow rate for this second in litres / minute
-//    Serial.print("Flow rate: ");
-//    Serial.print(int(flowRate));  // Print the integer part of the variable
-//    Serial.print("L/min");
-//    Serial.print("\t");       // Print tab space
-//
-//    // Print the cumulative total of litres flowed since starting
-//    Serial.print("Output Liquid Quantity: ");
-//    Serial.print(totalMilliLitres);
-//    Serial.print("mL / ");
-//    Serial.print(totalMilliLitres / 1000);
-//    Serial.println("L");
-//    FirebaseJson water;
-//    water.set("totalFlow", round(totalMilliLitres));  
-//    water.set("flowRate", round(flowRate));
-//    Firebase.updateNode(firebaseData1, "/", water);
-//  }
-//}
