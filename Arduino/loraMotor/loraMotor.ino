@@ -8,9 +8,10 @@
 #define dio0 2
 
 int s = 0;
-int current = 0;
+int sendc = 0;
+float current;
 
-double Irms;
+char irms[6];
 
 // Arduino UNO has 5.0 volt with a max ADC value of 1023 steps
 // ACS712 5A  uses 185 mV per A
@@ -64,14 +65,23 @@ void loop(){
       digitalWrite(relay, HIGH);
       t = millis() * 1.000;
       delay(2000);
-      Serial.println(ACS.mA_AC()/1000.00);
-      Serial.println(id + ":" + "motorCurrent:" + String(ACS.mA_AC()/1000.00).c_str() + ":");
+      current = ACS.mA_AC()/1000.00;
+      Serial.println(id + ":" + "motorCurrent:" + String(current).c_str() + ":");
       LoRa.beginPacket(); 
-      LoRa.print(id + ":" + "motorCurrent:" + String(ACS.mA_AC()/1000.00).c_str() + ":");  
-      LoRa.endPacket();  
+      LoRa.print(id + ":" + "motorCurrent:" + String(current).c_str() + ":");  
+      //LoRa.endPacket();
+      if(!LoRa.endPacket()){
+        Serial.println("LoRa failed to send");  
+        LoRa.begin(433E6);
+        current = ACS.mA_AC()/1000.00;
+        LoRa.beginPacket(); 
+        LoRa.print(id + ":" + "motorCurrent:" + String(current).c_str() + ":");
+        LoRa.endPacket();
+      }
+      LoRa.begin(433E6);
       t = millis();
       s = 0;
-      current = 0;
+      sendc = 0;
       while(s == 0){
         packetSize = LoRa.parsePacket();
         if (packetSize) {
@@ -80,35 +90,50 @@ void loop(){
             s = 1;  
           }
           else if( (String(buffer[2]) == "sendCurrent" && String(buffer[1]) == "state") && String(buffer[0]) == id ) {
-            current = 1;  
+            sendc = 1;  
             Serial.println("Calculating..");
           }
         }
         else if((millis() - t)/1000 == 5.0){
-            if(current == 1){
-              Serial.println(id + ":" + "motorCurrent:" + String(ACS.mA_AC()/1000.00).c_str() + ":");
+            if(sendc == 1){
+              current = ACS.mA_AC()/1000.00;
+              Serial.println(id + ":" + "motorCurrent:" + String(current).c_str() + ":");
               LoRa.beginPacket(); 
-              LoRa.print(id + ":" + "motorCurrent:" + String(ACS.mA_AC()/1000.00).c_str() + ":");  
-              LoRa.endPacket();
-              current = 0;
+              LoRa.print(id + ":" + "motorCurrent:" + String(current).c_str() + ":");  
+              if(!LoRa.endPacket()){
+                Serial.println("LoRa failed to send");
+                current = ACS.mA_AC()/1000.00;
+                LoRa.beginPacket(); 
+                LoRa.print(id + ":" + "motorCurrent:" + String(current).c_str() + ":");
+                LoRa.endPacket();
+              }
+              LoRa.begin(433E6);
+
+              sendc = 0;
+              
             }
-            Serial.println("running");
             if( (ACS.mA_AC()/1000.00) < 0.25){
               Serial.println("low");
               s = 1; 
             }
             t = millis();
         }
-        
+
       }
       digitalWrite(led, LOW);
       digitalWrite(relay, LOW);
-      delay(6000);
-      Serial.println(id + ":" + "motorCurrent:" + String(0.0) + ":");
+      Serial.println(id + ":" + "motorCurrent:" + String(0.0).c_str() + ":");
       LoRa.beginPacket(); 
-      LoRa.print(id + ":" + "motorCurrent:" + String(0.0) + ":");  
-      LoRa.endPacket();
+      LoRa.print(id + ":" + "motorCurrent:" + String(0.0).c_str() + ":");  
+      if(!LoRa.endPacket()){
+        Serial.println("LoRa failed to send");
+        LoRa.beginPacket(); 
+        LoRa.print(id + ":" + "motorCurrent:" + String(0.0).c_str() + ":");
+        LoRa.endPacket();
+      }
+      LoRa.begin(433E6);
       Serial.println("Stopping motor");
+      
     }
   }
 }
