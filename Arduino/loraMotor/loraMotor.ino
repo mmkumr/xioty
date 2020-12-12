@@ -58,23 +58,25 @@ void loop(){
         c = Wire.read(); // receive a byte as character
       }
       current = c/100.00;
-      Serial.println(id + ":" + "motorCurrent:" + String(current).c_str() + ":");
+      LoRa.begin(433E6);
       LoRa.beginPacket(); 
-      LoRa.print(id + ":" + "motorCurrent:" + String(current).c_str() + ":");  
-      //LoRa.endPacket();
-      if(!LoRa.endPacket()){
-        Serial.println("LoRa failed to send");  
-        LoRa.begin(433E6);
-        Wire.requestFrom(8, 1);    // request 6 bytes from slave device #8
+      LoRa.println(id + ":" + "motorCurrent:" + String(c) + ":");  
+      LoRa.endPacket();
+      Serial.println(id + ":" + "motorCurrent:" + String(c) + ":");
 
-        while (Wire.available()) { // slave may send less than requested
-          c = Wire.read(); // receive a byte as character
-        }
-        current = c/100.00;
-        LoRa.beginPacket(); 
-        LoRa.print(id + ":" + "motorCurrent:" + String(current).c_str() + ":");
-        LoRa.endPacket();
-      }
+//      if(!LoRa.endPacket()){
+//        Serial.println("LoRa failed to send");  
+//        LoRa.begin(433E6);
+//        Wire.requestFrom(8, 1);    // request 6 bytes from slave device #8
+//
+//        while (Wire.available()) { // slave may send less than requested
+//          c = Wire.read(); // receive a byte as character
+//        }
+//        current = c/100.00;
+//        LoRa.beginPacket(); 
+//        LoRa.print(id + ":" + "motorCurrent:" + String(current).c_str() + ":");
+//        LoRa.endPacket();
+//      }
       LoRa.begin(433E6);
       t = millis();
       s = 0;
@@ -104,21 +106,22 @@ void loop(){
                 c = Wire.read(); // receive a byte as character
               }
               current = c/100.00;
-              Serial.println(id + ":" + "motorCurrent:" + String(current).c_str() + ":");
+              Serial.println(id + ":" + "motorCurrent:" + String(c) + ":");
               LoRa.beginPacket(); 
-              LoRa.print(id + ":" + "motorCurrent:" + String(current).c_str() + ":");  
-              if(!LoRa.endPacket()){
-                Serial.println("LoRa failed to send");
-                Wire.requestFrom(8, 1);    // request 6 bytes from slave device #8
-
-                while (Wire.available()) { // slave may send less than requested
-                  c = Wire.read(); // receive a byte as character
-                }
-                current = c/100.00;
-                LoRa.beginPacket(); 
-                LoRa.print(id + ":" + "motorCurrent:" + String(current).c_str() + ":");
-                LoRa.endPacket();
-              }
+              LoRa.println(id + ":" + "motorCurrent:" + String(c) + ":");  
+              LoRa.endPacket();
+//              if(!LoRa.endPacket()){
+//                Serial.println("LoRa failed to send");
+//                Wire.requestFrom(8, 1);    // request 6 bytes from slave device #8
+//
+//                while (Wire.available()) { // slave may send less than requested
+//                  c = Wire.read(); // receive a byte as character
+//                }
+//                current = c/100.00;
+//                LoRa.beginPacket(); 
+//                LoRa.println(id + ":" + "motorCurrent:" + String(current).c_str() + ":");
+//                LoRa.endPacket();
+//              }
               LoRa.begin(433E6);
 
               sendc = 0;
@@ -140,15 +143,16 @@ void loop(){
       }
       digitalWrite(led, LOW);
       digitalWrite(relay, LOW);
-      Serial.println(id + ":" + "motorCurrent:" + String(0.0).c_str() + ":");
+      Serial.println(id + ":" + "motorCurrent:" + "0.0" + ":");
       LoRa.beginPacket(); 
-      LoRa.print(id + ":" + "motorCurrent:" + String(0.0).c_str() + ":");  
-      if(!LoRa.endPacket()){
-        Serial.println("LoRa failed to send");
-        LoRa.beginPacket(); 
-        LoRa.print(id + ":" + "motorCurrent:" + String(0.0).c_str() + ":");
-        LoRa.endPacket();
-      }
+      LoRa.println(id + ":" + "motorCurrent:" + "0.0" + ":");  
+      LoRa.endPacket();
+//      if(!LoRa.endPacket()){
+//        Serial.println("LoRa failed to send");
+//        LoRa.beginPacket(); 
+//        LoRa.println(id + ":" + "motorCurrent:" + String(0.0).c_str() + ":");
+//        LoRa.endPacket();
+//      }
       LoRa.begin(433E6);
       Serial.println("Stopping motor");
       

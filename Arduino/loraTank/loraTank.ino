@@ -82,11 +82,15 @@ void loop() {
 
 
 void getLora(){
+  int ok = 0;
   while(LoRa.available()) {
     int numChars = LoRa.readBytesUntil(termChar, buffer[i], length);
     buffer[i][numChars]='\0';
     Serial.println(buffer[i]);
     Serial.println(i);
+    if(String(buffer[0]) == id){
+      ok = 1;
+    }
     if( i == 2 || (String(buffer[0]) != area && String(buffer[0]) != id) ){
       i = 0;
     }
@@ -96,22 +100,25 @@ void getLora(){
   }
   LoRa.packetRssi();  
   i = 0;
-  Serial.println();
+  if(ok == 1){
+    strcpy(buffer[0], "1234");  
+    ok = 0;
+  }
 }
 
 void getType() {
   if( String(buffer[0]) == id ){
+    Serial.println(buffer[0]);
     if(String(buffer[1]) == "motorCurrent"){
       int sensorValue = analogRead(A0);
       float voltage = sensorValue * (4.15 / 1023.0);
-      if(String(buffer[2]) == "0.00"){
-       Serial.println(buffer[2]);
+      if(String(buffer[2]) == "0.0"){
        low = 1; 
       }
       delay(1000);
       LoRa.beginPacket();
-      LoRa.print( String(area) + ":" + String(id) + ":" + String(buffer[1]) + ":" + String(buffer[2]) + ":" + String(voltage) + ":");
-      Serial.println(String(buffer[2]));
+      LoRa.println( String(area) + ":" + String(id) + ":" + String(buffer[1]) + ":" + String(buffer[2]) + ":" + String(voltage) + ":");
+      Serial.println( String(area) + ":" + String(id) + ":" + String(buffer[1]) + ":" + String(buffer[2]) + ":" + String(voltage) + ":");
       LoRa.endPacket(); 
     }
   } 

@@ -6,6 +6,7 @@
 #define dio0 2
 String id = "1234";
 String area = "a1234";
+char tank[5];
 
 int length = 20;
 char buffer [5][20];
@@ -231,11 +232,15 @@ void getLora(){
     }else if((i == 3 && String(buffer[2]) == "motorCurrent")){
       ++i;
     }
+    if(i == 4 && String(buffer[4]).toFloat() != 0){
+      strcpy(tank, buffer[4]);
+      Serial.println(buffer[4]);
+    }
     
   }
   LoRa.packetRssi(); 
   i = 0; 
-  Serial.println(i);
+  
   if(change == 1){
     if((String(buffer[0]) == area && String(buffer[1]) == id) && (String(buffer[2]) == "motorCurrent") ){  
       if( String(buffer[3]).toFloat() == 0.0 ){ 
@@ -249,10 +254,11 @@ void getLora(){
       }else{
         updateData.clear();
         pipeData.clear();
-        updateData.set("motorCurrent", String(buffer[3]).toFloat() );
+        float current = String(buffer[3]).toInt();
+        updateData.set("motorCurrent", current / 100.00);
         Firebase.updateNode(firebaseData2, "/", updateData);
         FirebaseJson tankData;
-        tankData.set("tankBattery", String(buffer[4]).toFloat());
+        tankData.set("tankBattery", String(tank).toFloat());
         Firebase.updateNode(firebaseData2, "/", tankData);
         Serial.println(firebaseData2.dataPath());
         Serial.println(firebaseData2.dataType());
