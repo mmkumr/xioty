@@ -8,39 +8,42 @@
 // Created 29 March 2006
 
 // This example code is in the public domain.
-volatile String current;
+int value;
 
 #include <Wire.h>
-#include "EmonLib.h"             // Include Emon Library
+#include "ACS712.h"
 
-#define VOLT_CAL 151.0
-#define CURRENT_CAL 4.4
 
-EnergyMonitor emon1;
+
+// Arduino UNO has 5.0 volt with a max ADC value of 1023 steps
+// ACS712 5A  uses 185 mV per A
+// ACS712 20A uses 100 mV per A
+// ACS712 30A uses  66 mV per A
+
+ACS712  ACS(A0, 5.0, 1023, 185);
 
 
 void setup() {
   Wire.begin(8);                // join i2c bus with address #8
   Wire.onRequest(requestEvent); // register event
-  emon1.voltage(1, VOLT_CAL, 1.7);  // Voltage: input pin, calibration, phase_shift
-  emon1.current(0, CURRENT_CAL);
-
+  ACS.autoMidPoint();
+  Serial.print("MidPoint: ");
+  Serial.print(ACS.getMidPoint());
+  Serial.print(". Noise mV: ");
+  Serial.println(ACS.getNoisemV()); 
   Serial.begin(9600);
 }
 
 void loop() {
-  emon1.calcVI(20,2000);           // Calculate all. No.of half wavelengths (crossings), time-out
-  float currentDraw = emon1.Irms; //extract Irms into Variable
-  float supplyVoltage = emon1.Vrms;
-  Serial.println(currentDraw);
-  current = String(currentDraw);
+  float current = ACS.mA_AC()/1000.00;
+  value = round(current * 100);
 }
 
 // function that executes whenever data is requested by master
 // this function is registered as an event, see setup()
 void requestEvent() {
-  Wire.write(current.c_str()); // respond with message of 6 bytes
+  Wire.write(value); // respond with message of 6 bytes
   Serial.print("Sending current: ");
-  Serial.println(current.c_str());
+  Serial.println(value);
   // as expected by master
 }

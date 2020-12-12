@@ -61,12 +61,12 @@ void loop()
   // get temperature, pressure and altitude from library
   float temperature = bmp280.readTemperature();  // get temperature
   float pressure    = bmp280.readPressure();     // get pressure
-  float altitude_   = bmp280.readAltitude(1013.25); // get altitude (this should be adjusted to your local forecast)
+  float altitude_   = bmp280.readAltitude(1000.25); // get altitude (this should be adjusted to your local forecast)
   voltage = sensorValue * (4.15 / 1023.0);
   Serial.print("Pressure    = ");
   Serial.print(round(pressure/100));
   Serial.println(" hPa");
-  if( round(pressure/100) > 1010){
+  if( round(pressure/100) > 1020){
     int v ;
     if(voltage < 4.0){
       v = 0;
@@ -76,7 +76,7 @@ void loop()
     LoRa.beginPacket();
     LoRa.print(area + ":" + "pipePressure:" + String(pressure/100) + ":" + String(voltage) + ":");
     LoRa.endPacket();
-    while(round(pressure/100) < 1005) {
+    while(round(pressure/100) < 1015) {
       ;  
     }
   }

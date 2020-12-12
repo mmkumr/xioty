@@ -1,7 +1,6 @@
 #include <Wire.h>
 #include <SPI.h>
 #include <LoRa.h>
-#include "ACS712.h"
 
 #define ss 5
 #define rst 14
@@ -10,17 +9,9 @@
 int s = 0;
 int sendc = 0;
 float current;
-
+int c;
 char irms[6];
 
-// Arduino UNO has 5.0 volt with a max ADC value of 1023 steps
-// ACS712 5A  uses 185 mV per A
-// ACS712 20A uses 100 mV per A
-// ACS712 30A uses  66 mV per A
-
-ACS712  ACS(A0, 5.0, 1023, 185);
-// ESP 32 example (requires resistors to step down the logic voltage)
-//ACS712  ACS(25, 5.0, 4095, 185);
 
 int i = 0;
 String id = "1234";
@@ -38,7 +29,7 @@ int relay = 7;
 void setup(){
   pinMode(led, OUTPUT);
   pinMode(relay, OUTPUT);
-  
+  Wire.begin();
   Serial.begin(9600);
     
   while (!Serial);
@@ -49,11 +40,7 @@ void setup(){
     Serial.println("Starting LoRa failed!");
     while (1);
   }
-  ACS.autoMidPoint();
-  Serial.print("MidPoint: ");
-  Serial.print(ACS.getMidPoint());
-  Serial.print(". Noise mV: ");
-  Serial.println(ACS.getNoisemV());  
+  
 }
 
 void loop(){
@@ -65,7 +52,12 @@ void loop(){
       digitalWrite(relay, HIGH);
       t = millis() * 1.000;
       delay(2000);
-      current = ACS.mA_AC()/1000.00;
+      Wire.requestFrom(8, 1);    // request 6 bytes from slave device #8
+
+      while (Wire.available()) { // slave may send less than requested
+        c = Wire.read(); // receive a byte as character
+      }
+      current = c/100.00;
       Serial.println(id + ":" + "motorCurrent:" + String(current).c_str() + ":");
       LoRa.beginPacket(); 
       LoRa.print(id + ":" + "motorCurrent:" + String(current).c_str() + ":");  
@@ -73,7 +65,12 @@ void loop(){
       if(!LoRa.endPacket()){
         Serial.println("LoRa failed to send");  
         LoRa.begin(433E6);
-        current = ACS.mA_AC()/1000.00;
+        Wire.requestFrom(8, 1);    // request 6 bytes from slave device #8
+
+        while (Wire.available()) { // slave may send less than requested
+          c = Wire.read(); // receive a byte as character
+        }
+        current = c/100.00;
         LoRa.beginPacket(); 
         LoRa.print(id + ":" + "motorCurrent:" + String(current).c_str() + ":");
         LoRa.endPacket();
@@ -96,13 +93,28 @@ void loop(){
         }
         else if((millis() - t)/1000 == 5.0){
             if(sendc == 1){
-              current = ACS.mA_AC()/1000.00;
+              Wire.requestFrom(8, 1);    // request 6 bytes from slave device #8
+
+              while (Wire.available()) { // slave may send less than requested
+                c = Wire.read(); // receive a byte as character
+              }
+              Wire.requestFrom(8, 1);    // request 6 bytes from slave device #8
+
+              while (Wire.available()) { // slave may send less than requested
+                c = Wire.read(); // receive a byte as character
+              }
+              current = c/100.00;
               Serial.println(id + ":" + "motorCurrent:" + String(current).c_str() + ":");
               LoRa.beginPacket(); 
               LoRa.print(id + ":" + "motorCurrent:" + String(current).c_str() + ":");  
               if(!LoRa.endPacket()){
                 Serial.println("LoRa failed to send");
-                current = ACS.mA_AC()/1000.00;
+                Wire.requestFrom(8, 1);    // request 6 bytes from slave device #8
+
+                while (Wire.available()) { // slave may send less than requested
+                  c = Wire.read(); // receive a byte as character
+                }
+                current = c/100.00;
                 LoRa.beginPacket(); 
                 LoRa.print(id + ":" + "motorCurrent:" + String(current).c_str() + ":");
                 LoRa.endPacket();
@@ -112,7 +124,13 @@ void loop(){
               sendc = 0;
               
             }
-            if( (ACS.mA_AC()/1000.00) < 0.25){
+            Wire.requestFrom(8, 1);    // request 6 bytes from slave device #8
+
+            while (Wire.available()) { // slave may send less than requested
+              c = Wire.read(); // receive a byte as character
+            }
+            current = c/100.00;
+            if(current < 0.25){
               Serial.println("low");
               s = 1; 
             }
