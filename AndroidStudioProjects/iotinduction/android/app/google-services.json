@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "336305686899",
+    "firebase_url": "https://iot-induction-default-rtdb.firebaseio.com",
+    "project_id": "iot-induction",
+    "storage_bucket": "iot-induction.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:336305686899:android:3fbe6cae3f8a9667eadd06",
+        "android_client_info": {
+          "package_name": "com.example.iotinduction"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "336305686899-b6bt8vfb6irhpq88jpvhs3gon670uuef.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.iotinduction",
+            "certificate_hash": "a0ae164ed2c1cdf2bc8b9e09a184a21a5324f16e"
+          }
+        },
+        {
+          "client_id": "336305686899-9219od47jvamsa3up3mdbog5c1t387s6.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDA2hSo0BrYeilTW87plmJo7GH9tJwTAJA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "336305686899-9219od47jvamsa3up3mdbog5c1t387s6.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

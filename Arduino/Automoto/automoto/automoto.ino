@@ -1,4 +1,4 @@
-#include <FirebaseESP32.h>
+#include "FirebaseESP32.h"
 #include <LoRa.h>
 
 #define ss 5
@@ -220,17 +220,22 @@ void getLora(){
   while(LoRa.available()) {
     int numChars = LoRa.readBytesUntil(termChar, buffer[i], length);
     buffer[i][numChars]='\0';
-    Serial.println(buffer[i]);
+    Serial.print(buffer[i]);
     Serial.println(i);
-    if( (i == 3 && String(buffer[2]) != "motorCurrent") || String(buffer[0]) != area){
+    if(buffer[i] == " "){
+      Serial.println("ignore");
+    }
+    else if( (i == 3 && String(buffer[2]) != "motorCurrent") || String(buffer[0]) != area){
       i = 0;
     }
     else if(i < 3){
       ++i;
-      change = 1;
       
     }else if((i == 3 && String(buffer[2]) == "motorCurrent")){
       ++i;
+    }
+    if(i == 3){
+      change = 1;  
     }
     if(i == 4 && String(buffer[4]).toFloat() != 0){
       strcpy(tank, buffer[4]);
@@ -240,7 +245,7 @@ void getLora(){
   }
   LoRa.packetRssi(); 
   i = 0; 
-  
+  Serial.println(change);
   if(change == 1){
     if((String(buffer[0]) == area && String(buffer[1]) == id) && (String(buffer[2]) == "motorCurrent") ){  
       if( String(buffer[3]).toFloat() == 0.0 ){ 
@@ -268,7 +273,7 @@ void getLora(){
     }
 
     
-   if((String(buffer[0]) == area && String(buffer[1]) == "pipePressure") ){
+   if(String(buffer[1]) == "pipePressure"){
       updateData.clear();
       pipeData.clear();
       Serial.println("water in pipe");

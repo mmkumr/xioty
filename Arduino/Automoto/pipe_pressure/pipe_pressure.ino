@@ -74,7 +74,7 @@ void loop()
       v = 1;
     }
     LoRa.beginPacket();
-    LoRa.print(area + ":" + "pipePressure:" + String(pressure/100) + ":" + String(voltage) + ":");
+    LoRa.println(area + ":" + "pipePressure:" + String(pressure/100) + ":" + String(voltage) + ":");
     LoRa.endPacket();
     while(round(pressure/100) < 1015) {
       ;  

@@ -9,8 +9,8 @@ Adafruit_PWMServoDriver pca9685 = Adafruit_PWMServoDriver(0x40);
 // Range from 0 to 4095
 // This determines the pulse width
  
-#define SERVOMIN  80  // Minimum value
-#define SERVOMAX  600  // Maximum value
+#define SERVOMIN  218  // Minimum value
+#define SERVOMAX  436  // Maximum value
  
 
 
@@ -71,6 +71,7 @@ int I2C_SDA = 1,I2C_SCL = 2;
 void setup()
 {
   Serial.begin(9600);
+  Serial.println("PCA9685 Servo Test");
   pca9685.begin();
   // Set PWM Frequency to 50Hz
   pca9685.setPWMFreq(50);
@@ -78,6 +79,11 @@ void setup()
   pinMode(27, OUTPUT);
   digitalWrite(14, HIGH);
   digitalWrite(27, HIGH);
+  pca9685.setPWM(0, 0, map(150, 100, 200, SERVOMIN, SERVOMAX));// pwm channel no., don't care, pwm ticks value
+  pca9685.setPWM(1, 0, map(150, 100, 200, SERVOMIN, SERVOMAX));// pwm channel no., don't care, pwm ticks value
+  pca9685.setPWM(2, 0, map(100, 100, 200, SERVOMIN, SERVOMAX));// pwm channel no., don't care, pwm ticks value
+  pca9685.setPWM(3, 0, map(150, 100, 200, SERVOMIN, SERVOMAX));// pwm channel no., don't care, pwm ticks value
+  pca9685.setPWM(4, 0, map(186, 100, 200, SERVOMIN, SERVOMAX));// pwm channel no., don't care, pwm ticks value
   WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
   Serial.print("Connecting to Wi-Fi");
   while (WiFi.status() != WL_CONNECTED)
@@ -114,25 +120,26 @@ void loop()
   }
   // channel no. and its short name dx = 1 dy = 2 ty = 3 tx = 4 m = 5;
   if(change == 1) {
+    Serial.println(path);
     if(path == "/direction/x"){
       val = map(val, 100, 200, SERVOMIN, SERVOMAX);
-      pca9685.setPWM(1, 0, val);// pwm channel no., don't care, pwm ticks value
+      pca9685.setPWM(0, 0, val);// pwm channel no., don't care, pwm ticks value
     }
     if(path == "/direction/y"){
       val = map(val, 100, 200, SERVOMIN, SERVOMAX);
-      pca9685.setPWM(2, 0, val);// pwm channel no., don't care, pwm ticks value
+      pca9685.setPWM(1, 0, val);// pwm channel no., don't care, pwm ticks value
     }
     if(path == "/throttle/y"){
       val = map(val, 100, 200, SERVOMIN, SERVOMAX);
-      pca9685.setPWM(3, 0, val);// pwm channel no., don't care, pwm ticks value
+      pca9685.setPWM(2, 0, val);// pwm channel no., don't care, pwm ticks value
     }
     if(path == "/throttle/x"){
       val = map(val, 100, 200, SERVOMIN, SERVOMAX);
-      pca9685.setPWM(4, 0, val);// pwm channel no., don't care, pwm ticks value
+      pca9685.setPWM(3, 0, val);// pwm channel no., don't care, pwm ticks value
     }
     if(path == "/mode"){
       val = map(val, 100, 200, SERVOMIN, SERVOMAX);
-      pca9685.setPWM(5, 0, val);// pwm channel no., don't care, pwm ticks value
+      pca9685.setPWM(4, 0, val);// pwm channel no., don't care, pwm ticks value
     }
     if(path == "/motor"){
       if(val == 1){
