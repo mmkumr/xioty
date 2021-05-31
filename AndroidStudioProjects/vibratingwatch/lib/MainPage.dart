@@ -3,9 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
 import 'package:vibratingwatch/main.dart';
 
-import './DiscoveryPage.dart';
 import './SelectBondedDevicePage.dart';
-import './ChatPage.dart';
 
 class MainPage extends StatefulWidget {
   @override

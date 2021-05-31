@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "390095900247",
+    "project_id": "easymed-ad047",
+    "storage_bucket": "easymed-ad047.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:390095900247:android:0295d3b625f261ff009d12",
+        "android_client_info": {
+          "package_name": "com.example.easymed"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "390095900247-p7t5fkclpeufiol7858gkgebtsc19pu5.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.easymed",
+            "certificate_hash": "a0ae164ed2c1cdf2bc8b9e09a184a21a5324f16e"
+          }
+        },
+        {
+          "client_id": "390095900247-4mc8kr2f184j908pcgaj8qd7kp55b0qt.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA2huE2xafTjSoMmGkCWTcL4fJFK-FthdE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "390095900247-4mc8kr2f184j908pcgaj8qd7kp55b0qt.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

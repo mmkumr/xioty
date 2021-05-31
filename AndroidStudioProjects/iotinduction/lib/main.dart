@@ -66,6 +66,15 @@ class _MyHomePageState extends State<MyHomePage> {
     readData();
     var temp = [200, 400, 800, 1000, 1300, 1600, 1800, 2000];
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Color.fromARGB(255, 238, 238, 238),
+        elevation: 0,
+        title: Center(
+          child: Image(image: AssetImage("images/logo.png"),
+            width: MediaQuery.of(context).size.width * 0.30,
+          ),
+        ),
+      ),
       backgroundColor: Color.fromARGB(255, 238, 238, 238),
       body: Center(
         child: Column(
