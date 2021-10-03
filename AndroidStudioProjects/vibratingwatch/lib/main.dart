@@ -64,7 +64,7 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
 
-    BluetoothConnection.toAddress(widget.server.address).then((_connection) {
+    BluetoothConnection.toAddress(widget.serdataver.address).then((_connection) {
       print('Connected to the device');
       connection = _connection;
       setState(() {

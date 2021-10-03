@@ -1,4 +1,5 @@
 import 'package:easymed/main.dart';
+import 'package:easymed/thankyou.dart';
 import 'package:easymed/widget/mydrawer.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
@@ -22,7 +23,7 @@ class _RunState extends State<Run> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("easymed"),
+        title: Text("Self-Med"),
       ),
       drawer: MyDrawer(),
       body: loading == true
@@ -92,9 +93,10 @@ class _RunState extends State<Run> {
                                   "quantity": int.parse(_count.text)
                                 },
                               ).then((value) {
+                                Navigator.of(context).pop();
                                 Navigator.of(context).push(
                                   MaterialPageRoute(
-                                      builder: (context) => MyHomePage()),
+                                      builder: (context) => ThankYou()),
                                 );
                               });
                             }

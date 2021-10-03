@@ -1,5 +1,6 @@
 // @dart=2.9
 // ignore: import_of_legacy_library_into_null_safe
+import 'package:easymed/search.dart';
 import 'package:easymed/widget/mydrawer.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -18,7 +19,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.orange,
       ),
-      home: MyHomePage(title: 'Email File Link'),
+      home: Search(),
     );
   }
 }
@@ -46,7 +47,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("easymed"),
+        title: Text("Self-Med"),
       ),
       drawer: MyDrawer(),
       body: Center(

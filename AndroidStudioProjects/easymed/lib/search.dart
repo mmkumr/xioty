@@ -2,7 +2,6 @@
 // ignore: import_of_legacy_library_into_null_safe
 import 'package:easymed/run.dart';
 import 'package:easymed/widget/mydrawer.dart';
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:algolia/algolia.dart';
 
@@ -23,7 +22,7 @@ class _SearchState extends State<Search> {
         'b2f116b752f5480de1af77457694079f', //search-only api key in flutter code
   );
 
-  String _searchTerm;
+  String _searchTerm = "";
 
   Future<List<AlgoliaObjectSnapshot>> _operation(String input) async {
     AlgoliaQuery query = _algoliaApp.instance.index("easymed").search(input);
@@ -50,6 +49,7 @@ class _SearchState extends State<Search> {
                     Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: TextFormField(
+                        initialValue: " ",
                         //controller: _name,
                         onChanged: (word) {
                           setState(() {
@@ -115,17 +115,14 @@ class _SearchState extends State<Search> {
                                     SliverList(
                                       delegate: SliverChildBuilderDelegate(
                                         (context, index) {
-                                          return _searchTerm.length > 0
-                                              ? DisplaySearchResult(
-                                                  name: currSearchStuff[index]
-                                                      .data["name"],
-                                                  label: currSearchStuff[index]
-                                                      .data["label"],
-                                                  quantity:
-                                                      currSearchStuff[index]
-                                                          .data["quantity"],
-                                                )
-                                              : Container();
+                                          return DisplaySearchResult(
+                                            name: currSearchStuff[index]
+                                                .data["name"],
+                                            label: currSearchStuff[index]
+                                                .data["label"],
+                                            quantity: currSearchStuff[index]
+                                                .data["quantity"],
+                                          );
                                         },
                                         childCount: currSearchStuff.length ?? 0,
                                       ),
