@@ -16,8 +16,8 @@ int x2d = 9, x2p = 8, x2e = 10;
 int x1d = 12, x1p = 11, x1e = 13;
 int rd = 24, rp = 22, re = 26;
 //angle to step for x1 and x2
-int x1atos  = 423.333;
-int x2atos  = 359.444;
+int x1atos = 423.333;
+int x2atos = 359.444;
 //limit switch
 int eel = 30, x1l = 34, x2l = 32, zl = 36, rl = 38;
 // variable for storing the input serial string by using the delimeter ' '. Buffer for storing substring of tokenizer.
@@ -28,65 +28,67 @@ int i = 0, dlay = 0;
 int induct2_on = 23, induct2_up = 23, induct2_down = 27;
 int induct1_on = 29, induct1_up = 31, induct1_down = 33;
 
-#define TIMER1_INTERRUPTS_ON    TIMSK1 |=  (1 << OCIE1A);
-#define TIMER1_INTERRUPTS_OFF   TIMSK1 &= ~(1 << OCIE1A);
+int s1 = 35, s2 = 37, s3 = 39, s4 = 41, s5 = 43;
+
+#define TIMER1_INTERRUPTS_ON TIMSK1 |= (1 << OCIE1A);
+#define TIMER1_INTERRUPTS_OFF TIMSK1 &= ~(1 << OCIE1A);
 
 struct stepperInfo {
-  // externally defined parameters
-  float acceleration;
-  volatile unsigned long minStepInterval; // ie. max speed, smaller is faster
-  void (*dirFunc)(int);
-  void (*stepFunc)();
+    // externally defined parameters
+    float acceleration;
+    volatile unsigned long minStepInterval; // ie. max speed, smaller is faster
+    void( * dirFunc)(int);
+    void( * stepFunc)();
 
-  // derived parameters
-  unsigned int c0;                // step interval for first step, determines acceleration
-  long stepPosition;              // current position of stepper (total of all movements taken so far)
+    // derived parameters
+    unsigned int c0; // step interval for first step, determines acceleration
+    long stepPosition; // current position of stepper (total of all movements taken so far)
 
-  // per movement variables (only changed once per movement)
-  volatile int dir;                        // current direction of movement, used to keep track of position
-  volatile unsigned int totalSteps;        // number of steps requested for current movement
-  volatile bool movementDone = false;      // true if the current movement has been completed (used by main program to wait for completion)
-  volatile unsigned int rampUpStepCount;   // number of steps taken to reach either max speed, or half-way to the goal (will be zero until this number is known)
-  volatile unsigned long estStepsToSpeed;  // estimated steps required to reach max speed
-  volatile unsigned long estTimeForMove;   // estimated time (interrupt ticks) required to complete movement
-  volatile unsigned long rampUpStepTime;
-  volatile float speedScale;               // used to slow down this motor to make coordinated movement with other motors
+    // per movement variables (only changed once per movement)
+    volatile int dir; // current direction of movement, used to keep track of position
+    volatile unsigned int totalSteps; // number of steps requested for current movement
+    volatile bool movementDone = false; // true if the current movement has been completed (used by main program to wait for completion)
+    volatile unsigned int rampUpStepCount; // number of steps taken to reach either max speed, or half-way to the goal (will be zero until this number is known)
+    volatile unsigned long estStepsToSpeed; // estimated steps required to reach max speed
+    volatile unsigned long estTimeForMove; // estimated time (interrupt ticks) required to complete movement
+    volatile unsigned long rampUpStepTime;
+    volatile float speedScale; // used to slow down this motor to make coordinated movement with other motors
 
-  // per iteration variables (potentially changed every interrupt)
-  volatile unsigned int n;                 // index in acceleration curve, used to calculate next interval
-  volatile float d;                        // current interval length
-  volatile unsigned long di;               // above variable truncated
-  volatile unsigned int stepCount;         // number of steps completed in current movement
+    // per iteration variables (potentially changed every interrupt)
+    volatile unsigned int n; // index in acceleration curve, used to calculate next interval
+    volatile float d; // current interval length
+    volatile unsigned long di; // above variable truncated
+    volatile unsigned int stepCount; // number of steps completed in current movement
 };
 
 void x1Step() {
-  digitalWrite(x1p, HIGH);
-  digitalWrite(x1p, LOW);
-  /*X_STEP_HIGH
-  X_STEP_LOW*/
+    digitalWrite(x1p, HIGH);
+    digitalWrite(x1p, LOW);
+    /*X_STEP_HIGH
+    X_STEP_LOW*/
 }
 void x1Dir(int dir) {
-  digitalWrite(x1d, dir);
+    digitalWrite(x1d, dir);
 }
 
 void x2Step() {
-  digitalWrite(x2p, HIGH);
-  digitalWrite(x2p, LOW);
+    digitalWrite(x2p, HIGH);
+    digitalWrite(x2p, LOW);
 }
 void x2Dir(int dir) {
-  digitalWrite(x2d, dir);
+    digitalWrite(x2d, dir);
 }
 
-void resetStepperInfo( stepperInfo& si ) {
-  si.n = 0;
-  si.d = 0;
-  si.di = 0;
-  si.stepCount = 0;
-  si.rampUpStepCount = 0;
-  si.rampUpStepTime = 0;
-  si.totalSteps = 0;
-  si.stepPosition = 0;
-  si.movementDone = false;
+void resetStepperInfo(stepperInfo & si) {
+    si.n = 0;
+    si.d = 0;
+    si.di = 0;
+    si.stepCount = 0;
+    si.rampUpStepCount = 0;
+    si.rampUpStepTime = 0;
+    si.totalSteps = 0;
+    si.stepPosition = 0;
+    si.movementDone = false;
 }
 
 #define NUM_STEPPERS 2
@@ -119,6 +121,12 @@ void setup() {
     pinMode(rd, OUTPUT);
     pinMode(rp, OUTPUT);
     pinMode(re, OUTPUT);
+    //output pins for spices.
+    pinMode(s1, OUTPUT);
+    pinMode(s2, OUTPUT);
+    pinMode(s3, OUTPUT);
+    pinMode(s4, OUTPUT);
+    pinMode(s5, OUTPUT);
     //Limit switches set as input
     pinMode(zl, INPUT_PULLUP);
     pinMode(eel, INPUT_PULLUP);
@@ -139,188 +147,184 @@ void setup() {
     ts.write(15);
 
     noInterrupts();
-  TCCR1A = 0;
-  TCCR1B = 0;
-  TCNT1  = 0;
+    TCCR1A = 0;
+    TCCR1B = 0;
+    TCNT1 = 0;
 
-  OCR1A = 1000;                             // compare value
-  TCCR1B |= (1 << WGM12);                   // CTC mode
-  TCCR1B |= ((1 << CS11) | (1 << CS10));    // 64 prescaler
-  interrupts();
+    OCR1A = 1000; // compare value
+    TCCR1B |= (1 << WGM12); // CTC mode
+    TCCR1B |= ((1 << CS11) | (1 << CS10)); // 64 prescaler
+    interrupts();
 
-  steppers[0].dirFunc = x1Dir;
-  steppers[0].stepFunc = x1Step;
-  steppers[0].acceleration = 1000;
-  steppers[0].minStepInterval = 20;
+    steppers[0].dirFunc = x1Dir;
+    steppers[0].stepFunc = x1Step;
+    steppers[0].acceleration = 1000;
+    steppers[0].minStepInterval = 20;
 
-  steppers[1].dirFunc = x2Dir;
-  steppers[1].stepFunc = x2Step;
-  steppers[1].acceleration = 1000;
-  steppers[1].minStepInterval = 20;
+    steppers[1].dirFunc = x2Dir;
+    steppers[1].stepFunc = x2Step;
+    steppers[1].acceleration = 1000;
+    steppers[1].minStepInterval = 20;
 }
 int change = 0;
 
-void resetStepper(volatile stepperInfo& si) {
-  si.c0 = si.acceleration;
-  si.d = si.c0;
-  si.di = si.d;
-  si.stepCount = 0;
-  si.n = 0;
-  si.rampUpStepCount = 0;
-  si.movementDone = false;
-  si.speedScale = 1;
+void resetStepper(volatile stepperInfo & si) {
+    si.c0 = si.acceleration;
+    si.d = si.c0;
+    si.di = si.d;
+    si.stepCount = 0;
+    si.n = 0;
+    si.rampUpStepCount = 0;
+    si.movementDone = false;
+    si.speedScale = 1;
 
-  float a = si.minStepInterval / (float)si.c0;
-  a *= 0.676;
+    float a = si.minStepInterval / (float) si.c0;
+    a *= 0.676;
 
-  float m = ((a*a - 1) / (-2 * a));
-  float n = m * m;
+    float m = ((a * a - 1) / (-2 * a));
+    float n = m * m;
 
-  si.estStepsToSpeed = n;
+    si.estStepsToSpeed = n;
 }
 
 volatile byte remainingSteppersFlag = 0;
 
-float getDurationOfAcceleration(volatile stepperInfo& s, unsigned int numSteps) {
-  float d = s.c0;
-  float totalDuration = 0;
-  for (unsigned int n = 1; n < numSteps; n++) {
-    d = d - (2 * d) / (4 * n + 1);
-    totalDuration += d;
-  }
-  return totalDuration;
+float getDurationOfAcceleration(volatile stepperInfo & s, unsigned int numSteps) {
+    float d = s.c0;
+    float totalDuration = 0;
+    for (unsigned int n = 1; n < numSteps; n++) {
+        d = d - (2 * d) / (4 * n + 1);
+        totalDuration += d;
+    }
+    return totalDuration;
 }
 
 void prepareMovement(int whichMotor, long steps) {
-  volatile stepperInfo& si = steppers[whichMotor];
-  si.dirFunc( steps < 0 ? HIGH : LOW );
-  si.dir = steps > 0 ? 1 : -1;
-  si.totalSteps = abs(steps);
-  resetStepper(si);
-  
-  remainingSteppersFlag |= (1 << whichMotor);
+    volatile stepperInfo & si = steppers[whichMotor];
+    si.dirFunc(steps < 0 ? HIGH : LOW);
+    si.dir = steps > 0 ? 1 : -1;
+    si.totalSteps = abs(steps);
+    resetStepper(si);
 
-  unsigned long stepsAbs = abs(steps);
+    remainingSteppersFlag |= (1 << whichMotor);
 
-  if ( (2 * si.estStepsToSpeed) < stepsAbs ) {
-    // there will be a period of time at full speed
-    unsigned long stepsAtFullSpeed = stepsAbs - 2 * si.estStepsToSpeed;
-    float accelDecelTime = getDurationOfAcceleration(si, si.estStepsToSpeed);
-    si.estTimeForMove = 2 * accelDecelTime + stepsAtFullSpeed * si.minStepInterval;
-  }
-  else {
-    // will not reach full speed before needing to slow down again
-    float accelDecelTime = getDurationOfAcceleration( si, stepsAbs / 2 );
-    si.estTimeForMove = 2 * accelDecelTime;
-  }
+    unsigned long stepsAbs = abs(steps);
+
+    if ((2 * si.estStepsToSpeed) < stepsAbs) {
+        // there will be a period of time at full speed
+        unsigned long stepsAtFullSpeed = stepsAbs - 2 * si.estStepsToSpeed;
+        float accelDecelTime = getDurationOfAcceleration(si, si.estStepsToSpeed);
+        si.estTimeForMove = 2 * accelDecelTime + stepsAtFullSpeed * si.minStepInterval;
+    } else {
+        // will not reach full speed before needing to slow down again
+        float accelDecelTime = getDurationOfAcceleration(si, stepsAbs / 2);
+        si.estTimeForMove = 2 * accelDecelTime;
+    }
 }
 
 volatile byte nextStepperFlag = 0;
 
 void setNextInterruptInterval() {
 
-  bool movementComplete = true;
+    bool movementComplete = true;
 
-  unsigned long mind = 999999;
-  for (int i = 0; i < NUM_STEPPERS; i++) {
-    if ( ((1 << i) & remainingSteppersFlag) && steppers[i].di < mind ) {
-      mind = steppers[i].di;
+    unsigned long mind = 999999;
+    for (int i = 0; i < NUM_STEPPERS; i++) {
+        if (((1 << i) & remainingSteppersFlag) && steppers[i].di < mind) {
+            mind = steppers[i].di;
+        }
     }
-  }
 
-  nextStepperFlag = 0;
-  for (int i = 0; i < NUM_STEPPERS; i++) {
-    if ( ! steppers[i].movementDone )
-      movementComplete = false;
-    if ( ((1 << i) & remainingSteppersFlag) && steppers[i].di == mind )
-      nextStepperFlag |= (1 << i);
-  }
+    nextStepperFlag = 0;
+    for (int i = 0; i < NUM_STEPPERS; i++) {
+        if (!steppers[i].movementDone)
+            movementComplete = false;
+        if (((1 << i) & remainingSteppersFlag) && steppers[i].di == mind)
+            nextStepperFlag |= (1 << i);
+    }
 
-  if ( remainingSteppersFlag == 0 ) {
-    TIMER1_INTERRUPTS_OFF
+    if (remainingSteppersFlag == 0) {
+        TIMER1_INTERRUPTS_OFF
+        OCR1A = 65500;
+    }
+
+    OCR1A = mind;
+}
+
+ISR(TIMER1_COMPA_vect) {
+    unsigned int tmpCtr = OCR1A;
+
     OCR1A = 65500;
-  }
 
-  OCR1A = mind;
+    for (int i = 0; i < NUM_STEPPERS; i++) {
+
+        if (!((1 << i) & remainingSteppersFlag))
+            continue;
+
+        if (!(nextStepperFlag & (1 << i))) {
+            steppers[i].di -= tmpCtr;
+            continue;
+        }
+
+        volatile stepperInfo & s = steppers[i];
+
+        if (s.stepCount < s.totalSteps) {
+            s.stepFunc();
+            s.stepCount++;
+            s.stepPosition += s.dir;
+            if (s.stepCount >= s.totalSteps) {
+                s.movementDone = true;
+                remainingSteppersFlag &= ~(1 << i);
+            }
+        }
+
+        if (s.rampUpStepCount == 0) {
+            s.n++;
+            s.d = s.d - (2 * s.d) / (4 * s.n + 1);
+            if (s.d <= s.minStepInterval) {
+                s.d = s.minStepInterval;
+                s.rampUpStepCount = s.stepCount;
+            }
+            if (s.stepCount >= s.totalSteps / 2) {
+                s.rampUpStepCount = s.stepCount;
+            }
+            s.rampUpStepTime += s.d;
+        } else if (s.stepCount >= s.totalSteps - s.rampUpStepCount) {
+            s.d = (s.d * (4 * s.n + 1)) / (4 * s.n + 1 - 2);
+            s.n--;
+        }
+
+        s.di = s.d * s.speedScale; // integer
+    }
+
+    setNextInterruptInterval();
+
+    TCNT1 = 0;
 }
-
-ISR(TIMER1_COMPA_vect)
-{
-  unsigned int tmpCtr = OCR1A;
-
-  OCR1A = 65500;
-
-  for (int i = 0; i < NUM_STEPPERS; i++) {
-
-    if ( ! ((1 << i) & remainingSteppersFlag) )
-      continue;
-
-    if ( ! (nextStepperFlag & (1 << i)) ) {
-      steppers[i].di -= tmpCtr;
-      continue;
-    }
-
-    volatile stepperInfo& s = steppers[i];
-
-    if ( s.stepCount < s.totalSteps ) {
-      s.stepFunc();
-      s.stepCount++;
-      s.stepPosition += s.dir;
-      if ( s.stepCount >= s.totalSteps ) {
-        s.movementDone = true;
-        remainingSteppersFlag &= ~(1 << i);
-      }
-    }
-
-    if ( s.rampUpStepCount == 0 ) {
-      s.n++;
-      s.d = s.d - (2 * s.d) / (4 * s.n + 1);
-      if ( s.d <= s.minStepInterval ) {
-        s.d = s.minStepInterval;
-        s.rampUpStepCount = s.stepCount;
-      }
-      if ( s.stepCount >= s.totalSteps / 2 ) {
-        s.rampUpStepCount = s.stepCount;
-      }
-      s.rampUpStepTime += s.d;
-    }
-    else if ( s.stepCount >= s.totalSteps - s.rampUpStepCount ) {
-      s.d = (s.d * (4 * s.n + 1)) / (4 * s.n + 1 - 2);
-      s.n--;
-    }
-
-    s.di = s.d * s.speedScale; // integer
-  }
-
-  setNextInterruptInterval();
-
-  TCNT1  = 0;
-}
-
 
 void runAndWait() {
-  adjustSpeedScales();
-  setNextInterruptInterval();
-  TIMER1_INTERRUPTS_ON;
+    adjustSpeedScales();
+    setNextInterruptInterval();
+    TIMER1_INTERRUPTS_ON;
 }
 
 void adjustSpeedScales() {
-  float maxTime = 0;
-  
-  for (int i = 0; i < NUM_STEPPERS; i++) {
-    if ( ! ((1 << i) & remainingSteppersFlag) )
-      continue;
-    if ( steppers[i].estTimeForMove > maxTime )
-      maxTime = steppers[i].estTimeForMove;
-  }
+    float maxTime = 0;
 
-  if ( maxTime != 0 ) {
     for (int i = 0; i < NUM_STEPPERS; i++) {
-      if ( ! ( (1 << i) & remainingSteppersFlag) )
-        continue;
-      steppers[i].speedScale = maxTime / steppers[i].estTimeForMove;
+        if (!((1 << i) & remainingSteppersFlag))
+            continue;
+        if (steppers[i].estTimeForMove > maxTime)
+            maxTime = steppers[i].estTimeForMove;
     }
-  }
+
+    if (maxTime != 0) {
+        for (int i = 0; i < NUM_STEPPERS; i++) {
+            if (!((1 << i) & remainingSteppersFlag))
+                continue;
+            steppers[i].speedScale = maxTime / steppers[i].estTimeForMove;
+        }
+    }
 }
 void loop() {
     while (Serial.available()) {
@@ -351,10 +355,10 @@ void loop() {
         // change variable is used for check if the ';' is typed of not for marking the end of command;
         // comand fomat "command string speed direction steps ;"
         if (String(buffer[0]) == "x1" || String(buffer[0]) == "\nx1") {
-            runx1(atoi(buffer[1]));
+            runx1(atol(buffer[1]));
             Serial.println("o");
         } else if (String(buffer[0]) == "x2" || String(buffer[0]) == "\nx2") {
-            runx2(atoi(buffer[1]));
+            runx2(atol(buffer[1]));
             Serial.println("o");
         } else if (String(buffer[0]) == "e" || String(buffer[0]) == "\ne") {
             runee(atoi(buffer[2]), atoi(buffer[1]), atol(buffer[3]));
@@ -422,7 +426,7 @@ void loop() {
             Serial.println("o");
             //command syntax eep pwm ;
         } else if (String(buffer[0]) == "eep" || String(buffer[0]) == "\neep") {
-            analogWrite(eepwm, buffer[1]);
+            analogWrite(eepwm, atoi(buffer[1]));
             Serial.println("o");
         } else if (String(buffer[0]) == "x2en" || String(buffer[0]) == "\nx2en") {
             if (atol(buffer[1]) == 1) {
@@ -438,14 +442,38 @@ void loop() {
                 digitalWrite(ze, LOW);
             }
             Serial.println("o");
-        } else if(String(buffer[0]) == "x1x2" || String(buffer[0]) == "\nx1x2"){
-          prepareMovement( 0, atol(buffer[1]));
-          prepareMovement( 1, atol(buffer[2]));
-          runAndWait();  
-          while ( remainingSteppersFlag );
-          remainingSteppersFlag = 0;
-          nextStepperFlag = 0;
-          Serial.println("o");
+        } else if (String(buffer[0]) == "x1x2" || String(buffer[0]) == "\nx1x2") {
+            prepareMovement(0, atol(buffer[1]));
+            prepareMovement(1, atol(buffer[2]));
+            runAndWait();
+            while (remainingSteppersFlag);
+            remainingSteppersFlag = 0;
+            nextStepperFlag = 0;
+            Serial.println("o");
+        } else if (String(buffer[0]) == "s1" || String(buffer[0]) == "\ns1"){
+            digitalWrite(s1, HIGH);
+            delay(500);
+            digitalWrite(s1, LOW);
+        }
+        else if (String(buffer[0]) == "s2" || String(buffer[0]) == "\ns"){
+            digitalWrite(s2, HIGH);
+            delay(500);
+            digitalWrite(s2, LOW);
+        }
+        else if (String(buffer[0]) == "s3" || String(buffer[0]) == "\ns3"){
+            digitalWrite(s3, HIGH);
+            delay(500);
+            digitalWrite(s1, LOW);
+        }
+        else if (String(buffer[0]) == "s4" || String(buffer[0]) == "\ns4"){
+            digitalWrite(s4, HIGH);
+            delay(500);
+            digitalWrite(s4, LOW);
+        }
+        else if (String(buffer[0]) == "s5" || String(buffer[0]) == "\ns5"){
+            digitalWrite(s5, HIGH);
+            delay(500);
+            digitalWrite(s5, LOW);
         }
         change = 0;
         i = 0;
@@ -482,18 +510,18 @@ void runee(int direction, int speed, long step) {
 
 void runx1(long step) {
     prepareMovement(0, step);
-    runAndWait();  
-    while (remainingSteppersFlag && (digitalRead(x1l) == HIGH || direction == HIGH) );
+    runAndWait();
+    while (remainingSteppersFlag && (digitalRead(x1l) == HIGH || digitalRead(x1d) == HIGH));
     remainingSteppersFlag = 0;
     nextStepperFlag = 0;
 }
 
 void runx2(long step) {
-  prepareMovement(1, step);
-  runAndWait();  
-  while (remainingSteppersFlag && (digitalRead(x2l) == HIGH || direction == LOW) );
-  remainingSteppersFlag = 0;
-  nextStepperFlag = 0;
+    prepareMovement(1, step);
+    runAndWait();
+    while (remainingSteppersFlag && (digitalRead(x2l) == HIGH || digitalRead(x2d) == LOW));
+    remainingSteppersFlag = 0;
+    nextStepperFlag = 0;
 }
 
 void runr(int direction, int speed, long step) {
