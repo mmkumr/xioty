@@ -457,21 +457,25 @@ void loop() {
             digitalWrite(s1, HIGH);
             delay(500);
             digitalWrite(s1, LOW);
+            Serial.println("o");
         }
-        else if (String(buffer[0]) == "s2" || String(buffer[0]) == "\ns"){
+        else if (String(buffer[0]) == "s2" || String(buffer[0]) == "\ns2"){
             digitalWrite(s2, HIGH);
             delay(500);
             digitalWrite(s2, LOW);
+            Serial.println("o");
         }
         else if (String(buffer[0]) == "s3" || String(buffer[0]) == "\ns3"){
             digitalWrite(s3, HIGH);
             delay(500);
-            digitalWrite(s1, LOW);
+            digitalWrite(s3, LOW);
+            Serial.println("o");
         }
         else if (String(buffer[0]) == "s4" || String(buffer[0]) == "\ns4"){
             digitalWrite(s4, HIGH);
             delay(500);
             digitalWrite(s4, LOW);
+            Serial.println("o");
         }
         else if (String(buffer[0]) == "s5" || String(buffer[0]) == "\ns5"){
             digitalWrite(s5, HIGH);
@@ -484,7 +488,6 @@ void loop() {
                 digitalWrite(pump, LOW);
             }
             Serial.println("o");
-            //command syntax eep pwm ;
         }
         change = 0;
         i = 0;
