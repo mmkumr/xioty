@@ -18,6 +18,8 @@ int rd = 24, rp = 22, re = 26;
 //angle to step for x1 and x2
 int x1atos = 423.333;
 int x2atos = 359.444;
+//pump
+int pump = 45;
 //limit switch
 int eel = 30, x1l = 34, x2l = 32, zl = 36, rl = 38;
 // variable for storing the input serial string by using the delimeter ' '. Buffer for storing substring of tokenizer.
@@ -127,6 +129,7 @@ void setup() {
     pinMode(s3, OUTPUT);
     pinMode(s4, OUTPUT);
     pinMode(s5, OUTPUT);
+    pinMode(pump, OUTPUT);
     //Limit switches set as input
     pinMode(zl, INPUT_PULLUP);
     pinMode(eel, INPUT_PULLUP);
@@ -474,6 +477,14 @@ void loop() {
             digitalWrite(s5, HIGH);
             delay(500);
             digitalWrite(s5, LOW);
+        } else if (String(buffer[0]) == "water" || String(buffer[0]) == "\nwater") {
+            if (atol(buffer[1]) == 1) {
+                digitalWrite(pump, HIGH);
+            } else {
+                digitalWrite(pump, LOW);
+            }
+            Serial.println("o");
+            //command syntax eep pwm ;
         }
         change = 0;
         i = 0;
