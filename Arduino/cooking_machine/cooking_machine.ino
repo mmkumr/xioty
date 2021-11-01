@@ -34,6 +34,8 @@ int s1 = 35, s2 = 37, s3 = 39, s4 = 41, s5 = 43;
 
 #define TIMER1_INTERRUPTS_ON TIMSK1 |= (1 << OCIE1A);
 #define TIMER1_INTERRUPTS_OFF TIMSK1 &= ~(1 << OCIE1A);
+//for saving the printing mode.
+int mode = 0;
 
 struct stepperInfo {
     // externally defined parameters
@@ -81,6 +83,22 @@ void x2Dir(int dir) {
     digitalWrite(x2d, dir);
 }
 
+void zStep() {
+    digitalWrite(zp, HIGH);
+    digitalWrite(zp, LOW);
+}
+void zDir(int dir) {
+    digitalWrite(zd, dir);
+}
+
+void rStep() {
+    digitalWrite(rp, HIGH);
+    digitalWrite(rp, LOW);
+}
+void rDir(int dir) {
+    digitalWrite(rd, dir);
+}
+
 void resetStepperInfo(stepperInfo & si) {
     si.n = 0;
     si.d = 0;
@@ -93,7 +111,7 @@ void resetStepperInfo(stepperInfo & si) {
     si.movementDone = false;
 }
 
-#define NUM_STEPPERS 2
+#define NUM_STEPPERS 4
 
 volatile stepperInfo steppers[NUM_STEPPERS];
 
@@ -168,6 +186,16 @@ void setup() {
     steppers[1].stepFunc = x2Step;
     steppers[1].acceleration = 1000;
     steppers[1].minStepInterval = 20;
+
+    steppers[2].dirFunc = zDir;
+    steppers[2].stepFunc = zStep;
+    steppers[2].acceleration = 1000;
+    steppers[2].minStepInterval = 20;
+
+    steppers[3].dirFunc = rDir;
+    steppers[3].stepFunc = rStep;
+    steppers[3].acceleration = 1000;
+    steppers[3].minStepInterval = 20;
 }
 int change = 0;
 
@@ -330,6 +358,7 @@ void adjustSpeedScales() {
     }
 }
 void loop() {
+    char cmd[80] = "";
     while (Serial.available()) {
         char temp = (char) Serial.read();
         str[i] = temp;
@@ -340,6 +369,7 @@ void loop() {
         ++i;
     }
     if (change == 1) {
+        strcpy(cmd, str);
         const char s[2] = " ";
         i = 1;
         char * token;
@@ -354,39 +384,35 @@ void loop() {
                 ++i;
             }
         }
-
+        if(mode == 0 && !(String(buffer[0]) == "py" || String(buffer[0]) == "\npy") ){
+            Serial.println(cmd);
+        }
         // change variable is used for check if the ';' is typed of not for marking the end of command;
         // comand fomat "command string speed direction steps ;"
-        if (String(buffer[0]) == "x1" || String(buffer[0]) == "\nx1") {
+        if (String(buffer[0]) == "py" || String(buffer[0]) == "\npy"){
+            mode = atoi(buffer[1]);
+        }else if (String(buffer[0]) == "x1" || String(buffer[0]) == "\nx1") {
             runx1(atol(buffer[1]));
-            Serial.println("o");
         } else if (String(buffer[0]) == "x2" || String(buffer[0]) == "\nx2") {
             runx2(atol(buffer[1]));
-            Serial.println("o");
         } else if (String(buffer[0]) == "e" || String(buffer[0]) == "\ne") {
             runee(atoi(buffer[2]), atoi(buffer[1]), atol(buffer[3]));
-            Serial.println("o");
         } else if (String(buffer[0]) == "r" || String(buffer[0]) == "\nr") {
             runr(atoi(buffer[2]), atoi(buffer[1]), atol(buffer[3]));
-            Serial.println("o");
         } else if (String(buffer[0]) == "z" || String(buffer[0]) == "\nz") {
             runz(atoi(buffer[2]), atoi(buffer[1]), atol(buffer[3]));
-            Serial.println("o");
         } else if (String(buffer[0]) == "es" || String(buffer[0]) == "\nes") {
             ees.write(atoi(buffer[1]));
             delay(2000);
-            Serial.println("o");
         } else if (String(buffer[0]) == "ts" || String(buffer[0]) == "\nts") {
             ts.write(atoi(buffer[1]));
             delay(2000);
-            Serial.println("o");
         } else if (String(buffer[0]) == "x1en" || String(buffer[0]) == "\nx1en") {
             if (atol(buffer[1]) == 1) {
                 digitalWrite(x1e, HIGH);
             } else {
                 digitalWrite(x1e, LOW);
             }
-            Serial.println("o");
             //command syntax  ind 1/2 on/up/down ;
         } else if (String(buffer[0]) == "ind" || String(buffer[0]) == "\nind") {
             if (atol(buffer[1]) == 1) {
@@ -418,7 +444,6 @@ void loop() {
                     digitalWrite(induct2_down, LOW);
                 }
             }
-            Serial.println("o");
             //command syntax eed 0/1 ;
         } else if (String(buffer[0]) == "eed" || String(buffer[0]) == "\need") {
             if (atol(buffer[1]) == 1) {
@@ -426,11 +451,9 @@ void loop() {
             } else {
                 digitalWrite(eedir, LOW);
             }
-            Serial.println("o");
             //command syntax eep pwm ;
         } else if (String(buffer[0]) == "eep" || String(buffer[0]) == "\neep") {
             analogWrite(eepwm, atoi(buffer[1]));
-            Serial.println("o");
         } else if (String(buffer[0]) == "x2en" || String(buffer[0]) == "\nx2en") {
             if (atol(buffer[1]) == 1) {
                 digitalWrite(x2e, HIGH);
@@ -444,10 +467,18 @@ void loop() {
             } else {
                 digitalWrite(ze, LOW);
             }
-            Serial.println("o");
         } else if (String(buffer[0]) == "x1x2" || String(buffer[0]) == "\nx1x2") {
             prepareMovement(0, atol(buffer[1]));
             prepareMovement(1, atol(buffer[2]));
+            runAndWait();
+            while (remainingSteppersFlag);
+            remainingSteppersFlag = 0;
+            nextStepperFlag = 0;
+        } else if (String(buffer[0]) == "x12zr" || String(buffer[0]) == "\nx12zr") {
+            prepareMovement(0, atol(buffer[1]));
+            prepareMovement(1, atol(buffer[2]));
+            prepareMovement(2, atol(buffer[3]));
+            prepareMovement(3, atol(buffer[4]));
             runAndWait();
             while (remainingSteppersFlag);
             remainingSteppersFlag = 0;
@@ -457,25 +488,21 @@ void loop() {
             digitalWrite(s1, HIGH);
             delay(500);
             digitalWrite(s1, LOW);
-            Serial.println("o");
         }
         else if (String(buffer[0]) == "s2" || String(buffer[0]) == "\ns2"){
             digitalWrite(s2, HIGH);
             delay(500);
             digitalWrite(s2, LOW);
-            Serial.println("o");
         }
         else if (String(buffer[0]) == "s3" || String(buffer[0]) == "\ns3"){
             digitalWrite(s3, HIGH);
             delay(500);
             digitalWrite(s3, LOW);
-            Serial.println("o");
         }
         else if (String(buffer[0]) == "s4" || String(buffer[0]) == "\ns4"){
             digitalWrite(s4, HIGH);
             delay(500);
             digitalWrite(s4, LOW);
-            Serial.println("o");
         }
         else if (String(buffer[0]) == "s5" || String(buffer[0]) == "\ns5"){
             digitalWrite(s5, HIGH);
@@ -487,7 +514,18 @@ void loop() {
             } else {
                 digitalWrite(pump, LOW);
             }
-            Serial.println("o");
+        }
+        else if (String(buffer[0]) == "een" || String(buffer[0]) == "\neen") {
+            if (atol(buffer[1]) == 1) {
+                digitalWrite(eee, HIGH);
+            } else {
+                digitalWrite(eee, LOW);
+            }
+        } else if (String(buffer[0]) == "delay" || String(buffer[0]) == "\ndelay") {
+            delay(atoi(buffer[1]));
+        }
+        if(mode == 1){
+          Serial.println("o");
         }
         change = 0;
         i = 0;
@@ -509,7 +547,6 @@ void runz(int direction, int speed, long step) {
 
 void runee(int direction, int speed, long step) {
     digitalWrite(eed, direction);
-    digitalWrite(eee, LOW);
     for (int i = 0; i < step; i++) {
         if (digitalRead(eel) == HIGH || direction == HIGH) {
             digitalWrite(eep, LOW);
@@ -519,13 +556,12 @@ void runee(int direction, int speed, long step) {
             break;
         }
     }
-    digitalWrite(eee, HIGH);
 }
 
 void runx1(long step) {
     prepareMovement(0, step);
     runAndWait();
-    while (remainingSteppersFlag && (digitalRead(x1l) == HIGH || digitalRead(x1d) == HIGH));
+    while (remainingSteppersFlag && (digitalRead(x1l) == HIGH || digitalRead(x1d) == LOW));
     remainingSteppersFlag = 0;
     nextStepperFlag = 0;
 }
