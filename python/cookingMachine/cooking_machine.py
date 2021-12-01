@@ -15,7 +15,6 @@ for i in range(1, len(sys.argv)):
         cmd = file.readlines()
         for j, c in enumerate(cmd):
             ser.write(cmd[j].encode())
-            while ser.readline() != b'o\r\n':
-                print("waiting")
+            time.sleep(1)
             print("Executed " + cmd[j])
         file.close()

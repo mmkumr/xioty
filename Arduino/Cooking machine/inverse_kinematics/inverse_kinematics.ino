@@ -2,7 +2,7 @@ const float theta1AngleToSteps = 170;
 const float theta2AngleToSteps = 186.3;
 const float zDistanceToSteps = 100;
 
-float x_off = 400, y_off = 400;
+float x_off = 0, y_off = 0;
 
 double L1 = 228; // L1 = 228mm
 double L2 = 136.5; // L2 = 136.5mm
@@ -13,7 +13,7 @@ int yd = A7, yp = A6, ye = A2;
 int xd = A1, xp = A0, xe = 38;
 int xl = 3, yl = 14;
 
-float x = 250.0, y = 550.0;
+float x = 100, y = 50;
 
 
 void setup() {

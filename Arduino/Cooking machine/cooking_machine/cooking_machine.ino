@@ -1,17 +1,17 @@
 #include <Servo_Hardware_PWM.h>
-
 #include <string.h>
-
-
+#include <SPI.h>
+#include <SD.h>
 #include <stdlib.h>
 
 Servo ts; //Tool servo
 Servo ees; // Endeffector servo
+File myFile;
 
 //Stepper motor pins
-int zd = 1, zp = 2, ze = 4;
-int eed = 6, eep = 5, eee = 7;
-int eepwm = 51, eedir = 49; //Pins for controlling endeffector detachable motor.
+int zd = 48, zp = 46, ze = A8;
+int eed = 0, eep = 0, eee = 0;
+int eepwm = 0, eedir = 0; //Pins for controlling endeffector detachable motor.
 int x2d = A7, x2p = A6, x2e = A2;
 int x1d = A1, x1p = A0, x1e = 38;
 int rd = 24, rp = 22, re = 26;
@@ -23,14 +23,17 @@ const float theta1AngleToSteps = 171.6;
 const float theta2AngleToSteps = 186.3;
 const float zDistanceToSteps = 100;
 //length variable for x1, x2 / x, y
-double L1 = 228; // L1 = 228mm
-double L2 = 136.5; // L2 = 136.5mm
+//inverse kinametics variables
+double L1 = 228;
+double L2 = 136.5;
+float x_off = 0, y_off = 0;
 double theta1, theta2, z;
+double prev_theta1 = 0.0, prev_theta2 = 0.0, current_theta1, current_theta2;
 
 //pump
 int pump = 45;
 //limit switch
-int eel = 0, x1l = 3, x2l = 14, zl = 0, rl = 0;
+int eel = 0, x1l = 3, x2l = 14, zl = 18, rl = 0;
 // variable for storing the input serial string by using the delimeter ' '. Buffer for storing substring of tokenizer.
 char buffer[5][20], str[80];
 // i for line increment while storing word k for index of word.
@@ -72,6 +75,8 @@ struct stepperInfo {
     volatile float d; // current interval length
     volatile unsigned long di; // above variable truncated
     volatile unsigned int stepCount; // number of steps completed in current movement
+    volatile int homedir; //inversion of direction from home.
+    volatile int limit_switch;
 };
 
 void x1Step() {
@@ -190,21 +195,30 @@ void setup() {
     steppers[0].stepFunc = x1Step;
     steppers[0].acceleration = 1000;
     steppers[0].minStepInterval = 40;
+    steppers[0].homedir = LOW;
+    steppers[0].limit_switch = x1l;
 
     steppers[1].dirFunc = x2Dir;
     steppers[1].stepFunc = x2Step;
     steppers[1].acceleration = 1000;
     steppers[1].minStepInterval = 40;
+    steppers[1].homedir = LOW;
+    steppers[1].limit_switch = x2l;
 
     steppers[2].dirFunc = zDir;
     steppers[2].stepFunc = zStep;
     steppers[2].acceleration = 1000;
     steppers[2].minStepInterval = 20;
+    steppers[2].homedir = HIGH;
+    steppers[2].limit_switch = zl;
 
     steppers[3].dirFunc = rDir;
     steppers[3].stepFunc = rStep;
     steppers[3].acceleration = 1000;
     steppers[3].minStepInterval = 20;
+    steppers[3].homedir = HIGH;
+    steppers[3].limit_switch = rl;
+
 }
 int change = 0;
 
@@ -241,7 +255,7 @@ float getDurationOfAcceleration(volatile stepperInfo & s, unsigned int numSteps)
 
 void prepareMovement(int whichMotor, long steps) {
     volatile stepperInfo & si = steppers[whichMotor];
-    si.dirFunc(steps < 0 ? HIGH : LOW);
+    si.dirFunc(steps < 0 ? LOW : HIGH);
     si.dir = steps > 0 ? 1 : -1;
     si.totalSteps = abs(steps);
     resetStepper(si);
@@ -312,7 +326,7 @@ ISR(TIMER1_COMPA_vect) {
             s.stepFunc();
             s.stepCount++;
             s.stepPosition += s.dir;
-            if (s.stepCount >= s.totalSteps) {
+            if (s.stepCount >= s.totalSteps || (digitalRead(s.limit_switch) == HIGH && s.homedir == (s.dir == 1 ? HIGH : LOW)) ) {
                 s.movementDone = true;
                 remainingSteppersFlag &= ~(1 << i);
             }
@@ -346,6 +360,9 @@ void runAndWait() {
     adjustSpeedScales();
     setNextInterruptInterval();
     TIMER1_INTERRUPTS_ON;
+    while (remainingSteppersFlag);
+    remainingSteppersFlag = 0;
+    nextStepperFlag = 0;
 }
 
 void adjustSpeedScales() {
@@ -403,7 +420,7 @@ void loop() {
         }else if (String(buffer[0]) == "x1" || String(buffer[0]) == "\nx1") {
             runx1(atol(buffer[1]));
         }else if (String(buffer[0]) == "xy" || String(buffer[0]) == "\nxy") {
-            inverseKinematics(atol(buffer[1]), atol(buffer[2]));
+            inverseKinematics(atof(buffer[1]), atof(buffer[2]));
         }else if (String(buffer[0]) == "x2" || String(buffer[0]) == "\nx2") {
             runx2(atol(buffer[1]));
         } else if (String(buffer[0]) == "e" || String(buffer[0]) == "\ne") {
@@ -481,18 +498,12 @@ void loop() {
             prepareMovement(0, atol(buffer[1]));
             prepareMovement(1, atol(buffer[2]));
             runAndWait();
-            while (remainingSteppersFlag);
-            remainingSteppersFlag = 0;
-            nextStepperFlag = 0;
         } else if (String(buffer[0]) == "x12zr" || String(buffer[0]) == "\nx12zr") {
             prepareMovement(0, atol(buffer[1]));
             prepareMovement(1, atol(buffer[2]));
             prepareMovement(2, atol(buffer[3]));
             prepareMovement(3, atol(buffer[4]));
             runAndWait();
-            while (remainingSteppersFlag);
-            remainingSteppersFlag = 0;
-            nextStepperFlag = 0;
         } else if (String(buffer[0]) == "s1" || String(buffer[0]) == "\ns1"){
             digitalWrite(s1, HIGH);
             delay(500);
@@ -570,17 +581,11 @@ void runee(int direction, int speed, long step) {
 void runx1(long step) {
     prepareMovement(0, step);
     runAndWait();
-    while (remainingSteppersFlag && (digitalRead(x1l) == LOW || digitalRead(x1d) == HIGH));
-    remainingSteppersFlag = 0;
-    nextStepperFlag = 0;
 }
 
 void runx2(long step) {
     prepareMovement(1, step);
     runAndWait();
-    while (remainingSteppersFlag && (digitalRead(x2l) == LOW || digitalRead(x2d) == HIGH));
-    remainingSteppersFlag = 0;
-    nextStepperFlag = 0;
 }
 
 void runr(int direction, int speed, long step) {
@@ -600,46 +605,48 @@ void runr(int direction, int speed, long step) {
 
 
 void inverseKinematics(float x, float y) {
+  x = x - x_off;
+  y = y - y_off;
+
   theta2 = acos((sq(x) + sq(y) - sq(L1) - sq(L2)) / (2 * L1 * L2));
-  if (x < 0 & y < 0) {
-    theta2 = (-1) * theta2;
-  }
   
   theta1 = atan(y / x) - atan((L2 * sin(theta2)) / (L1 + L2 * cos(theta2)));
   
-  theta2 = (-1) * theta2 * 180 / PI;
+  theta2 = theta2 * 180 / PI;
   theta1 = theta1 * 180 / PI;
 
  // Angles adjustment depending in which quadrant the final tool coordinate x,y is
-  if (x >= 0 & y >= 0) {       // 1st quadrant
-    theta1 = 90 - theta1;
-  }
+  
   if (x < 0 & y > 0) {       // 2nd quadrant
     theta1 = 90 - theta1;
+    theta2 = (-1) * theta2;
   }
   if (x < 0 & y < 0) {       // 3d quadrant
-    theta1 = 270 - theta1;
+    theta1 = 180 + theta1;
   }
   if (x > 0 & y < 0) {       // 4th quadrant
-    theta1 = -90 - theta1;
+    theta1 = 270 - theta1;
+    theta2 = (-1) * theta2;
   }
   if (x < 0 & y == 0) {
     theta1 = 270 + theta1;
   }
-  
-  theta1=round(theta1);
-  theta2=round(theta2);
-  Serial.print("Theta1: ");
-  Serial.println(theta1);
-  Serial.print("Theta2: ");
-  Serial.println(theta2);
-  Serial.print("Z: ");
-  Serial.println(z);
-  
-  prepareMovement(0, x * theta2AngleToSteps);
-  prepareMovement(1, y * theta2AngleToSteps);
+
+  current_theta1 = theta1 - prev_theta1;
+  current_theta2 = theta2 - prev_theta2;
+  prev_theta1 = theta1;
+  prev_theta2 = theta2; 
+  /*
+  Serial.print("Current Theta1: ");
+  Serial.println(current_theta1);
+  Serial.print("Current Theta2: ");
+  Serial.println(current_theta2);
+  Serial.print("Prev Theta1: ");
+  Serial.println(prev_theta1);
+  Serial.print("Prev Theta2: ");
+  Serial.println(prev_theta2);
+  */
+  prepareMovement(0, current_theta1 * theta2AngleToSteps);
+  prepareMovement(1, current_theta2 * theta2AngleToSteps);
   runAndWait();
-  while (remainingSteppersFlag);
-  remainingSteppersFlag = 0;
-  nextStepperFlag = 0;
 }
