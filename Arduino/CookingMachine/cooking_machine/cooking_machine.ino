@@ -1,26 +1,25 @@
+#include <AccelStepper.h>
+#include <MultiStepper.h>
 #include <Servo_Hardware_PWM.h>
 #include <string.h>
 #include <SPI.h>
-#include <SD.h>
-#include <stdlib.h>
 
 Servo ts; //Tool servo
 Servo ees; // Endeffector servo
-File myFile;
 
 //Stepper motor pins
 int zd = 48, zp = 46, ze = A8;
 int eed = 0, eep = 0, eee = 0;
 int eepwm = 0, eedir = 0; //Pins for controlling endeffector detachable motor.
-int x2d = A7, x2p = A6, x2e = A2;
-int x1d = A1, x1p = A0, x1e = 38;
+int x2d = 6, x2p = 5, x2e = 7;
+int x1d = 3, x1p = 2, x1e = 4;
 int rd = 24, rp = 22, re = 26;
-//angle to step for x1 and x2.
-int x1atos = 423.333;
-int x2atos = 359.444;
+AccelStepper x(AccelStepper::FULL2WIRE, x1p, x1d);
+AccelStepper y(AccelStepper::FULL2WIRE, x2p, x2d);
+MultiStepper xy;
 //angle to step for inverse kinametics.
-const float theta1AngleToSteps = 171.6;
-const float theta2AngleToSteps = 186.3;
+const float theta1AngleToSteps = 18;
+const float theta2AngleToSteps = 18;
 const float zDistanceToSteps = 100;
 //length variable for x1, x2 / x, y
 //inverse kinametics variables
@@ -33,7 +32,7 @@ double prev_theta1 = 0.0, prev_theta2 = 0.0, current_theta1, current_theta2;
 //pump
 int pump = 45;
 //limit switch
-int eel = 0, x1l = 3, x2l = 14, zl = 18, rl = 0;
+int eel = 0, x1l = 8, x2l = 9, zl = 18, rl = 0;
 // variable for storing the input serial string by using the delimeter ' '. Buffer for storing substring of tokenizer.
 char buffer[5][20], str[80];
 // i for line increment while storing word k for index of word.
@@ -42,7 +41,6 @@ int i = 0, dlay = 0;
 int induct2_on = 23, induct2_up = 23, induct2_down = 27;
 int induct1_on = 29, induct1_up = 31, induct1_down = 33;
 
-int s1 = 35, s2 = 37, s3 = 39, s4 = 41, s5 = 43;
 
 #define TIMER1_INTERRUPTS_ON TIMSK1 |= (1 << OCIE1A);
 #define TIMER1_INTERRUPTS_OFF TIMSK1 &= ~(1 << OCIE1A);
@@ -130,7 +128,7 @@ void resetStepperInfo(stepperInfo & si) {
 volatile stepperInfo steppers[NUM_STEPPERS];
 
 void setup() {
-    Serial.begin(9600);
+    Serial.begin(115200);
     //setting tool pins
     ees.attach(46);
     ts.attach(44);
@@ -156,11 +154,6 @@ void setup() {
     pinMode(rp, OUTPUT);
     pinMode(re, OUTPUT);
     //output pins for spices.
-    pinMode(s1, OUTPUT);
-    pinMode(s2, OUTPUT);
-    pinMode(s3, OUTPUT);
-    pinMode(s4, OUTPUT);
-    pinMode(s5, OUTPUT);
     pinMode(pump, OUTPUT);
     //Limit switches set as input
     pinMode(zl, INPUT_PULLUP);
@@ -172,8 +165,8 @@ void setup() {
     //disabling all motors
     digitalWrite(ze, HIGH);
     digitalWrite(eee, HIGH);
-    digitalWrite(x1e, HIGH);
-    digitalWrite(x2e, HIGH);
+    digitalWrite(x1e, LOW);
+    digitalWrite(x2e, LOW);
     digitalWrite(re, HIGH);
     // higher speed number lower speed
     //runx1(LOW, 60, 10000);
@@ -219,6 +212,11 @@ void setup() {
     steppers[3].homedir = HIGH;
     steppers[3].limit_switch = rl;
 
+    x.setMaxSpeed(1000);
+    y.setMaxSpeed(1000);
+    // Then give them to MultiStepper to manage
+    xy.addStepper(x);
+    xy.addStepper(y);
 }
 int change = 0;
 
@@ -384,22 +382,16 @@ void adjustSpeedScales() {
     }
 }
 void loop() {
-    char cmd[80] = "";
+    String cmd;
     while (Serial.available()) {
-        char temp = (char) Serial.read();
-        str[i] = temp;
-        if (str[i] == ';') {
-            str[i] = '\0';
-            change = 1;
-        }
-        ++i;
+        cmd = Serial.readString();
+        change = 1;
     }
     if (change == 1) {
-        strcpy(cmd, str);
         const char s[2] = " ";
         i = 1;
         char * token;
-        token = strtok(str, s);
+        token = strtok(cmd.c_str(), s);
         strcpy(buffer[0], token);
         buffer[0][String(buffer[0]).length()] = '\0';
         while (token != NULL) {
@@ -417,11 +409,18 @@ void loop() {
         // comand fomat "command string speed direction steps ;"
         if (String(buffer[0]) == "py" || String(buffer[0]) == "\npy"){
             mode = atoi(buffer[1]);
-        }else if (String(buffer[0]) == "x1" || String(buffer[0]) == "\nx1") {
-            runx1(atol(buffer[1]));
-        }else if (String(buffer[0]) == "xy" || String(buffer[0]) == "\nxy") {
+        } else if (String(buffer[0]) == "G00" || String(buffer[0]) == "\nG00" || String(buffer[0]) == "G01" || String(buffer[0]) == "\nG01") {
+            xy.run();
+            while(xy.run() && (x.speed() != 0 && y.speed() != 0) ){
+              if( (digitalRead(x1l) == LOW && digitalRead(x1d) == LOW) || (digitalRead(x2l) == LOW && digitalRead(x2l) == LOW) ) {
+                x.setSpeed(0);
+                y.setSpeed(0);
+              }  
+            }
             inverseKinematics(atof(buffer[1]), atof(buffer[2]));
-        }else if (String(buffer[0]) == "x2" || String(buffer[0]) == "\nx2") {
+        } else if (String(buffer[0]) == "x1" || String(buffer[0]) == "\nx1") {
+            runx1(atol(buffer[1]));
+        } else if (String(buffer[0]) == "x2" || String(buffer[0]) == "\nx2") {
             runx2(atol(buffer[1]));
         } else if (String(buffer[0]) == "e" || String(buffer[0]) == "\ne") {
             runee(atoi(buffer[2]), atoi(buffer[1]), atol(buffer[3]));
@@ -504,30 +503,6 @@ void loop() {
             prepareMovement(2, atol(buffer[3]));
             prepareMovement(3, atol(buffer[4]));
             runAndWait();
-        } else if (String(buffer[0]) == "s1" || String(buffer[0]) == "\ns1"){
-            digitalWrite(s1, HIGH);
-            delay(500);
-            digitalWrite(s1, LOW);
-        }
-        else if (String(buffer[0]) == "s2" || String(buffer[0]) == "\ns2"){
-            digitalWrite(s2, HIGH);
-            delay(500);
-            digitalWrite(s2, LOW);
-        }
-        else if (String(buffer[0]) == "s3" || String(buffer[0]) == "\ns3"){
-            digitalWrite(s3, HIGH);
-            delay(500);
-            digitalWrite(s3, LOW);
-        }
-        else if (String(buffer[0]) == "s4" || String(buffer[0]) == "\ns4"){
-            digitalWrite(s4, HIGH);
-            delay(500);
-            digitalWrite(s4, LOW);
-        }
-        else if (String(buffer[0]) == "s5" || String(buffer[0]) == "\ns5"){
-            digitalWrite(s5, HIGH);
-            delay(500);
-            digitalWrite(s5, LOW);
         } else if (String(buffer[0]) == "water" || String(buffer[0]) == "\nwater") {
             if (atol(buffer[1]) == 1) {
                 digitalWrite(pump, HIGH);
@@ -603,7 +578,6 @@ void runr(int direction, int speed, long step) {
     digitalWrite(re, HIGH);
 }
 
-
 void inverseKinematics(float x, float y) {
   x = x - x_off;
   y = y - y_off;
@@ -631,22 +605,20 @@ void inverseKinematics(float x, float y) {
   if (x < 0 & y == 0) {
     theta1 = 270 + theta1;
   }
-
-  current_theta1 = theta1 - prev_theta1;
-  current_theta2 = theta2 - prev_theta2;
-  prev_theta1 = theta1;
-  prev_theta2 = theta2; 
+   
+  long positions[2] = { round(theta1 * theta1AngleToSteps), round(theta2 * theta2AngleToSteps)};
+  xy.moveTo(positions);
   /*
   Serial.print("Current Theta1: ");
-  Serial.println(current_theta1);
+  Serial.println(positions[0]);
   Serial.print("Current Theta2: ");
-  Serial.println(current_theta2);
+  Serial.println(positions[1]);
   Serial.print("Prev Theta1: ");
   Serial.println(prev_theta1);
   Serial.print("Prev Theta2: ");
   Serial.println(prev_theta2);
-  */
   prepareMovement(0, current_theta1 * theta2AngleToSteps);
   prepareMovement(1, current_theta2 * theta2AngleToSteps);
   runAndWait();
+  */
 }
