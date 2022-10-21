@@ -135,7 +135,6 @@ void setup() {
   ps.attach(3);
   gs.attach(5);
   ts.attach(6);
-  
   //Setting pinmode for all Output pins
   //output pins for z axis
   pinMode(zd, OUTPUT);
