@@ -109,8 +109,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
 //////////////////Server fucntions
   bool connected = false;
-  String device = '192.168.4.1';
-  // String device = '192.168.29.170';
+  //String device = '192.168.4.1';
+  String device = '192.168.29.170';
   check() async {
     var url = Uri.http(device);
     try {
