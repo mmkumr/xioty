@@ -110,7 +110,7 @@ class _MyHomePageState extends State<MyHomePage> {
 //////////////////Server fucntions
   bool connected = false;
   //String device = '192.168.4.1';
-  String device = '192.168.29.170';
+  String device = '192.168.194.218';
   check() async {
     var url = Uri.http(device);
     try {
@@ -195,7 +195,7 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       backgroundColor: const Color(0xffD8E3E4),
       appBar: AppBar(
-        backgroundColor: connected ? const Color(0xffD8E3E4) : Colors.red,
+        backgroundColor: connected ? Colors.green : Colors.red,
         title: Center(
           child: Text(
             connected ? "Connected" : "Not connected",
