@@ -1,0 +1,67 @@
+[
+  {
+    "Sourcefile": null,
+    "Include": "",
+    "Includepath": "/home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.2/cores/esp32"
+  },
+  {
+    "Sourcefile": null,
+    "Include": "",
+    "Includepath": "/home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.2/variants/esp32"
+  },
+  {
+    "Sourcefile": "/mnt/MyWorkspace/Projects/Xioty/VendingMachine/espnow_mac/build/sketch/espnow_mac.ino.cpp",
+    "Include": "WiFi.h",
+    "Includepath": "/home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.2/libraries/WiFi/src"
+  },
+  {
+    "Sourcefile": "/mnt/MyWorkspace/Projects/Xioty/VendingMachine/espnow_mac/build/sketch/espnow_mac.ino.cpp",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.2/libraries/WiFi/src/WiFi.cpp",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.2/libraries/WiFi/src/WiFiAP.cpp",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.2/libraries/WiFi/src/WiFiClient.cpp",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.2/libraries/WiFi/src/WiFiGeneric.cpp",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.2/libraries/WiFi/src/WiFiMulti.cpp",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.2/libraries/WiFi/src/WiFiSTA.cpp",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.2/libraries/WiFi/src/WiFiScan.cpp",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.2/libraries/WiFi/src/WiFiServer.cpp",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.2/libraries/WiFi/src/WiFiUdp.cpp",
+    "Include": "",
+    "Includepath": null
+  }
+]

@@ -1,0 +1,11 @@
+{
+  "additionalFiles": "",
+  "builtInToolsFolders": "",
+  "compiler.optimization_flags": "",
+  "customBuildProperties": "",
+  "fqbn": "esp32:esp32:esp32",
+  "hardwareFolders": "/home/mmkumr/.arduino15/packages",
+  "otherLibrariesFolders": "/home/mmkumr/Arduino/libraries",
+  "runtime.ide.version": "10607",
+  "sketchLocation": "/mnt/MyWorkspace/Projects/Xioty/VendingMachine/espnow_mac/espnow_mac.ino"
+}
