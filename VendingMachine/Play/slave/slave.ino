@@ -4,21 +4,23 @@
 #include <MultiStepper.h>
 
 //Stepper configs
-int en = 5, dir = 17, pul = 16;
-int cw = 22, ccw = 23;
+int en = 19, dir = 18, pul = 5;
+int cw = 12, ccw = 13;
 AccelStepper stepper(1, 16, 17);
 MultiStepper ms;
 //////////////////////////////////
 //Variables for storing steps, speed and number of commands.
-long rcv[5000];
-int spd[5000];
+long rcv[1000];
+float spd[1000];
 int s = 0;
+int r = 0;
 ///////////////////////////////////
 //F0:08:D1:57:87:64(Mac address for for future ref.)
 //Struct of data receiving
 typedef struct struct_message {
-  long trigger[5];
-  int spd[5];
+  long trigger;
+  float spd;
+  char cmd[50];
 } struct_message;
 
 
@@ -26,11 +28,17 @@ typedef struct struct_message {
 struct_message myData;
 
 // callback function that will be executed when data is received
-void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len) {
+void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len) { 
   memcpy(&myData, incomingData, sizeof(myData));
-  Serial.println(myData.trigger[0]);
-  rcv[s] = myData.trigger[0];
-  s++; 
+  //Serial.println(myData.trigger);
+  if(round(myData.spd) != 0){
+    spd[s] = myData.spd;
+    s++;
+  }
+  if(myData.trigger != 0){
+    rcv[r] = myData.trigger;
+    r++;
+  }
 }
 // callback when data is sent
 void setup() {
@@ -55,20 +63,24 @@ void setup() {
   ms.addStepper(stepper);
 }
 
-void loop() {  
-  if(myData.trigger[0] == -1){
+void loop() { 
+  if(myData.trigger == -1){
     Serial.println("Done");
+    Serial.print("no. of steps");
     Serial.println(s);
-    long temp = 0;
-    for(int i = 0; i < s; i++){
-      temp += rcv[i];
-      Serial.println(temp);
-      stepper.setMaxSpeed(5000);
-      long mul[2] = {temp,0};
-      ms.moveTo(mul);
-      stepper.enableOutputs();
+    Serial.print("no. of speeds");
+    Serial.println(r);
+    for(int i = 0; i < r ; i++){
+      stepper.setMaxSpeed(spd[i]);
+      Serial.println(spd[i]);
+      long temp[] = {rcv[i], 0};
+      Serial.println(rcv[i]);
+      ms.moveTo(temp);
       ms.runSpeedToPosition();
     }
     s = 0;
+    r = 0;
+    myData.trigger = 0;
+    myData.spd = 0;
   }
 }
