@@ -1,6 +1,8 @@
 import 'package:flutter/services.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'db/micros.dart';
+import 'db/recipes.dart';
 import 'layouts/commons.dart';
 import 'new_recipe.dart';
 
@@ -28,6 +30,7 @@ class _PreDetailsState extends State<PreDetails> {
   List microsList = [];
   List othersList = [];
   List selectedMicros = [];
+  Map data = {};
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -257,5 +260,27 @@ class _PreDetailsState extends State<PreDetails> {
             initializing name, _M and _m text controllers
             initializing selectionboxes
      */
+    RecipesServices recipesServices = RecipesServices();
+    MicrosServices microsServices = MicrosServices();
+    await recipesServices.getRecipe(widget.id).then((value) {
+      setState(() {
+        data = value;
+      });
+    });
+    setState(() {
+      _name.text = data['name'];
+      data['macros'].forEach((k, v) {
+        _M[int.parse(k.replaceAll('M', ''))].text = v;
+      });
+      data['micros'].forEach((k, v) {
+        _m[int.parse(k.replaceAll('m', ''))].text = v;
+        selectedMicros.add(int.parse(k.replaceAll('m', '')));
+      });
+    });
+    await microsServices.getMicros().then((value) {
+      setState(() {
+        microsList = value;
+      });
+    });
   }
 }

@@ -483,6 +483,7 @@ class _NewRecipeState extends State<NewRecipe> {
                                                           TextEditingController(
                                                               text: '1'));
                                                     });
+
                                                     setState(() {
                                                       operations.add(operation(
                                                           name:
@@ -525,7 +526,7 @@ class _NewRecipeState extends State<NewRecipe> {
             FloatingActionButton.extended(
               backgroundColor: elementsC,
               icon: Icon(FontAwesomeIcons.floppyDisk),
-              label: Text('Save'),
+              label: Text('Assemble'),
               onPressed: () {
                 if (operations.isNotEmpty) {
                   setState(() {
