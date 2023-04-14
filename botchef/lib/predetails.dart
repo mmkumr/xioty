@@ -1,10 +1,11 @@
 import 'package:flutter/services.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+
 import 'db/micros.dart';
 import 'db/recipes.dart';
 import 'layouts/commons.dart';
-import 'new_recipe.dart';
+import 'recipe.dart';
 
 class PreDetails extends StatefulWidget {
   final String id;
@@ -30,7 +31,7 @@ class _PreDetailsState extends State<PreDetails> {
   List microsList = [];
   List othersList = [];
   List selectedMicros = [];
-  Map data = {};
+  Map<String, dynamic> data = {};
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -240,12 +241,13 @@ class _PreDetailsState extends State<PreDetails> {
               'name': _name.text,
               'macros': macros,
               'micros': micros,
-              'others': othersList,
+              'others': data['others'],
+              'operations': data['operations'],
             };
             navigate(
                 'r',
                 context,
-                NewRecipe(
+                Recipe(
                   recipe: recipe,
                 ));
           }

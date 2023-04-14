@@ -487,7 +487,7 @@ class _NewRecipeState extends State<NewRecipe> {
                                                     setState(() {
                                                       operations.add(operation(
                                                           name:
-                                                              '${widget.recipe['others'][i]}  ${_params!.length}',
+                                                              '${widget.recipe['others'][i]} ${_params!.length}',
                                                           label: 'O${i + 1}'));
                                                     });
                                                   }
