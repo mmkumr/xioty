@@ -1,3 +1,7 @@
+import 'dart:io';
+
+import 'package:path_provider/path_provider.dart';
+
 import 'db/micros.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
@@ -537,7 +541,7 @@ class _RecipeState extends State<Recipe> {
               backgroundColor: elementsC,
               icon: Icon(FontAwesomeIcons.floppyDisk),
               label: Text('Run'),
-              onPressed: () {
+              onPressed: () async {
                 if (operations.isNotEmpty) {
                   setState(() {
                     loading = true;
@@ -548,8 +552,16 @@ class _RecipeState extends State<Recipe> {
                       value: (e) => e.name.contains('Delay')
                           ? [e.name, e.param]
                           : e.name);
+                  List<String> files = [];
+                  for (int i = 0; i < data['operations'].keys.length; i++) {
+                    await getFileLines(data['operations'].keys.toList()[i])
+                        .then((value) {
+                      files = files + value;
+                    });
+                  }
                   RecipesServices recipesServices = RecipesServices();
-                  recipesServices.addRecipe(data);
+                  recipesServices.updateRecipe(data, widget.recipe['id']);
+                  recipesServices.runRecipe(files);
                   Navigator.of(context).pop();
                 }
                 setState(() {
@@ -562,6 +574,22 @@ class _RecipeState extends State<Recipe> {
         ),
       ),
     );
+  }
+
+  //for get lines in file as list
+  Future<List<String>> getFileLines(String name) async {
+    final data = await rootBundle.load('assets/operations/${name[0]}/$name');
+    final directory = (await getTemporaryDirectory()).path;
+    final file = await writeToFile(data, '$directory/$name');
+    return await file.readAsLines();
+  }
+
+  //Saving files to a temporary location.
+  Future<File> writeToFile(ByteData data, String path) {
+    return File(path).writeAsBytes(data.buffer.asUint8List(
+      data.offsetInBytes,
+      data.lengthInBytes,
+    ));
   }
 
   getmicros() async {

@@ -7,6 +7,10 @@ class RecipesServices {
     await _firestore.collection(collection).add(data);
   }
 
+  updateRecipe(Map<String, dynamic> data, String id) async {
+    await _firestore.collection(collection).doc(id).update(data);
+  }
+
   Future<List<DocumentSnapshot>> getAllRecipes() async {
     return _firestore.collection(collection).get().then((value) {
       return value.docs;
@@ -17,6 +21,13 @@ class RecipesServices {
     return _firestore.collection(collection).doc(id).get().then((value) {
       return value.data()!;
     });
+  }
+
+  runRecipe(List<String> data) async {
+    await _firestore
+        .collection('run')
+        .doc('aadkVC7gURqOpZquVHWH')
+        .update({'run': data});
   }
 
   removeRecipe(String id) async {

@@ -238,6 +238,7 @@ class _PreDetailsState extends State<PreDetails> {
             }
             //For passing data to next page.
             Map<String, dynamic> recipe = {
+              'id': widget.id,
               'name': _name.text,
               'macros': macros,
               'micros': micros,

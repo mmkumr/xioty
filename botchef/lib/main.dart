@@ -1,7 +1,6 @@
 import 'package:animated_splash_screen/animated_splash_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-
 import 'error.dart';
 import 'recipe_list.dart';
 
@@ -49,7 +48,7 @@ class _MyHomePageState extends State<MyHomePage> {
         splash: 'assets/imgs/logo.png',
         nextScreen: RecipeList(),
         splashTransition: SplashTransition.scaleTransition,
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+      ),
     );
   }
 }
