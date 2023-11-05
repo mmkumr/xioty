@@ -1,0 +1,27 @@
+; Arm
+G0 F600
+G0 X500 Y2000
+M 1 P300
+G0 F100
+G0 X50 Y100
+S 2 10000 500
+G0 F600
+G0 X200 Y300
+G0 X10 Y50
+G0 X100 Y10
+H 0
+; Induction
+ind 1
+ind 400
+ind 0
+; ingredient tower
+M 1 P0
+M 2 P0
+M 1 P500
+M 2 P300
+M 3 P3000
+; Gripper
+S 1 0 1500
+S 2 10000 200
+; stir tool
+stir P1000
