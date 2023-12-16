@@ -19,10 +19,10 @@ int targetHeatLevel = 4;
 //mqtt
 const char* ssid = "ConnectndEnjoy";
 const char* password = "P@$$w0rd";
-const char* mqttServer = "192.168.29.219";
+const char* mqttServer = "6b3b54fa5f4a464fa80e2e0410aec35e.s2.eu.hivemq.cloud";
 const char* mqtt_username = "xara";  // MQTT username
 const char* mqtt_password = "xara";  // MQTT password
-const int mqttPort = 1883;
+const int mqttPort = 8883;
 const char* mqttTopic = "xara/induction";
 const char* mqttName = "induction";
 
@@ -83,7 +83,8 @@ void setup() {
   // delay(500); // Simulate button press
   // digitalWrite(powerButtonPin, HIGH);
 }
-int t = 0;  // Temperature input
+int t = 0;      // Temperature input
+int state = 0;  // Power status of Induction cooker.
 void loop() {
   if (Serial.available()) {
     String input = Serial.readStringUntil('\n');
@@ -98,14 +99,17 @@ void induction(String input) {
       digitalWrite(powerButtonPin, LOW);
       delay(500);  // Simulate button press
       digitalWrite(powerButtonPin, HIGH);
+      state = 0;
     }
-    if (t == 1) {
+    if (state == 0) {
       targetHeatLevel = 4;
       currentHeatLevel = targetHeatLevel;
       digitalWrite(powerButtonPin, LOW);
       delay(500);  // Simulate button press
       digitalWrite(powerButtonPin, HIGH);
-    } else if (t == 200) {
+      state = 1;
+    }
+    if (t == 200) {
       targetHeatLevel = 0;
     } else if (t == 400) {
       targetHeatLevel = 1;

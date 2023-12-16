@@ -1,4 +1,4 @@
-/home/mmkumr/Downloads/mqttcontrol/Arduino/Ind_Command/build/libraries/WiFi/WiFiMulti.cpp.o: \
+/run/media/mmkumr/MyWorkspace/Projects/xioty/mqttcontrol/Arduino/Ind_Command/build/libraries/WiFi/WiFiMulti.cpp.o: \
  /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/libraries/WiFi/src/WiFiMulti.cpp \
  /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/libraries/WiFi/src/WiFiMulti.h \
  /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/libraries/WiFi/src/WiFi.h \

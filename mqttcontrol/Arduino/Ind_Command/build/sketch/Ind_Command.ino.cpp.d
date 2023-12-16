@@ -1,5 +1,5 @@
-/home/mmkumr/Downloads/mqttcontrol/Arduino/Ind_Command/build/sketch/Ind_Command.ino.cpp.o: \
- /home/mmkumr/Downloads/mqttcontrol/Arduino/Ind_Command/build/sketch/Ind_Command.ino.cpp \
+/run/media/mmkumr/MyWorkspace/Projects/xioty/mqttcontrol/Arduino/Ind_Command/build/sketch/Ind_Command.ino.cpp.o: \
+ /run/media/mmkumr/MyWorkspace/Projects/xioty/mqttcontrol/Arduino/Ind_Command/build/sketch/Ind_Command.ino.cpp \
  /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/cores/esp32/Arduino.h \
  /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/cores/esp32/esp_arduino_version.h \
  /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/freertos/include/freertos/FreeRTOS.h \

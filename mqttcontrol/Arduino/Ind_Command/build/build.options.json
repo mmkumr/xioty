@@ -6,5 +6,5 @@
   "fqbn": "esp32:esp32:esp32doit-devkit-v1:UploadSpeed=921600,DebugLevel=none,FlashFreq=80,EraseFlash=none",
   "hardwareFolders": "/home/mmkumr/.arduino15/packages",
   "otherLibrariesFolders": "/home/mmkumr/Arduino/libraries",
-  "sketchLocation": "/home/mmkumr/Downloads/mqttcontrol/Arduino/Ind_Command"
+  "sketchLocation": "/run/media/mmkumr/MyWorkspace/Projects/xioty/mqttcontrol/Arduino/Ind_Command"
 }

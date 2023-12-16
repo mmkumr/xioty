@@ -1,4 +1,4 @@
-/home/mmkumr/Downloads/mqttcontrol/Arduino/Ind_Command/build/libraries/PubSubClient/PubSubClient.cpp.o: \
+/run/media/mmkumr/MyWorkspace/Projects/xioty/mqttcontrol/Arduino/Ind_Command/build/libraries/PubSubClient/PubSubClient.cpp.o: \
  /home/mmkumr/Arduino/libraries/PubSubClient/src/PubSubClient.cpp \
  /home/mmkumr/Arduino/libraries/PubSubClient/src/PubSubClient.h \
  /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/cores/esp32/Arduino.h \

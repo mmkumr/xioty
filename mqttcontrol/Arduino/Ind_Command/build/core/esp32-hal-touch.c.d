@@ -1,4 +1,4 @@
-/home/mmkumr/Downloads/mqttcontrol/Arduino/Ind_Command/build/core/esp32-hal-touch.c.o: \
+/run/media/mmkumr/MyWorkspace/Projects/xioty/mqttcontrol/Arduino/Ind_Command/build/core/esp32-hal-touch.c.o: \
  /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/cores/esp32/esp32-hal-touch.c \
  /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/soc/esp32/include/soc/soc_caps.h \
  /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/dio_qspi/include/sdkconfig.h \

@@ -1,4 +1,4 @@
-/home/mmkumr/Downloads/mqttcontrol/Arduino/Ind_Command/build/core/wiring_pulse.c.o: \
+/run/media/mmkumr/MyWorkspace/Projects/xioty/mqttcontrol/Arduino/Ind_Command/build/core/wiring_pulse.c.o: \
  /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/cores/esp32/wiring_pulse.c \
  /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/cores/esp32/wiring_private.h \
  /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/cores/esp32/Arduino.h \

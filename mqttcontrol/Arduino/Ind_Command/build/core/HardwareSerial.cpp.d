@@ -1,4 +1,4 @@
-/home/mmkumr/Downloads/mqttcontrol/Arduino/Ind_Command/build/core/HardwareSerial.cpp.o: \
+/run/media/mmkumr/MyWorkspace/Projects/xioty/mqttcontrol/Arduino/Ind_Command/build/core/HardwareSerial.cpp.o: \
  /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/cores/esp32/HardwareSerial.cpp \
  /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/variants/doitESP32devkitV1/pins_arduino.h \
  /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/cores/esp32/io_pin_remap.h \

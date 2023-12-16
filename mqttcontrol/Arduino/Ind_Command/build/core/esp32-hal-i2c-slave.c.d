@@ -1,4 +1,4 @@
-/home/mmkumr/Downloads/mqttcontrol/Arduino/Ind_Command/build/core/esp32-hal-i2c-slave.c.o: \
+/run/media/mmkumr/MyWorkspace/Projects/xioty/mqttcontrol/Arduino/Ind_Command/build/core/esp32-hal-i2c-slave.c.o: \
  /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/cores/esp32/esp32-hal-i2c-slave.c \
  /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/esp_common/include/esp_attr.h \
  /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/esp_rom/include/esp32/rom/gpio.h \

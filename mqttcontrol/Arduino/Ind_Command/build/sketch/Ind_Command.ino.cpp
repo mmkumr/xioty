@@ -1,4 +1,4 @@
-#line 1 "/home/mmkumr/Downloads/mqttcontrol/Arduino/Ind_Command/Ind_Command.ino"
+#line 1 "/run/media/mmkumr/MyWorkspace/Projects/xioty/mqttcontrol/Arduino/Ind_Command/Ind_Command.ino"
 // command: ind temp_val/0/1
 
 #include <Arduino.h>
@@ -20,26 +20,26 @@ int targetHeatLevel = 4;
 //mqtt
 const char* ssid = "ConnectndEnjoy";
 const char* password = "P@$$w0rd";
-const char* mqttServer = "192.168.29.219";
+const char* mqttServer = "6b3b54fa5f4a464fa80e2e0410aec35e.s2.eu.hivemq.cloud";
 const char* mqtt_username = "xara";  // MQTT username
 const char* mqtt_password = "xara";  // MQTT password
-const int mqttPort = 1883;
+const int mqttPort = 8883;
 const char* mqttTopic = "xara/induction";
 const char* mqttName = "induction";
 
 WiFiClient espClient;
 PubSubClient client(espClient);
-#line 31 "/home/mmkumr/Downloads/mqttcontrol/Arduino/Ind_Command/Ind_Command.ino"
+#line 31 "/run/media/mmkumr/MyWorkspace/Projects/xioty/mqttcontrol/Arduino/Ind_Command/Ind_Command.ino"
 void callback(char* topic, byte* payload, unsigned int length);
-#line 45 "/home/mmkumr/Downloads/mqttcontrol/Arduino/Ind_Command/Ind_Command.ino"
+#line 45 "/run/media/mmkumr/MyWorkspace/Projects/xioty/mqttcontrol/Arduino/Ind_Command/Ind_Command.ino"
 void setup();
-#line 87 "/home/mmkumr/Downloads/mqttcontrol/Arduino/Ind_Command/Ind_Command.ino"
+#line 88 "/run/media/mmkumr/MyWorkspace/Projects/xioty/mqttcontrol/Arduino/Ind_Command/Ind_Command.ino"
 void loop();
-#line 95 "/home/mmkumr/Downloads/mqttcontrol/Arduino/Ind_Command/Ind_Command.ino"
+#line 96 "/run/media/mmkumr/MyWorkspace/Projects/xioty/mqttcontrol/Arduino/Ind_Command/Ind_Command.ino"
 void induction(String input);
-#line 129 "/home/mmkumr/Downloads/mqttcontrol/Arduino/Ind_Command/Ind_Command.ino"
+#line 132 "/run/media/mmkumr/MyWorkspace/Projects/xioty/mqttcontrol/Arduino/Ind_Command/Ind_Command.ino"
 void adjustHeatLevel();
-#line 31 "/home/mmkumr/Downloads/mqttcontrol/Arduino/Ind_Command/Ind_Command.ino"
+#line 31 "/run/media/mmkumr/MyWorkspace/Projects/xioty/mqttcontrol/Arduino/Ind_Command/Ind_Command.ino"
 void callback(char* topic, byte* payload, unsigned int length) {
   String input = "";
   Serial.print("Message arrived in topic: ");
@@ -95,7 +95,8 @@ void setup() {
   // delay(500); // Simulate button press
   // digitalWrite(powerButtonPin, HIGH);
 }
-int t = 0;  // Temperature input
+int t = 0;      // Temperature input
+int state = 0;  // Power status of Induction cooker.
 void loop() {
   if (Serial.available()) {
     String input = Serial.readStringUntil('\n');
@@ -111,13 +112,15 @@ void induction(String input) {
       delay(500);  // Simulate button press
       digitalWrite(powerButtonPin, HIGH);
     }
-    if (t == 1) {
+    if (state == 0) {
       targetHeatLevel = 4;
       currentHeatLevel = targetHeatLevel;
       digitalWrite(powerButtonPin, LOW);
       delay(500);  // Simulate button press
       digitalWrite(powerButtonPin, HIGH);
-    } else if (t == 200) {
+      state = 1;
+    }
+    if (t == 200) {
       targetHeatLevel = 0;
     } else if (t == 400) {
       targetHeatLevel = 1;
