@@ -1,5 +1,6 @@
-/run/media/mmkumr/MyWorkspace/Projects/xioty/mqttcontrol/Arduino/Ind_Command/build/sketch/Ind_Command.ino.cpp.o: \
- /run/media/mmkumr/MyWorkspace/Projects/xioty/mqttcontrol/Arduino/Ind_Command/build/sketch/Ind_Command.ino.cpp \
+/run/media/mmkumr/MyWorkspace/Projects/xioty/mqttcontrol/Arduino/Ind_Command/build/libraries/WiFiClientSecure/WiFiClientSecure.cpp.o: \
+ /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/libraries/WiFiClientSecure/src/WiFiClientSecure.cpp \
+ /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/libraries/WiFiClientSecure/src/WiFiClientSecure.h \
  /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/cores/esp32/Arduino.h \
  /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/cores/esp32/esp_arduino_version.h \
  /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/freertos/include/freertos/FreeRTOS.h \
@@ -192,8 +193,6 @@
  /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/libraries/WiFi/src/WiFiUdp.h \
  /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/cores/esp32/Udp.h \
  /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/cores/esp32/cbuf.h \
- /home/mmkumr/Arduino/libraries/PubSubClient/src/PubSubClient.h \
- /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/libraries/WiFiClientSecure/src/WiFiClientSecure.h \
  /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/libraries/WiFiClientSecure/src/ssl_client.h \
  /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/mbedtls/mbedtls/include/mbedtls/platform.h \
  /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/mbedtls/port/include/mbedtls/esp_config.h \
@@ -231,4 +230,18 @@
  /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/mbedtls/port/include/aes_alt.h \
  /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/mbedtls/port/include/aes/esp_aes.h \
  /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/hal/include/hal/aes_types.h \
- /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/mbedtls/mbedtls/include/mbedtls/error.h
+ /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/mbedtls/mbedtls/include/mbedtls/error.h \
+ /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/libraries/WiFiClientSecure/src/esp_crt_bundle.h \
+ /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/lwip/lwip/src/include/lwip/sockets.h \
+ /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/newlib/platform_include/sys/poll.h \
+ /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/lwip/lwip/src/include/lwip/netif.h \
+ /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/lwip/lwip/src/include/lwip/pbuf.h \
+ /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/lwip/lwip/src/include/lwip/stats.h \
+ /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/lwip/lwip/src/include/lwip/mem.h \
+ /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/lwip/lwip/src/include/lwip/memp.h \
+ /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/lwip/lwip/src/include/lwip/priv/memp_std.h \
+ /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/lwip/lwip/src/include/lwip/priv/memp_priv.h \
+ /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/lwip/lwip/src/include/lwip/priv/mem_priv.h \
+ /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/lwip/lwip/src/include/lwip/inet.h \
+ /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/lwip/lwip/src/include/lwip/errno.h \
+ /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/lwip/lwip/src/include/lwip/netdb.h

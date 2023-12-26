@@ -1,5 +1,5 @@
-/run/media/mmkumr/MyWorkspace/Projects/xioty/mqttcontrol/Arduino/Ind_Command/build/sketch/Ind_Command.ino.cpp.o: \
- /run/media/mmkumr/MyWorkspace/Projects/xioty/mqttcontrol/Arduino/Ind_Command/build/sketch/Ind_Command.ino.cpp \
+/run/media/mmkumr/MyWorkspace/Projects/xioty/mqttcontrol/Arduino/Ind_Command/build/libraries/WiFiClientSecure/ssl_client.cpp.o: \
+ /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/libraries/WiFiClientSecure/src/ssl_client.cpp \
  /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/cores/esp32/Arduino.h \
  /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/cores/esp32/esp_arduino_version.h \
  /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/freertos/include/freertos/FreeRTOS.h \
@@ -132,6 +132,82 @@
  /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/esp_hw_support/include/soc/esp32/spiram.h \
  /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/cores/esp32/io_pin_remap.h \
  /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/cores/esp32/Arduino.h \
+ /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/cores/esp32/esp32-hal-log.h \
+ /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/lwip/lwip/src/include/lwip/err.h \
+ /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/lwip/lwip/src/include/lwip/opt.h \
+ /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/lwip/port/esp32/include/lwipopts.h \
+ /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/newlib/platform_include/sys/ioctl.h \
+ /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/esp_system/include/esp_task.h \
+ /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/freertos/include/esp_additions/freertos/FreeRTOSConfig.h \
+ /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/lwip/port/esp32/include/netif/dhcp_state.h \
+ /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/lwip/port/esp32/include/sntp/sntp_get_set_time.h \
+ /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/lwip/lwip/src/include/lwip/debug.h \
+ /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/lwip/lwip/src/include/lwip/arch.h \
+ /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/lwip/port/esp32/include/arch/cc.h \
+ /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/lwip/port/esp32/include/arch/sys_arch.h \
+ /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/lwip/port/esp32/include/arch/vfs_lwip.h \
+ /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/lwip/lwip/src/include/lwip/sockets.h \
+ /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/newlib/platform_include/sys/poll.h \
+ /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/lwip/lwip/src/include/lwip/ip_addr.h \
+ /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/lwip/lwip/src/include/lwip/def.h \
+ /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/lwip/lwip/src/include/lwip/ip4_addr.h \
+ /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/lwip/lwip/src/include/lwip/ip6_addr.h \
+ /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/lwip/lwip/src/include/lwip/def.h \
+ /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/lwip/lwip/src/include/lwip/ip6_zone.h \
+ /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/lwip/lwip/src/include/lwip/netif.h \
+ /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/lwip/lwip/src/include/lwip/pbuf.h \
+ /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/lwip/lwip/src/include/lwip/stats.h \
+ /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/lwip/lwip/src/include/lwip/mem.h \
+ /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/lwip/lwip/src/include/lwip/memp.h \
+ /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/lwip/lwip/src/include/lwip/priv/memp_std.h \
+ /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/lwip/lwip/src/include/lwip/priv/memp_priv.h \
+ /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/lwip/lwip/src/include/lwip/priv/mem_priv.h \
+ /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/lwip/lwip/src/include/lwip/inet.h \
+ /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/lwip/lwip/src/include/lwip/errno.h \
+ /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/lwip/lwip/src/include/lwip/sys.h \
+ /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/lwip/lwip/src/include/lwip/netdb.h \
+ /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/mbedtls/mbedtls/include/mbedtls/sha256.h \
+ /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/mbedtls/port/include/mbedtls/esp_config.h \
+ /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/mbedtls/mbedtls/include/mbedtls/config.h \
+ /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/mbedtls/mbedtls/include/mbedtls/check_config.h \
+ /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/mbedtls/port/include/esp_mem.h \
+ /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/mbedtls/port/include/sha256_alt.h \
+ /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/hal/include/hal/sha_types.h \
+ /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/esp_rom/include/esp32/rom/sha.h \
+ /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/mbedtls/mbedtls/include/mbedtls/oid.h \
+ /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/mbedtls/mbedtls/include/mbedtls/asn1.h \
+ /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/mbedtls/port/include/mbedtls/bignum.h \
+ /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/mbedtls/mbedtls/include/mbedtls/bignum.h \
+ /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/mbedtls/mbedtls/include/mbedtls/pk.h \
+ /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/mbedtls/mbedtls/include/mbedtls/md.h \
+ /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/mbedtls/mbedtls/include/mbedtls/platform_util.h \
+ /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/mbedtls/mbedtls/include/mbedtls/rsa.h \
+ /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/mbedtls/mbedtls/include/mbedtls/ecp.h \
+ /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/mbedtls/mbedtls/include/mbedtls/ecdsa.h \
+ /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/mbedtls/mbedtls/include/mbedtls/cipher.h \
+ /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/libraries/WiFiClientSecure/src/ssl_client.h \
+ /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/mbedtls/mbedtls/include/mbedtls/platform.h \
+ /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/mbedtls/mbedtls/include/mbedtls/platform_time.h \
+ /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/mbedtls/mbedtls/include/mbedtls/net.h \
+ /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/mbedtls/mbedtls/include/mbedtls/net_sockets.h \
+ /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/mbedtls/mbedtls/include/mbedtls/ssl.h \
+ /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/mbedtls/mbedtls/include/mbedtls/ssl_ciphersuites.h \
+ /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/mbedtls/mbedtls/include/mbedtls/x509_crt.h \
+ /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/mbedtls/mbedtls/include/mbedtls/x509.h \
+ /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/mbedtls/mbedtls/include/mbedtls/x509_crl.h \
+ /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/mbedtls/mbedtls/include/mbedtls/dhm.h \
+ /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/mbedtls/mbedtls/include/mbedtls/ecdh.h \
+ /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/mbedtls/mbedtls/include/mbedtls/debug.h \
+ /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/mbedtls/mbedtls/include/mbedtls/entropy.h \
+ /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/mbedtls/mbedtls/include/mbedtls/sha512.h \
+ /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/mbedtls/port/include/sha512_alt.h \
+ /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/mbedtls/mbedtls/include/mbedtls/ctr_drbg.h \
+ /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/mbedtls/mbedtls/include/mbedtls/aes.h \
+ /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/mbedtls/port/include/aes_alt.h \
+ /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/mbedtls/port/include/aes/esp_aes.h \
+ /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/hal/include/hal/aes_types.h \
+ /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/mbedtls/mbedtls/include/mbedtls/error.h \
+ /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/libraries/WiFiClientSecure/src/esp_crt_bundle.h \
  /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/libraries/WiFi/src/WiFi.h \
  /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/cores/esp32/Print.h \
  /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/cores/esp32/IPv6Address.h \
@@ -157,26 +233,7 @@
  /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/esp_eth/include/esp_eth_phy.h \
  /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/tcpip_adapter/include/tcpip_adapter.h \
  /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/tcpip_adapter/include/tcpip_adapter_types.h \
- /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/lwip/lwip/src/include/lwip/ip_addr.h \
- /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/lwip/lwip/src/include/lwip/opt.h \
- /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/lwip/port/esp32/include/lwipopts.h \
- /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/newlib/platform_include/sys/ioctl.h \
- /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/esp_system/include/esp_task.h \
- /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/freertos/include/esp_additions/freertos/FreeRTOSConfig.h \
- /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/lwip/port/esp32/include/netif/dhcp_state.h \
- /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/lwip/port/esp32/include/sntp/sntp_get_set_time.h \
- /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/lwip/lwip/src/include/lwip/debug.h \
- /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/lwip/lwip/src/include/lwip/arch.h \
- /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/lwip/port/esp32/include/arch/cc.h \
- /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/lwip/port/esp32/include/arch/sys_arch.h \
- /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/lwip/port/esp32/include/arch/vfs_lwip.h \
- /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/lwip/lwip/src/include/lwip/def.h \
- /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/lwip/lwip/src/include/lwip/ip4_addr.h \
- /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/lwip/lwip/src/include/lwip/ip6_addr.h \
- /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/lwip/lwip/src/include/lwip/def.h \
- /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/lwip/lwip/src/include/lwip/ip6_zone.h \
  /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/lwip/include/apps/dhcpserver/dhcpserver.h \
- /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/lwip/lwip/src/include/lwip/err.h \
  /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/esp_netif/include/esp_netif_sta_list.h \
  /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/esp_wifi/include/esp_smartconfig.h \
  /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/wifi_provisioning/include/wifi_provisioning/manager.h \
@@ -191,44 +248,4 @@
  /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/cores/esp32/Server.h \
  /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/libraries/WiFi/src/WiFiUdp.h \
  /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/cores/esp32/Udp.h \
- /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/cores/esp32/cbuf.h \
- /home/mmkumr/Arduino/libraries/PubSubClient/src/PubSubClient.h \
- /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/libraries/WiFiClientSecure/src/WiFiClientSecure.h \
- /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/libraries/WiFiClientSecure/src/ssl_client.h \
- /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/mbedtls/mbedtls/include/mbedtls/platform.h \
- /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/mbedtls/port/include/mbedtls/esp_config.h \
- /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/mbedtls/mbedtls/include/mbedtls/config.h \
- /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/mbedtls/mbedtls/include/mbedtls/check_config.h \
- /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/mbedtls/port/include/esp_mem.h \
- /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/mbedtls/mbedtls/include/mbedtls/platform_time.h \
- /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/mbedtls/mbedtls/include/mbedtls/net.h \
- /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/mbedtls/mbedtls/include/mbedtls/net_sockets.h \
- /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/mbedtls/mbedtls/include/mbedtls/ssl.h \
- /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/mbedtls/port/include/mbedtls/bignum.h \
- /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/mbedtls/mbedtls/include/mbedtls/bignum.h \
- /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/mbedtls/mbedtls/include/mbedtls/ecp.h \
- /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/mbedtls/mbedtls/include/mbedtls/ssl_ciphersuites.h \
- /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/mbedtls/mbedtls/include/mbedtls/pk.h \
- /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/mbedtls/mbedtls/include/mbedtls/md.h \
- /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/mbedtls/mbedtls/include/mbedtls/platform_util.h \
- /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/mbedtls/mbedtls/include/mbedtls/rsa.h \
- /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/mbedtls/mbedtls/include/mbedtls/ecdsa.h \
- /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/mbedtls/mbedtls/include/mbedtls/cipher.h \
- /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/mbedtls/mbedtls/include/mbedtls/x509_crt.h \
- /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/mbedtls/mbedtls/include/mbedtls/x509.h \
- /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/mbedtls/mbedtls/include/mbedtls/asn1.h \
- /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/mbedtls/mbedtls/include/mbedtls/x509_crl.h \
- /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/mbedtls/mbedtls/include/mbedtls/dhm.h \
- /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/mbedtls/mbedtls/include/mbedtls/ecdh.h \
- /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/mbedtls/mbedtls/include/mbedtls/debug.h \
- /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/mbedtls/mbedtls/include/mbedtls/entropy.h \
- /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/mbedtls/mbedtls/include/mbedtls/sha512.h \
- /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/mbedtls/port/include/sha512_alt.h \
- /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/hal/include/hal/sha_types.h \
- /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/esp_rom/include/esp32/rom/sha.h \
- /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/mbedtls/mbedtls/include/mbedtls/ctr_drbg.h \
- /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/mbedtls/mbedtls/include/mbedtls/aes.h \
- /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/mbedtls/port/include/aes_alt.h \
- /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/mbedtls/port/include/aes/esp_aes.h \
- /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/hal/include/hal/aes_types.h \
- /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/tools/sdk/esp32/include/mbedtls/mbedtls/include/mbedtls/error.h
+ /home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/cores/esp32/cbuf.h

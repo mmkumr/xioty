@@ -2,16 +2,23 @@ import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:mqtt_client/mqtt_client.dart';
 import 'package:mqtt_client/mqtt_server_client.dart';
 
-void main() {
+ByteData? cacert;
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  cacert = await rootBundle.load('certs/ca.pem');
   runApp(MyApp());
 }
 
+enum Pause { wait, processing, run }
+
 class MyApp extends StatefulWidget {
-  final MqttServerClient client = MqttServerClient('192.168.29.219', '');
+  final MqttServerClient client = MqttServerClient.withPort(
+      '6b3b54fa5f4a464fa80e2e0410aec35e.s2.eu.hivemq.cloud', '', 8883);
   MyApp({super.key}) {
     // MQTT setup
     client.logging(on: true);
@@ -20,16 +27,23 @@ class MyApp extends StatefulWidget {
     client.pongCallback = pong;
     client.onSubscribed = onSubscribed;
     client.onConnected = onConnected;
+    client.onAutoReconnect = onReconnect;
+
+    /// Security context
+    SecurityContext context = SecurityContext()
+      ..setTrustedCertificatesBytes(cacert!.buffer.asUint8List());
+    client.secure = true;
+    client.securityContext = context;
 
     final connMessage = MqttConnectMessage()
         .withClientIdentifier('android')
         .withWillTopic('willtopic')
         .withWillMessage('Will Message')
         .startClean();
-    client.keepAlivePeriod = 60;
+    client.keepAlivePeriod = 1800;
     client.connectionMessage = connMessage;
 
-    client.connect('xara', 'xara');
+    client.connect('xioty', 'P@ssw0rd');
   }
 
   void onDisconnected() {
@@ -48,6 +62,10 @@ class MyApp extends StatefulWidget {
     debugPrint('Client connection was successful');
   }
 
+  void onReconnect() {
+    client.port = 1883;
+  }
+
   // MQTT setup end
   @override
   State<MyApp> createState() => _MyAppState();
@@ -62,7 +80,9 @@ class _MyAppState extends State<MyApp> {
       'ind': induction,
       'M': ingredients,
       'S': gripper,
-      'stir': stir
+      'stir': stir,
+      'Tool': arm,
+      'delay': delay,
     };
     super.initState();
   }
@@ -73,8 +93,11 @@ class _MyAppState extends State<MyApp> {
   bool start = false;
   File? file;
   List<String> data = [];
+  List<String> tempData = [];
   int index = 0;
   TextEditingController input = TextEditingController();
+
+  Pause pause = Pause.run;
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -84,11 +107,86 @@ class _MyAppState extends State<MyApp> {
         ),
         body: Center(
           child: sending
-              ? const Column(
+              ? Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    CircularProgressIndicator(),
-                    Text('Sending command(s). Please wait!'),
+                    if (pause == Pause.run)
+                      MaterialButton(
+                        color: Colors.blue,
+                        onPressed: () {
+                          setState(() {
+                            pause = Pause.wait;
+                          });
+                        },
+                        child: const Text("Pause"),
+                      ),
+                    if (pause == Pause.processing)
+                      MaterialButton(
+                        color: Colors.blue,
+                        onPressed: () async {
+                          setState(() {
+                            tempData = data;
+                          });
+                          await FilePicker.platform.clearTemporaryFiles();
+                          FilePickerResult? result =
+                              await FilePicker.platform.pickFiles(
+                            type: FileType.custom,
+                            allowedExtensions: ['txt'],
+                          );
+                          if (result != null) {
+                            file = File(result.files.single.path!);
+                            data = await file!.readAsLines();
+                            setState(() {
+                              data.removeWhere((element) {
+                                if (!commands
+                                    .containsKey(element.split(' ')[0])) {
+                                  return true;
+                                }
+                                return false;
+                              });
+                            });
+                            if (data.isNotEmpty) {
+                              setState(() {
+                                sending = true;
+                              });
+                              setState(() {
+                                int i = 0;
+                                try {
+                                  data.firstWhere((element) {
+                                    if (element != tempData[i]) {
+                                      if (i < index) {
+                                        setState(() {
+                                          index = i;
+                                        });
+                                      }
+                                      return true;
+                                    }
+                                    i++;
+                                    return false;
+                                  });
+                                } catch (e) {
+                                  Fluttertoast.showToast(msg: 'No changes!');
+                                }
+                              });
+                              commands[data[index].split(' ')[0]](data[index]);
+                            }
+                          } else {
+                            if (context.mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('Failed to add file!'),
+                                ),
+                              );
+                            }
+                          }
+                          setState(() {
+                            pause = Pause.run;
+                          });
+                        },
+                        child: const Text("Resume"),
+                      ),
+                    const CircularProgressIndicator(),
+                    const Text('Sending command(s). Please wait!'),
                   ],
                 )
               : Column(
@@ -96,9 +194,14 @@ class _MyAppState extends State<MyApp> {
                   children: <Widget>[
                     ElevatedButton(
                       onPressed: () async {
-                        setState(() {
-                          sending = true;
-                        });
+                        if (widget.client.connectionStatus!.state ==
+                                MqttConnectionState.connected &&
+                            !start) {
+                          subscribe();
+                          setState(() {
+                            start = true;
+                          });
+                        }
                         await FilePicker.platform.clearTemporaryFiles();
                         FilePickerResult? result =
                             await FilePicker.platform.pickFiles(
@@ -119,15 +222,10 @@ class _MyAppState extends State<MyApp> {
                           });
                           debugPrint(data.toString());
                           if (data.isNotEmpty) {
-                            commands[data[0].split(' ')[0]](data[0]);
-                          }
-                          if (widget.client.connectionStatus!.state ==
-                                  MqttConnectionState.connected &&
-                              !start) {
-                            subscribe();
                             setState(() {
-                              start = true;
+                              sending = true;
                             });
+                            commands[data[0].split(' ')[0]](data[0]);
                           }
                         } else {
                           if (context.mounted) {
@@ -145,7 +243,7 @@ class _MyAppState extends State<MyApp> {
                       padding: const EdgeInsets.all(8.0),
                       child: TextField(
                         controller: input,
-                        onEditingComplete: () {
+                        onEditingComplete: () async {
                           if (widget.client.connectionStatus!.state ==
                                   MqttConnectionState.connected &&
                               !start) {
@@ -160,10 +258,17 @@ class _MyAppState extends State<MyApp> {
                               data.add(input.text);
                               sending = true;
                             });
-                          } catch (e) {
+                          } on NoSuchMethodError catch (e) {
                             debugPrint(e.toString());
                             Fluttertoast.showToast(
                               msg: 'Invalid command',
+                              backgroundColor: Colors.red,
+                              textColor: Colors.white,
+                            );
+                          } on ConnectionException catch (e) {
+                            debugPrint(e.toString());
+                            Fluttertoast.showToast(
+                              msg: 'MQTT server not connected',
                               backgroundColor: Colors.red,
                               textColor: Colors.white,
                             );
@@ -209,9 +314,30 @@ class _MyAppState extends State<MyApp> {
     sendData(cmd, 'xara/stir');
   }
 
+  delay(String cmd) async {
+    await Future.delayed(
+      Duration(
+        seconds: int.parse(
+          cmd.split(' ')[1],
+        ),
+      ),
+    );
+    index++;
+    if (index < data.length) {
+      commands[data[index].split(' ')[0]](data[index]);
+    } else {
+      setState(() {
+        index = 0;
+        sending = false;
+        data.clear();
+        receivedMessage = '';
+      });
+    }
+  }
+
 //end of Function for commands
-  subscribe() {
-    widget.client.subscribe('response', MqttQos.atMostOnce);
+  subscribe() async {
+    widget.client.subscribe('response', MqttQos.atLeastOnce);
     widget.client.updates!
         .listen((List<MqttReceivedMessage<MqttMessage?>>? c) async {
       final recMess = c![0].payload as MqttPublishMessage;
@@ -225,7 +351,11 @@ class _MyAppState extends State<MyApp> {
 
       if (receivedMessage == 'o') {
         index++;
-        if (index < data.length) {
+        if (pause == Pause.wait) {
+          setState(() {
+            pause = Pause.processing;
+          });
+        } else if (index < data.length) {
           commands[data[index].split(' ')[0]](data[index]);
         } else {
           setState(() {

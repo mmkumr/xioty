@@ -21,6 +21,11 @@
   },
   {
     "Sourcefile": "/run/media/mmkumr/MyWorkspace/Projects/xioty/mqttcontrol/Arduino/Ind_Command/build/sketch/Ind_Command.ino.cpp",
+    "Include": "WiFiClientSecure.h",
+    "Includepath": "/home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/libraries/WiFiClientSecure/src"
+  },
+  {
+    "Sourcefile": "/run/media/mmkumr/MyWorkspace/Projects/xioty/mqttcontrol/Arduino/Ind_Command/build/sketch/Ind_Command.ino.cpp",
     "Include": "",
     "Includepath": null
   },
@@ -71,6 +76,21 @@
   },
   {
     "Sourcefile": "/home/mmkumr/Arduino/libraries/PubSubClient/src/PubSubClient.cpp",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/libraries/WiFiClientSecure/src/WiFiClientSecure.cpp",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/libraries/WiFiClientSecure/src/esp_crt_bundle.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/mmkumr/.arduino15/packages/esp32/hardware/esp32/2.0.11/libraries/WiFiClientSecure/src/ssl_client.cpp",
     "Include": "",
     "Includepath": null
   }
