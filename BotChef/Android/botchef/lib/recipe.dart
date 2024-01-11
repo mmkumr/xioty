@@ -35,11 +35,9 @@ class _RecipeState extends State<Recipe> {
   void initState() {
     super.initState();
     getmicros();
-    debugPrint(widget.recipe['operations'].toString());
     widget.recipe['operations'].every((e) {
       setState(() {
-        _params = List.generate(widget.recipe['operations'].length,
-            (i) => TextEditingController(text: e['param']));
+        _params!.add(TextEditingController(text: e['param'].toString()));
         operations.add(
             operation(label: e['label'], name: e['name'], param: e['param']));
       });
@@ -104,6 +102,7 @@ class _RecipeState extends State<Recipe> {
                               if (operations[index].name!.contains('Delay') ||
                                   operations[index].name!.contains('Tilt') ||
                                   operations[index].name!.contains('Sqeeze')) {
+                                debugPrint(_params![index + 1].text);
                                 showDialog(
                                   context: context,
                                   builder: (ctx) => AlertDialog(
@@ -127,8 +126,7 @@ class _RecipeState extends State<Recipe> {
                                           child: TextFormField(
                                             keyboardType: TextInputType.number,
                                             controller: _params![index],
-                                            inputFormatters: <
-                                                TextInputFormatter>[
+                                            inputFormatters: <TextInputFormatter>[
                                               FilteringTextInputFormatter
                                                   .digitsOnly,
                                             ],
@@ -162,7 +160,6 @@ class _RecipeState extends State<Recipe> {
                                   ),
                                 );
                               }
-                              debugPrint(index.toString());
                             },
                             leading: Text(operations[index].label!),
                             title: Text(operations[index].name!),
@@ -227,48 +224,39 @@ class _RecipeState extends State<Recipe> {
                                         TextStyle(fontWeight: FontWeight.bold),
                                   ),
                                   children: [
-                                    for (int i = 0;
-                                        i < widget.recipe['macros'].keys.length;
-                                        i++)
-                                      Padding(
-                                        padding: const EdgeInsets.all(10.0),
-                                        child: Neumorphic(
-                                          style: NeumorphicStyle(
-                                            boxShape:
-                                                NeumorphicBoxShape.roundRect(
-                                                    BorderRadius.circular(12)),
-                                            depth: 10,
-                                            color: macroColor,
-                                          ),
-                                          child: ListTile(
-                                            title: Text(widget.recipe['macros'][
-                                                widget.recipe['macros'].keys
-                                                    .toList()[i]]),
-                                            onTap: () {
-                                              String label = 'M' +
-                                                  (int.parse(widget
+                                    for (int i = 0; i < 5; i++)
+                                      if (widget.recipe['macros']
+                                          .containsKey('M$i'))
+                                        Padding(
+                                          padding: const EdgeInsets.all(10.0),
+                                          child: Neumorphic(
+                                            style: NeumorphicStyle(
+                                              boxShape:
+                                                  NeumorphicBoxShape.roundRect(
+                                                      BorderRadius.circular(
+                                                          12)),
+                                              depth: 10,
+                                              color: macroColor,
+                                            ),
+                                            child: ListTile(
+                                              title: Text(
+                                                widget.recipe['macros']['M$i'],
+                                              ),
+                                              onTap: () {
+                                                setState(() {
+                                                  operations.add(
+                                                    operation(
+                                                      name: widget
                                                               .recipe['macros']
-                                                              .keys
-                                                              .toList()[i]
-                                                              .substring(1)) +
-                                                          1)
-                                                      .toString();
-                                              setState(() {
-                                                operations.add(
-                                                  operation(
-                                                    name: widget
-                                                            .recipe['macros'][
-                                                        widget.recipe['macros']
-                                                            .keys
-                                                            .toList()[i]],
-                                                    label: label,
-                                                  ),
-                                                );
-                                              });
-                                            },
+                                                          ['M$i'],
+                                                      label: 'M${i + 1}',
+                                                    ),
+                                                  );
+                                                });
+                                              },
+                                            ),
                                           ),
                                         ),
-                                      ),
                                   ],
                                 ),
                               ),
@@ -437,10 +425,53 @@ class _RecipeState extends State<Recipe> {
                 },
               ),
             ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: FloatingActionButton(
+                backgroundColor: elementsC,
+                child: Icon(FontAwesomeIcons.play),
+                onPressed: () async {
+                  if (operations.isNotEmpty) {
+                    setState(() {
+                      loading = true;
+                    });
+                    List<String> files = [];
+                    for (operation e in operations) {
+                      if (e.label![0] == 'm') {
+                        if (e.name!.contains('Hold')) {
+                          files = files + await getFileLines('n/up/${e.label}');
+                        } else if (e.name!.contains('Drop')) {
+                          files =
+                              files + await getFileLines('n/down/${e.label}');
+                        }
+                      } else if (e.name!.contains('Delay')) {
+                        files = files + ['G4 S${e.param}'];
+                      } else if (e.name!.contains('Tilt') ||
+                          e.name!.contains('Sqeeze')) {
+                        for (int i = 0; i < int.parse(e.param!); i++) {
+                          files = files +
+                              await getFileLines('${e.label![0]}/${e.label}');
+                        }
+                      } else {
+                        files = files +
+                            await getFileLines('${e.label![0]}/${e.label}');
+                      }
+                    }
+                    RecipesServices recipesServices = RecipesServices();
+                    recipesServices.runRecipe(files);
+                    Navigator.of(context).pop();
+                  }
+                  setState(() {
+                    loading = true;
+                  });
+                  navigate('r', context, RecipeList());
+                },
+              ),
+            ),
             FloatingActionButton.extended(
               backgroundColor: elementsC,
               icon: Icon(FontAwesomeIcons.floppyDisk),
-              label: Text('Run'),
+              label: Text('Save'),
               onPressed: () async {
                 if (operations.isNotEmpty) {
                   setState(() {
@@ -454,30 +485,8 @@ class _RecipeState extends State<Recipe> {
                       'param': e.param,
                     };
                   }).toList();
-                  List<String> files = [];
-                  for (operation e in operations) {
-                    if (e.label![0] == 'm') {
-                      if (e.name!.contains('Hold')) {
-                        files = files + await getFileLines('m/up/${e.label}');
-                      } else if (e.name!.contains('Drop')) {
-                        files = files + await getFileLines('m/down/${e.label}');
-                      }
-                    } else if (e.name!.contains('Delay')) {
-                      files = files + ['G4 S${e.param}'];
-                    } else if (e.name!.contains('Tilt') ||
-                        e.name!.contains('Sqeeze')) {
-                      for (int i = 0; i < int.parse(e.param!); i++) {
-                        files = files +
-                            await getFileLines('${e.label![0]}/${e.label}');
-                      }
-                    } else {
-                      files = files +
-                          await getFileLines('${e.label![0]}/${e.label}');
-                    }
-                  }
                   RecipesServices recipesServices = RecipesServices();
                   recipesServices.updateRecipe(data, widget.recipe['id']);
-                  recipesServices.runRecipe(files);
                   Navigator.of(context).pop();
                 }
                 setState(() {

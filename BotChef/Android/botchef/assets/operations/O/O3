@@ -1,6 +1,6 @@
-;Ind on-off
+;Ind_On/Off
 G4 S1
-M42 P16 S255
-G4 P500
 M42 P16 S0
+G4 P500
+M42 P16 S255
 G4 S1

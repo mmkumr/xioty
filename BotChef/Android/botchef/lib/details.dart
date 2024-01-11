@@ -30,7 +30,8 @@ class _DetailsState extends State<Details> {
   final GlobalKey<FormState> _key = GlobalKey<FormState>();
   List<TextEditingController> _M =
       List.generate(5, (i) => TextEditingController(), growable: false);
-  List<TextEditingController> _m = [];
+  List<TextEditingController> _m = List.generate(9, (i) => TextEditingController(),
+            growable: true);
   TextEditingController _name = TextEditingController();
   List microsList = [];
   List othersList = [];
@@ -84,7 +85,7 @@ class _DetailsState extends State<Details> {
                 ),
                 ListTile(
                     title: Center(child: Text('Macros')), tileColor: elementsC),
-                for (int i = 0; i < 4; i++)
+                for (int i = 0; i < 5; i++)
                   Padding(
                     padding: const EdgeInsets.only(top: 20),
                     child: Neumorphic(
@@ -193,8 +194,6 @@ class _DetailsState extends State<Details> {
     await microsServices.getMicros().then((value) {
       setState(() {
         microsList = value;
-        _m = List.generate(value.length, (i) => TextEditingController(),
-            growable: true);
       });
     });
   }

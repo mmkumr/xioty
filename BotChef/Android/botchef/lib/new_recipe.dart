@@ -213,7 +213,7 @@ class _NewRecipeState extends State<NewRecipe> {
                                         TextStyle(fontWeight: FontWeight.bold),
                                   ),
                                   children: [
-                                    for (int i = 0; i < 4; i++)
+                                    for (int i = 0; i < 5; i++)
                                       if (widget.recipe['macros']
                                           .containsKey('M$i'))
                                         Padding(
@@ -238,7 +238,7 @@ class _NewRecipeState extends State<NewRecipe> {
                                                       name: widget
                                                               .recipe['macros']
                                                           ['M$i'],
-                                                      label: 'M$i',
+                                                      label: 'M${i + 1}',
                                                     ),
                                                   );
                                                 });

@@ -5,6 +5,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'db/recipes.dart';
 import 'details.dart';
 import 'layouts/commons.dart';
+import 'mqtt.dart';
 import 'predetails.dart';
 
 class RecipeList extends StatefulWidget {
@@ -29,6 +30,14 @@ class _RecipeListState extends State<RecipeList> {
       appBar: AppBar(
         title: Text('Recipe'),
         backgroundColor: Color(0xff9a94c8),
+        actions: [
+          MaterialButton(
+            onPressed: () {
+              navigate('p', context, MQTTPage());
+            },
+            child: Text('Manual Mode'),
+          )
+        ],
       ),
       body: ListView.builder(
         itemCount: recipes.length,

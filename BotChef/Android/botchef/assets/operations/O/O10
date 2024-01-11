@@ -1,4 +1,4 @@
 ;Water-Off
 G4 P10
-M42 P2 S0
+M42 P8 S0
 G4 P10

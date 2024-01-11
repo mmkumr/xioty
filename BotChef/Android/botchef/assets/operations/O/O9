@@ -1,4 +1,4 @@
 ;Water-On
 G4 P10
-M42 P2 S255
+M42 P8 S70
 G4 P10
