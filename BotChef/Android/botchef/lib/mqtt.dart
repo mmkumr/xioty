@@ -91,11 +91,6 @@ class _MQTTPageState extends State<MQTTPage> {
     super.initState();
   }
 
-  @override
-  void didChangeDependencies() async {
-    super.didChangeDependencies();
-  }
-
   Map commands = {};
   List cmdHist = [];
   int histIndex = -1;
@@ -181,6 +176,9 @@ class _MQTTPageState extends State<MQTTPage> {
                                 });
                               } catch (e) {
                                 Fluttertoast.showToast(msg: 'No changes!');
+                                setState(() {
+                                  pause = Pause.run;
+                                });
                               }
                             });
                             if (data[index].split(' ')[0][0] == 'G' ||
@@ -248,17 +246,20 @@ class _MQTTPageState extends State<MQTTPage> {
                           });
                         });
                         debugPrint(data.toString());
-                        if (data.isNotEmpty) {
+                        if (data.isNotEmpty || data.length < 4) {
                           setState(() {
                             sending = true;
                           });
-                          if (data[0].split(' ')[0][0] == 'G' ||
-                              data[0].split(' ')[0][0] == 'M' ||
-                              data[0].split(' ')[0][0] == 'T') {
-                            commands[data[0].split(' ')[0][0]](data[0]);
-                          } else {
-                            commands[data[0].split(' ')[0]](data[0]);
+                          for (int i = 0; i < 4; i++) {
+                            if (data[i].split(' ')[0][0] == 'G' ||
+                                data[i].split(' ')[0][0] == 'M' ||
+                                data[i].split(' ')[0][0] == 'T') {
+                              commands[data[i].split(' ')[0][0]](data[i]);
+                            } else {
+                              commands[data[i].split(' ')[0]](data[i]);
+                            }
                           }
+                          index = 4;
                         }
                       } else {
                         if (context.mounted) {
