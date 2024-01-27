@@ -43,7 +43,7 @@ class MQTTPage extends StatefulWidget {
         .withWillTopic('willtopic')
         .withWillMessage('Will Message')
         .startClean();
-    client.keepAlivePeriod = 1800;
+    client.keepAlivePeriod = 60;
     client.connectionMessage = connMessage;
 
     client.connect('xioty', 'P@ssw0rd');
@@ -419,7 +419,7 @@ class _MQTTPageState extends State<MQTTPage> {
 
 //end of Function for commands
   subscribe() async {
-    widget.client.subscribe('response', MqttQos.atLeastOnce);
+    widget.client.subscribe('response', MqttQos.exactlyOnce);
     widget.client.updates!
         .listen((List<MqttReceivedMessage<MqttMessage?>>? c) async {
       final recMess = c![0].payload as MqttPublishMessage;
