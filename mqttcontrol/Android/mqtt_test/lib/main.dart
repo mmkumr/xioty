@@ -8,18 +8,20 @@ import 'package:mqtt_client/mqtt_client.dart';
 import 'package:mqtt_client/mqtt_server_client.dart';
 
 ByteData? cacert;
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  cacert = await rootBundle.load('certs/ca.pem');
-  runApp(MyApp());
+
+class CACert {
+  static getCert() async {
+    cacert = await rootBundle.load('certs/ca.pem');
+  }
 }
 
 enum Pause { wait, processing, run }
 
-class MyApp extends StatefulWidget {
+class MQTTPage extends StatefulWidget {
   final MqttServerClient client = MqttServerClient.withPort(
       '6b3b54fa5f4a464fa80e2e0410aec35e.s2.eu.hivemq.cloud', '', 8883);
-  MyApp({super.key}) {
+
+  MQTTPage({super.key}) {
     // MQTT setup
     client.logging(on: true);
     client.onDisconnected = onDisconnected;
@@ -30,6 +32,7 @@ class MyApp extends StatefulWidget {
     client.onAutoReconnect = onReconnect;
 
     /// Security context
+    CACert.getCert();
     SecurityContext context = SecurityContext()
       ..setTrustedCertificatesBytes(cacert!.buffer.asUint8List());
     client.secure = true;
@@ -40,7 +43,7 @@ class MyApp extends StatefulWidget {
         .withWillTopic('willtopic')
         .withWillMessage('Will Message')
         .startClean();
-    client.keepAlivePeriod = 1800;
+    client.keepAlivePeriod = 60;
     client.connectionMessage = connMessage;
 
     client.connect('xioty', 'P@ssw0rd');
@@ -68,10 +71,10 @@ class MyApp extends StatefulWidget {
 
   // MQTT setup end
   @override
-  State<MyApp> createState() => _MyAppState();
+  State<MQTTPage> createState() => _MQTTPageState();
 }
 
-class _MyAppState extends State<MyApp> {
+class _MQTTPageState extends State<MQTTPage> {
   @override
   void initState() {
     commands = {
@@ -89,6 +92,8 @@ class _MyAppState extends State<MyApp> {
   }
 
   Map commands = {};
+  List cmdHist = [];
+  int histIndex = -1;
   String receivedMessage = '';
   bool sending = false;
   bool start = false;
@@ -101,120 +106,32 @@ class _MyAppState extends State<MyApp> {
   Pause pause = Pause.run;
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(
-          title: const Text('MQTT Flutter App'),
-        ),
-        body: Center(
-          child: sending
-              ? Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    if (pause == Pause.run)
-                      MaterialButton(
-                        color: Colors.blue,
-                        onPressed: () {
-                          setState(() {
-                            pause = Pause.wait;
-                          });
-                        },
-                        child: const Text("Pause"),
-                      ),
-                    if (pause == Pause.processing)
-                      MaterialButton(
-                        color: Colors.blue,
-                        onPressed: () async {
-                          setState(() {
-                            tempData = data;
-                          });
-                          await FilePicker.platform.clearTemporaryFiles();
-                          FilePickerResult? result =
-                              await FilePicker.platform.pickFiles(
-                            type: FileType.custom,
-                            allowedExtensions: ['txt'],
-                          );
-                          if (result != null) {
-                            file = File(result.files.single.path!);
-                            data = await file!.readAsLines();
-                            setState(() {
-                              data.removeWhere((element) {
-                                if (!commands
-                                        .containsKey(element.split(' ')[0]) ||
-                                    element.split(' ')[0][0] == 'G' ||
-                                    element.split(' ')[0][0] == 'M' ||
-                                    element.split(' ')[0][0] == 'T') {
-                                  return true;
-                                }
-                                return false;
-                              });
-                            });
-                            if (data.isNotEmpty) {
-                              setState(() {
-                                sending = true;
-                              });
-                              setState(() {
-                                int i = 0;
-                                try {
-                                  data.firstWhere((element) {
-                                    if (element != tempData[i]) {
-                                      if (i < index) {
-                                        setState(() {
-                                          index = i;
-                                        });
-                                      }
-                                      return true;
-                                    }
-                                    i++;
-                                    return false;
-                                  });
-                                } catch (e) {
-                                  Fluttertoast.showToast(msg: 'No changes!');
-                                }
-                              });
-                              if (data[index].split(' ')[0][0] == 'G' ||
-                                  data[index].split(' ')[0][0] == 'M' ||
-                                  data[index].split(' ')[0][0] == 'T' ||
-                                  data[index].split(' ')[0][0] == 'M') {
-                                commands[data[index].split(' ')[0][0]](
-                                    data[index]);
-                              } else {
-                                commands[data[index].split(' ')[0]](
-                                    data[index]);
-                              }
-                            }
-                          } else {
-                            if (context.mounted) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('Failed to add file!'),
-                                ),
-                              );
-                            }
-                          }
-                          setState(() {
-                            pause = Pause.run;
-                          });
-                        },
-                        child: const Text("Resume"),
-                      ),
-                    const CircularProgressIndicator(),
-                    const Text('Sending command(s). Please wait!'),
-                  ],
-                )
-              : Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    ElevatedButton(
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('MQTT Flutter App'),
+      ),
+      body: Center(
+        child: sending
+            ? Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  if (pause == Pause.run)
+                    MaterialButton(
+                      color: Colors.blue,
+                      onPressed: () {
+                        setState(() {
+                          pause = Pause.wait;
+                        });
+                      },
+                      child: const Text("Pause"),
+                    ),
+                  if (pause == Pause.processing)
+                    MaterialButton(
+                      color: Colors.blue,
                       onPressed: () async {
-                        if (widget.client.connectionStatus!.state ==
-                                MqttConnectionState.connected &&
-                            !start) {
-                          subscribe();
-                          setState(() {
-                            start = true;
-                          });
-                        }
+                        setState(() {
+                          tempData = data;
+                        });
                         await FilePicker.platform.clearTemporaryFiles();
                         FilePickerResult? result =
                             await FilePicker.platform.pickFiles(
@@ -226,25 +143,52 @@ class _MyAppState extends State<MyApp> {
                           data = await file!.readAsLines();
                           setState(() {
                             data.removeWhere((element) {
+                              if (element.split(' ')[0][0] == 'G' ||
+                                  element.split(' ')[0][0] == 'M' ||
+                                  element.split(' ')[0][0] == 'T') {
+                                return false;
+                              }
                               if (!commands
-                                      .containsKey(element.split(' ')[0]) ||
-                                  element.split(' ')[0][0] == 'M') {
+                                  .containsKey(element.split(' ')[0])) {
                                 return true;
                               }
                               return false;
                             });
                           });
-                          debugPrint(data.toString());
                           if (data.isNotEmpty) {
                             setState(() {
                               sending = true;
                             });
-                            if (data[0].split(' ')[0][0] == 'G' ||
-                                data[0].split(' ')[0][0] == 'M' ||
-                                data[0].split(' ')[0][0] == 'T') {
-                              commands[data[0].split(' ')[0][0]](data[0]);
+                            setState(() {
+                              int i = 0;
+                              try {
+                                data.firstWhere((element) {
+                                  if (element != tempData[i]) {
+                                    if (i < index) {
+                                      setState(() {
+                                        index = i;
+                                      });
+                                    }
+                                    return true;
+                                  }
+                                  i++;
+                                  return false;
+                                });
+                              } catch (e) {
+                                Fluttertoast.showToast(msg: 'No changes!');
+                                setState(() {
+                                  pause = Pause.run;
+                                });
+                              }
+                            });
+                            if (data[index].split(' ')[0][0] == 'G' ||
+                                data[index].split(' ')[0][0] == 'M' ||
+                                data[index].split(' ')[0][0] == 'T' ||
+                                data[index].split(' ')[0][0] == 'M') {
+                              commands[data[index].split(' ')[0][0]](
+                                  data[index]);
                             } else {
-                              commands[data[0].split(' ')[0]](data[0]);
+                              commands[data[index].split(' ')[0]](data[index]);
                             }
                           }
                         } else {
@@ -256,65 +200,177 @@ class _MyAppState extends State<MyApp> {
                             );
                           }
                         }
+                        setState(() {
+                          pause = Pause.run;
+                        });
                       },
-                      child: const Text("Select command file"),
+                      child: const Text("Resume"),
                     ),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: TextField(
-                        controller: input,
-                        onEditingComplete: () async {
-                          if (widget.client.connectionStatus!.state ==
-                                  MqttConnectionState.connected &&
-                              !start) {
-                            subscribe();
-                            setState(() {
-                              start = true;
-                            });
-                          }
-                          try {
-                            if (input.text.split(' ')[0][0] == 'G' ||
-                                input.text.split(' ')[0][0] == 'M' ||
-                                input.text.split(' ')[0][0] == 'T') {
-                              commands[input.text.split(' ')[0][0]](input.text);
-                            } else {
-                              commands[input.text.split(' ')[0]](input.text);
+                  const CircularProgressIndicator(),
+                  const Text('Sending command(s). Please wait!'),
+                ],
+              )
+            : Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  ElevatedButton(
+                    onPressed: () async {
+                      if (widget.client.connectionStatus!.state ==
+                              MqttConnectionState.connected &&
+                          !start) {
+                        subscribe();
+                        setState(() {
+                          start = true;
+                        });
+                      }
+                      await FilePicker.platform.clearTemporaryFiles();
+                      FilePickerResult? result =
+                          await FilePicker.platform.pickFiles(
+                        type: FileType.custom,
+                        allowedExtensions: ['txt'],
+                      );
+                      if (result != null) {
+                        file = File(result.files.single.path!);
+                        data = await file!.readAsLines();
+                        setState(() {
+                          data.removeWhere((element) {
+                            if (element.split(' ')[0][0] == 'G' ||
+                                element.split(' ')[0][0] == 'M' ||
+                                element.split(' ')[0][0] == 'T') {
+                              return false;
                             }
-                            setState(() {
-                              data.add(input.text);
-                              sending = true;
-                            });
-                          } on NoSuchMethodError catch (e) {
-                            debugPrint(e.toString());
-                            Fluttertoast.showToast(
-                              msg: 'Invalid command',
-                              backgroundColor: Colors.red,
-                              textColor: Colors.white,
-                            );
-                          } on ConnectionException catch (e) {
-                            debugPrint(e.toString());
-                            Fluttertoast.showToast(
-                              msg: 'MQTT server not connected',
-                              backgroundColor: Colors.red,
-                              textColor: Colors.white,
-                            );
+                            if (!commands.containsKey(element.split(' ')[0])) {
+                              return true;
+                            }
+                            return false;
+                          });
+                        });
+                        debugPrint(data.toString());
+                        if (data.isNotEmpty || data.length < 4) {
+                          setState(() {
+                            sending = true;
+                          });
+                          for (int i = 0; i < 4; i++) {
+                            if (data[i].split(' ')[0][0] == 'G' ||
+                                data[i].split(' ')[0][0] == 'M' ||
+                                data[i].split(' ')[0][0] == 'T') {
+                              commands[data[i].split(' ')[0][0]](data[i]);
+                            } else {
+                              commands[data[i].split(' ')[0]](data[i]);
+                            }
                           }
-                          debugPrint(input.text);
-                          input.clear();
-                        },
-                        decoration: const InputDecoration(
-                          labelText: "Command", //babel text
-                          hintText: "Enter command", //hint text
-                          prefixIcon: Icon(
-                            Icons.keyboard_arrow_right,
-                            size: 40,
-                          ), //prefix iocn
-                        ),
+                          index = 4;
+                        }
+                      } else {
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Failed to add file!'),
+                            ),
+                          );
+                        }
+                      }
+                    },
+                    child: const Text("Select command file"),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: ElevatedButton(
+                      onPressed: () {
+                        setState(() {
+                          if (histIndex < cmdHist.length - 1) histIndex++;
+                          debugPrint(histIndex.toString());
+                          if (cmdHist.isNotEmpty)
+                            input.text = cmdHist[histIndex];
+                        });
+                      },
+                      child: Icon(
+                        Icons.keyboard_arrow_up_rounded,
+                        size: 50,
                       ),
-                    )
-                  ],
-                ),
-        ),
+                      style: ElevatedButton.styleFrom(
+                        shape: CircleBorder(),
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: TextField(
+                      controller: input,
+                      onEditingComplete: () async {
+                        if (widget.client.connectionStatus!.state ==
+                                MqttConnectionState.connected &&
+                            !start) {
+                          subscribe();
+                          setState(() {
+                            start = true;
+                          });
+                        }
+                        try {
+                          setState(() {
+                            cmdHist.insert(0, input.text);
+                          });
+                          if (input.text.split(' ')[0][0] == 'G' ||
+                              input.text.split(' ')[0][0] == 'M' ||
+                              input.text.split(' ')[0][0] == 'T') {
+                            commands[input.text.split(' ')[0][0]](input.text);
+                          } else {
+                            commands[input.text.split(' ')[0]](input.text);
+                          }
+                          setState(() {
+                            data.add(input.text);
+                            sending = true;
+                          });
+                        } on NoSuchMethodError catch (e) {
+                          debugPrint(e.toString());
+                          Fluttertoast.showToast(
+                            msg: 'Invalid command',
+                            backgroundColor: Colors.red,
+                            textColor: Colors.white,
+                          );
+                        } on ConnectionException catch (e) {
+                          debugPrint(e.toString());
+                          Fluttertoast.showToast(
+                            msg: 'MQTT server not connected',
+                            backgroundColor: Colors.red,
+                            textColor: Colors.white,
+                          );
+                        }
+                        debugPrint(input.text);
+                        input.clear();
+                      },
+                      decoration: const InputDecoration(
+                        labelText: "Command", //babel text
+                        hintText: "Enter command", //hint text
+                        prefixIcon: Icon(
+                          Icons.keyboard_arrow_right,
+                          size: 40,
+                        ), //prefix iocn
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: ElevatedButton(
+                      onPressed: () {
+                        setState(() {
+                          if (histIndex > 0) histIndex--;
+                          debugPrint(histIndex.toString());
+                          if (cmdHist.isNotEmpty)
+                            input.text = cmdHist[histIndex];
+                        });
+                      },
+                      child: Icon(
+                        Icons.keyboard_arrow_down_rounded,
+                        size: 50,
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        shape: CircleBorder(),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
       ),
     );
   }
@@ -363,7 +419,7 @@ class _MyAppState extends State<MyApp> {
 
 //end of Function for commands
   subscribe() async {
-    widget.client.subscribe('response', MqttQos.atLeastOnce);
+    widget.client.subscribe('response', MqttQos.exactlyOnce);
     widget.client.updates!
         .listen((List<MqttReceivedMessage<MqttMessage?>>? c) async {
       final recMess = c![0].payload as MqttPublishMessage;

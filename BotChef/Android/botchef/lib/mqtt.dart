@@ -77,28 +77,16 @@ class MQTTPage extends StatefulWidget {
 class _MQTTPageState extends State<MQTTPage> {
   @override
   void initState() {
-    commands = {
-      'G': arm,
-      'M': arm,
-      'T': arm,
-      'ind': induction,
-      'i': ingredients,
-      'S': gripper,
-      'stir': stir,
-      'Tool': arm,
-      'delay': delay,
-    };
     super.initState();
   }
 
-  Map commands = {};
   List cmdHist = [];
   int histIndex = -1;
   String receivedMessage = '';
   bool sending = false;
   bool start = false;
   File? file;
-  List<String> data = [];
+  String data = "";
   List<String> tempData = [];
   int index = 0;
   TextEditingController input = TextEditingController();
@@ -122,16 +110,14 @@ class _MQTTPageState extends State<MQTTPage> {
                         setState(() {
                           pause = Pause.wait;
                         });
+                        sendData("pause", "xara/cmd");
                       },
                       child: const Text("Pause"),
                     ),
-                  if (pause == Pause.processing)
+                  if (pause == Pause.wait)
                     MaterialButton(
                       color: Colors.blue,
                       onPressed: () async {
-                        setState(() {
-                          tempData = data;
-                        });
                         await FilePicker.platform.clearTemporaryFiles();
                         FilePickerResult? result =
                             await FilePicker.platform.pickFiles(
@@ -140,63 +126,20 @@ class _MQTTPageState extends State<MQTTPage> {
                         );
                         if (result != null) {
                           file = File(result.files.single.path!);
-                          data = await file!.readAsLines();
-                          setState(() {
-                            data.removeWhere((element) {
-                              if (element.split(' ')[0][0] == 'G' ||
-                                  element.split(' ')[0][0] == 'M' ||
-                                  element.split(' ')[0][0] == 'T') {
-                                return false;
-                              }
-                              if (!commands
-                                  .containsKey(element.split(' ')[0])) {
-                                return true;
-                              }
-                              return false;
-                            });
-                          });
-                          if (data.isNotEmpty) {
+                          data = await file!.readAsString();
+                          debugPrint(data);
+                          if (data.isNotEmpty || data.length < 4) {
+                            sendData(data, "xara/cmd");
                             setState(() {
                               sending = true;
                             });
-                            setState(() {
-                              int i = 0;
-                              try {
-                                data.firstWhere((element) {
-                                  if (element != tempData[i]) {
-                                    if (i < index) {
-                                      setState(() {
-                                        index = i;
-                                      });
-                                    }
-                                    return true;
-                                  }
-                                  i++;
-                                  return false;
-                                });
-                              } catch (e) {
-                                Fluttertoast.showToast(msg: 'No changes!');
-                                setState(() {
-                                  pause = Pause.run;
-                                });
-                              }
-                            });
-                            if (data[index].split(' ')[0][0] == 'G' ||
-                                data[index].split(' ')[0][0] == 'M' ||
-                                data[index].split(' ')[0][0] == 'T' ||
-                                data[index].split(' ')[0][0] == 'M') {
-                              commands[data[index].split(' ')[0][0]](
-                                  data[index]);
-                            } else {
-                              commands[data[index].split(' ')[0]](data[index]);
-                            }
                           }
                         } else {
                           if (context.mounted) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('Failed to add file!'),
-                              ),
+                            Fluttertoast.showToast(
+                              msg: 'Failed to add file!',
+                              backgroundColor: Colors.red,
+                              textColor: Colors.white,
                             );
                           }
                         }
@@ -231,42 +174,20 @@ class _MQTTPageState extends State<MQTTPage> {
                       );
                       if (result != null) {
                         file = File(result.files.single.path!);
-                        data = await file!.readAsLines();
-                        setState(() {
-                          data.removeWhere((element) {
-                            if (element.split(' ')[0][0] == 'G' ||
-                                element.split(' ')[0][0] == 'M' ||
-                                element.split(' ')[0][0] == 'T') {
-                              return false;
-                            }
-                            if (!commands.containsKey(element.split(' ')[0])) {
-                              return true;
-                            }
-                            return false;
-                          });
-                        });
-                        debugPrint(data.toString());
+                        data = await file!.readAsString();
+                        debugPrint(data);
                         if (data.isNotEmpty || data.length < 4) {
+                          sendData(data, "xara/cmd");
                           setState(() {
                             sending = true;
                           });
-                          for (int i = 0; i < 4; i++) {
-                            if (data[i].split(' ')[0][0] == 'G' ||
-                                data[i].split(' ')[0][0] == 'M' ||
-                                data[i].split(' ')[0][0] == 'T') {
-                              commands[data[i].split(' ')[0][0]](data[i]);
-                            } else {
-                              commands[data[i].split(' ')[0]](data[i]);
-                            }
-                          }
-                          index = 4;
                         }
                       } else {
                         if (context.mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Failed to add file!'),
-                            ),
+                          Fluttertoast.showToast(
+                            msg: 'Failed to add file!',
+                            backgroundColor: Colors.red,
+                            textColor: Colors.white,
                           );
                         }
                       }
@@ -310,24 +231,10 @@ class _MQTTPageState extends State<MQTTPage> {
                           setState(() {
                             cmdHist.insert(0, input.text);
                           });
-                          if (input.text.split(' ')[0][0] == 'G' ||
-                              input.text.split(' ')[0][0] == 'M' ||
-                              input.text.split(' ')[0][0] == 'T') {
-                            commands[input.text.split(' ')[0][0]](input.text);
-                          } else {
-                            commands[input.text.split(' ')[0]](input.text);
-                          }
                           setState(() {
-                            data.add(input.text);
+                            sendData(input.text, "xara/cmd");
                             sending = true;
                           });
-                        } on NoSuchMethodError catch (e) {
-                          debugPrint(e.toString());
-                          Fluttertoast.showToast(
-                            msg: 'Invalid command',
-                            backgroundColor: Colors.red,
-                            textColor: Colors.white,
-                          );
                         } on ConnectionException catch (e) {
                           debugPrint(e.toString());
                           Fluttertoast.showToast(
@@ -375,51 +282,8 @@ class _MQTTPageState extends State<MQTTPage> {
     );
   }
 
-//Function for commands
-  arm(String cmd) async {
-    sendData(cmd, 'xara/arm');
-  }
-
-  induction(String cmd) {
-    sendData(cmd, 'xara/induction');
-  }
-
-  ingredients(String cmd) {
-    sendData(cmd, 'xara/ingredients');
-  }
-
-  gripper(String cmd) {
-    sendData(cmd, 'xara/gripper');
-  }
-
-  stir(String cmd) {
-    sendData(cmd, 'xara/stir');
-  }
-
-  delay(String cmd) async {
-    await Future.delayed(
-      Duration(
-        seconds: int.parse(
-          cmd.split(' ')[1],
-        ),
-      ),
-    );
-    index++;
-    if (index < data.length) {
-      commands[data[index].split(' ')[0]](data[index]);
-    } else {
-      setState(() {
-        index = 0;
-        sending = false;
-        data.clear();
-        receivedMessage = '';
-      });
-    }
-  }
-
-//end of Function for commands
   subscribe() async {
-    widget.client.subscribe('response', MqttQos.exactlyOnce);
+    widget.client.subscribe('response', MqttQos.atLeastOnce);
     widget.client.updates!
         .listen((List<MqttReceivedMessage<MqttMessage?>>? c) async {
       final recMess = c![0].payload as MqttPublishMessage;
@@ -431,29 +295,24 @@ class _MQTTPageState extends State<MQTTPage> {
 
       debugPrint('Topic is <${c[0].topic}>, Received payload $pt');
 
-      if (receivedMessage == 'o') {
-        index++;
-        if (pause == Pause.wait) {
-          setState(() {
-            pause = Pause.processing;
-          });
-        } else if (index < data.length) {
-          if (data[index].split(' ')[0][0] == 'G' ||
-              data[index].split(' ')[0][0] == 'M' ||
-              data[index].split(' ')[0][0] == 'T' ||
-              data[index].split(' ')[0][0] == 'M') {
-            commands[data[index].split(' ')[0][0]](data[index]);
-          } else {
-            commands[data[index].split(' ')[0]](data[index]);
-          }
-        } else {
-          setState(() {
-            index = 0;
-            sending = false;
-            data.clear();
-            receivedMessage = '';
-          });
-        }
+      if (receivedMessage == 'ok') {
+        Fluttertoast.showToast(
+          msg: 'Rpi successfully executed all commands',
+          backgroundColor: Colors.green,
+          textColor: Colors.white,
+        );
+        sending = false;
+        data = '';
+        receivedMessage = '';
+      }
+      if (receivedMessage == 'received') {
+        Fluttertoast.showToast(
+          msg: 'Commands received by the Rpi',
+          backgroundColor: Colors.blue,
+          textColor: Colors.white,
+        );
+        data = '';
+        receivedMessage = '';
       }
     });
   }
