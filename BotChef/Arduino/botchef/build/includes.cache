@@ -1,0 +1,52 @@
+[
+  {
+    "Sourcefile": null,
+    "Include": "",
+    "Includepath": "/home/mmkumr/.arduino15/packages/arduino/hardware/avr/1.8.6/cores/arduino"
+  },
+  {
+    "Sourcefile": null,
+    "Include": "",
+    "Includepath": "/home/mmkumr/.arduino15/packages/arduino/hardware/avr/1.8.6/variants/mega"
+  },
+  {
+    "Sourcefile": "/run/media/mmkumr/MyWorkspace/Projects/xioty/BotChef/Arduino/botchef/build/sketch/botchef.ino.cpp",
+    "Include": "gcode.h",
+    "Includepath": "/home/mmkumr/Arduino/libraries/G-Code-Arduino-Library"
+  },
+  {
+    "Sourcefile": "/run/media/mmkumr/MyWorkspace/Projects/xioty/BotChef/Arduino/botchef/build/sketch/botchef.ino.cpp",
+    "Include": "Servo_Hardware_PWM.h",
+    "Includepath": "/home/mmkumr/Arduino/libraries/Servo_Hardware_PWM/src"
+  },
+  {
+    "Sourcefile": "/run/media/mmkumr/MyWorkspace/Projects/xioty/BotChef/Arduino/botchef/build/sketch/botchef.ino.cpp",
+    "Include": "Wire.h",
+    "Includepath": "/home/mmkumr/.arduino15/packages/arduino/hardware/avr/1.8.6/libraries/Wire/src"
+  },
+  {
+    "Sourcefile": "/run/media/mmkumr/MyWorkspace/Projects/xioty/BotChef/Arduino/botchef/build/sketch/botchef.ino.cpp",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/mmkumr/Arduino/libraries/G-Code-Arduino-Library/gcode.cpp",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/mmkumr/Arduino/libraries/Servo_Hardware_PWM/src/Servo_Hardware_PWM.cpp",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/mmkumr/.arduino15/packages/arduino/hardware/avr/1.8.6/libraries/Wire/src/Wire.cpp",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "/home/mmkumr/.arduino15/packages/arduino/hardware/avr/1.8.6/libraries/Wire/src/utility/twi.c",
+    "Include": "",
+    "Includepath": null
+  }
+]
