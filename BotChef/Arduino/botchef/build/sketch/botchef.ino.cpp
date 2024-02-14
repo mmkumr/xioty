@@ -95,45 +95,6 @@ struct stepperInfo {
   volatile int limit_switch;
 };
 
-#line 96 "/run/media/mmkumr/MyWorkspace/Projects/xioty/BotChef/Arduino/botchef/botchef.ino"
-void xStep();
-#line 100 "/run/media/mmkumr/MyWorkspace/Projects/xioty/BotChef/Arduino/botchef/botchef.ino"
-void xDir(int dir);
-#line 104 "/run/media/mmkumr/MyWorkspace/Projects/xioty/BotChef/Arduino/botchef/botchef.ino"
-void yStep();
-#line 108 "/run/media/mmkumr/MyWorkspace/Projects/xioty/BotChef/Arduino/botchef/botchef.ino"
-void yDir(int dir);
-#line 111 "/run/media/mmkumr/MyWorkspace/Projects/xioty/BotChef/Arduino/botchef/botchef.ino"
-void zStep();
-#line 115 "/run/media/mmkumr/MyWorkspace/Projects/xioty/BotChef/Arduino/botchef/botchef.ino"
-void zDir(int dir);
-#line 118 "/run/media/mmkumr/MyWorkspace/Projects/xioty/BotChef/Arduino/botchef/botchef.ino"
-void aStep();
-#line 122 "/run/media/mmkumr/MyWorkspace/Projects/xioty/BotChef/Arduino/botchef/botchef.ino"
-void aDir(int dir);
-#line 125 "/run/media/mmkumr/MyWorkspace/Projects/xioty/BotChef/Arduino/botchef/botchef.ino"
-void bStep();
-#line 129 "/run/media/mmkumr/MyWorkspace/Projects/xioty/BotChef/Arduino/botchef/botchef.ino"
-void bDir(int dir);
-#line 133 "/run/media/mmkumr/MyWorkspace/Projects/xioty/BotChef/Arduino/botchef/botchef.ino"
-void resetStepperInfo(stepperInfo& si);
-#line 149 "/run/media/mmkumr/MyWorkspace/Projects/xioty/BotChef/Arduino/botchef/botchef.ino"
-void setup();
-#line 247 "/run/media/mmkumr/MyWorkspace/Projects/xioty/BotChef/Arduino/botchef/botchef.ino"
-void resetStepper(volatile stepperInfo& si);
-#line 268 "/run/media/mmkumr/MyWorkspace/Projects/xioty/BotChef/Arduino/botchef/botchef.ino"
-float getDurationOfAcceleration(volatile stepperInfo& s, unsigned long numSteps);
-#line 278 "/run/media/mmkumr/MyWorkspace/Projects/xioty/BotChef/Arduino/botchef/botchef.ino"
-void prepareMovement(int whichMotor, long steps);
-#line 303 "/run/media/mmkumr/MyWorkspace/Projects/xioty/BotChef/Arduino/botchef/botchef.ino"
-void setNextInterruptInterval();
-#line 383 "/run/media/mmkumr/MyWorkspace/Projects/xioty/BotChef/Arduino/botchef/botchef.ino"
-void runAndWait();
-#line 393 "/run/media/mmkumr/MyWorkspace/Projects/xioty/BotChef/Arduino/botchef/botchef.ino"
-void adjustSpeedScales();
-#line 413 "/run/media/mmkumr/MyWorkspace/Projects/xioty/BotChef/Arduino/botchef/botchef.ino"
-void loop();
-#line 96 "/run/media/mmkumr/MyWorkspace/Projects/xioty/BotChef/Arduino/botchef/botchef.ino"
 void xStep() {
   x_high;
   x_low;
@@ -271,12 +232,12 @@ void setup() {
   // end of stepper pins config.
 
   // Servo pins config.
-  servos[0].pin = 44;
+  servos[0].pin = 5;
   servos[0].position = 0;
   Servo myServo;
   myServo.attach(servos[0].pin);
   myServo.write(servos[0].position);
-  servos[1].pin = 45;
+  servos[1].pin = 6;
   servos[1].position = 0;
   myServo.attach(servos[1].pin);
   myServo.write(servos[1].position);
@@ -389,13 +350,13 @@ ISR(TIMER1_COMPA_vect) {
       s.stepFunc();
       s.stepCount++;
       s.stepPosition += s.dir;
-      if (s.stepCount >= s.totalSteps || (digitalRead(s.limit_switch) == LOW && s.homedir == (s.dir == 1 ? HIGH : LOW))) {
-        if (digitalRead(s.limit_switch) == LOW && s.homedir == (s.dir == 1 ? HIGH : LOW)) {
-          s.stepPosition = 0;
-        }
-        s.movementDone = true;
-        remainingSteppersFlag &= ~(1 << i);
+#if (s.stepCount >= s.totalSteps || (digitalRead(s.limit_switch) == LOW && s.homedir == (s.dir == 1 ? HIGH : LOW)))
+      if (digitalRead(s.limit_switch) == LOW && s.homedir == (s.dir == 1 ? HIGH : LOW)) {
+        s.stepPosition = 0;
       }
+      s.movementDone = true;
+      remainingSteppersFlag &= ~(1 << i);
+#endif
     }
     if (s.rampUpStepCount == 0) {
       s.n++;
@@ -452,6 +413,8 @@ void adjustSpeedScales() {
 // End of untions for coordinated motion.
 
 void loop() {
+  String("").startsWith("G0");
+
   Commands.available();
 }
 // Callbacks for commands

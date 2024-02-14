@@ -7,69 +7,10 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:mqtt_client/mqtt_client.dart';
 import 'package:mqtt_client/mqtt_server_client.dart';
 
-ByteData? cacert;
-
-class CACert {
-  static getCert() async {
-    cacert = await rootBundle.load('certs/ca.pem');
-  }
-}
-
 enum Pause { wait, processing, run }
 
 class MQTTPage extends StatefulWidget {
-  final MqttServerClient client = MqttServerClient.withPort(
-      '6b3b54fa5f4a464fa80e2e0410aec35e.s2.eu.hivemq.cloud', '', 8883);
-
-  MQTTPage({super.key}) {
-    // MQTT setup
-    client.logging(on: true);
-    client.onDisconnected = onDisconnected;
-    client.autoReconnect = true;
-    client.pongCallback = pong;
-    client.onSubscribed = onSubscribed;
-    client.onConnected = onConnected;
-    client.onAutoReconnect = onReconnect;
-
-    /// Security context
-    CACert.getCert();
-    SecurityContext context = SecurityContext()
-      ..setTrustedCertificatesBytes(cacert!.buffer.asUint8List());
-    client.secure = true;
-    client.securityContext = context;
-
-    final connMessage = MqttConnectMessage()
-        .withClientIdentifier('android')
-        .withWillTopic('willtopic')
-        .withWillMessage('Will Message')
-        .startClean();
-    client.keepAlivePeriod = 60;
-    client.connectionMessage = connMessage;
-
-    client.connect('xioty', 'P@ssw0rd');
-  }
-
-  void onDisconnected() {
-    debugPrint('Disconnected');
-  }
-
-  void pong() {
-    debugPrint('Ping response client callback invoked');
-  }
-
-  void onSubscribed(String topic) {
-    debugPrint('Subscription confirmed for topic $topic');
-  }
-
-  void onConnected() {
-    debugPrint('Client connection was successful');
-  }
-
-  void onReconnect() {
-    client.port = 1883;
-  }
-
-  // MQTT setup end
+  MQTTPage({super.key}) {}
   @override
   State<MQTTPage> createState() => _MQTTPageState();
 }
@@ -77,8 +18,12 @@ class MQTTPage extends StatefulWidget {
 class _MQTTPageState extends State<MQTTPage> {
   @override
   void initState() {
+    mqttinit();
     super.initState();
   }
+
+  final MqttServerClient client = MqttServerClient.withPort(
+      '6b3b54fa5f4a464fa80e2e0410aec35e.s2.eu.hivemq.cloud', '', 8883);
 
   List cmdHist = [];
   int histIndex = -1;
@@ -97,6 +42,14 @@ class _MQTTPageState extends State<MQTTPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('MQTT Flutter App'),
+        actions: [
+          IconButton(
+            onPressed: () {
+              sendData("shutdown", "xara/cmd");
+            },
+            icon: Icon(Icons.power_off, color: Colors.red),
+          ),
+        ],
       ),
       body: Center(
         child: sending
@@ -158,7 +111,7 @@ class _MQTTPageState extends State<MQTTPage> {
                 children: <Widget>[
                   ElevatedButton(
                     onPressed: () async {
-                      if (widget.client.connectionStatus!.state ==
+                      if (client.connectionStatus!.state ==
                               MqttConnectionState.connected &&
                           !start) {
                         subscribe();
@@ -219,7 +172,7 @@ class _MQTTPageState extends State<MQTTPage> {
                     child: TextField(
                       controller: input,
                       onEditingComplete: () async {
-                        if (widget.client.connectionStatus!.state ==
+                        if (client.connectionStatus!.state ==
                                 MqttConnectionState.connected &&
                             !start) {
                           subscribe();
@@ -282,10 +235,33 @@ class _MQTTPageState extends State<MQTTPage> {
     );
   }
 
+  mqttinit() async {
+    client.logging(on: true);
+    client.onDisconnected = onDisconnected;
+    client.autoReconnect = true;
+    client.pongCallback = pong;
+    client.onSubscribed = onSubscribed;
+    client.onConnected = onConnected;
+    client.onAutoReconnect = onReconnect;
+    ByteData cacert = await rootBundle.load('certs/ca.pem');
+    SecurityContext context = SecurityContext()
+      ..setTrustedCertificatesBytes(cacert.buffer.asUint8List());
+    client.secure = true;
+    client.securityContext = context;
+
+    final connMessage = MqttConnectMessage()
+        .withClientIdentifier('android')
+        .withWillTopic('willtopic')
+        .withWillMessage('Will Message')
+        .startClean();
+    client.keepAlivePeriod = 300;
+    client.connectionMessage = connMessage;
+    client.connect('xioty', 'P@ssw0rd');
+  }
+
   subscribe() async {
-    widget.client.subscribe('response', MqttQos.atLeastOnce);
-    widget.client.updates!
-        .listen((List<MqttReceivedMessage<MqttMessage?>>? c) async {
+    client.subscribe('response', MqttQos.atLeastOnce);
+    client.updates!.listen((List<MqttReceivedMessage<MqttMessage?>>? c) async {
       final recMess = c![0].payload as MqttPublishMessage;
       final pt =
           MqttPublishPayload.bytesToStringAsString(recMess.payload.message);
@@ -300,6 +276,19 @@ class _MQTTPageState extends State<MQTTPage> {
           msg: 'Rpi successfully executed all commands',
           backgroundColor: Colors.green,
           textColor: Colors.white,
+          timeInSecForIosWeb: 5,
+        );
+        sending = false;
+        data = '';
+        receivedMessage = '';
+      }
+
+      if (receivedMessage == 'Shutdown') {
+        Fluttertoast.showToast(
+          msg: 'Rpi is shutting down',
+          backgroundColor: Colors.green,
+          textColor: Colors.white,
+          timeInSecForIosWeb: 5,
         );
         sending = false;
         data = '';
@@ -310,6 +299,7 @@ class _MQTTPageState extends State<MQTTPage> {
           msg: 'Commands received by the Rpi',
           backgroundColor: Colors.blue,
           textColor: Colors.white,
+          timeInSecForIosWeb: 5,
         );
         data = '';
         receivedMessage = '';
@@ -320,6 +310,28 @@ class _MQTTPageState extends State<MQTTPage> {
   sendData(String cmd, String topic) {
     final builder = MqttClientPayloadBuilder();
     builder.addString(cmd);
-    widget.client.publishMessage(topic, MqttQos.atLeastOnce, builder.payload!);
+    client.publishMessage(topic, MqttQos.atLeastOnce, builder.payload!);
   }
+
+// Mqtt callback functions.
+  void onDisconnected() {
+    debugPrint('Disconnected');
+  }
+
+  void pong() {
+    debugPrint('Ping response client callback invoked');
+  }
+
+  void onSubscribed(String topic) {
+    debugPrint('Subscription confirmed for topic $topic');
+  }
+
+  void onConnected() {
+    debugPrint('Client connection was successful');
+  }
+
+  void onReconnect() {
+    client.port = 8883;
+  }
+// end of mqtt callback functions.
 }

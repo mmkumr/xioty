@@ -230,12 +230,12 @@ void setup() {
   // end of stepper pins config.
 
   // Servo pins config.
-  servos[0].pin = 44;
+  servos[0].pin = 5;
   servos[0].position = 0;
   Servo myServo;
   myServo.attach(servos[0].pin);
   myServo.write(servos[0].position);
-  servos[1].pin = 45;
+  servos[1].pin = 6;
   servos[1].position = 0;
   myServo.attach(servos[1].pin);
   myServo.write(servos[1].position);
