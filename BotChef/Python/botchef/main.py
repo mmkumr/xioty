@@ -106,7 +106,8 @@ def send_message():
                         pass
                     i = pause_command()
                 command(ser, (cmds[i] + '\r\n'))
-            client.publish(mqtt_topic_send, 'ok', qos=1)
+            for i in range(3):
+                client.publish(mqtt_topic_send, 'ok', qos=1)
     cmds = []
 
 
