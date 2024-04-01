@@ -1,15 +1,16 @@
+import 'package:botchef_v2/pages/machine_connect.dart';
 import 'package:flutter/material.dart';
 
 import '../commons.dart';
 
-class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+class LoginPage extends StatefulWidget {
+  const LoginPage({super.key});
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  State<LoginPage> createState() => _LoginPageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -45,7 +46,13 @@ class _HomePageState extends State<HomePage> {
                   borderRadius: BorderRadius.circular(40),
                 ),
                 color: elementsC,
-                onPressed: () {},
+                onPressed: () {
+                  navigate(
+                    type: Type.push,
+                    context: context,
+                    page: const MachineConnect(),
+                  );
+                },
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
