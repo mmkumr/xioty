@@ -80,6 +80,7 @@ class _MQTTPageState extends State<MQTTPage> {
                         if (result != null) {
                           file = File(result.files.single.path!);
                           data = await file!.readAsString();
+                          data = data.replaceAll('\n', "@");
                           debugPrint(data);
                           if (data.isNotEmpty || data.length < 4) {
                             sendData(data, "xara/cmd");
@@ -128,6 +129,7 @@ class _MQTTPageState extends State<MQTTPage> {
                       if (result != null) {
                         file = File(result.files.single.path!);
                         data = await file!.readAsString();
+                        data = data.replaceAll('\n', "@");
                         debugPrint(data);
                         if (data.isNotEmpty || data.length < 4) {
                           sendData(data, "xara/cmd");
@@ -278,9 +280,24 @@ class _MQTTPageState extends State<MQTTPage> {
           textColor: Colors.white,
           timeInSecForIosWeb: 5,
         );
-        sending = false;
-        data = '';
-        receivedMessage = '';
+        setState(() {
+          sending = false;
+          data = '';
+          receivedMessage = '';
+        });
+      }
+
+      if (receivedMessage == 'pause') {
+        Fluttertoast.showToast(
+          msg: 'Rpi has been paused',
+          backgroundColor: Colors.green,
+          textColor: Colors.white,
+          timeInSecForIosWeb: 5,
+        );
+        setState(() {
+          receivedMessage = '';
+          pause = Pause.wait;
+        });
       }
 
       if (receivedMessage == 'Shutdown') {
@@ -290,9 +307,11 @@ class _MQTTPageState extends State<MQTTPage> {
           textColor: Colors.white,
           timeInSecForIosWeb: 5,
         );
-        sending = false;
-        data = '';
-        receivedMessage = '';
+        setState(() {
+          sending = false;
+          data = '';
+          receivedMessage = '';
+        });
       }
       if (receivedMessage == 'received') {
         Fluttertoast.showToast(
@@ -301,8 +320,10 @@ class _MQTTPageState extends State<MQTTPage> {
           textColor: Colors.white,
           timeInSecForIosWeb: 5,
         );
-        data = '';
-        receivedMessage = '';
+        setState(() {
+          data = '';
+          receivedMessage = '';
+        });
       }
     });
   }
