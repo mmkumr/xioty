@@ -50,7 +50,7 @@ class _LoginPageState extends State<LoginPage> {
                   navigate(
                     type: Type.push,
                     context: context,
-                    page: const MachineConnect(),
+                    page: const MachineConnectPage(),
                   );
                 },
                 child: Row(

@@ -2,19 +2,22 @@ import 'package:botchef_v2/commons.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
-class MachineConnect extends StatefulWidget {
-  const MachineConnect({super.key});
+import 'home.dart';
+
+class MachineConnectPage extends StatefulWidget {
+  const MachineConnectPage({super.key});
 
   @override
-  State<MachineConnect> createState() => _MachineConnectState();
+  State<MachineConnectPage> createState() => _MachineConnectPageState();
 }
 
-class _MachineConnectState extends State<MachineConnect> {
+class _MachineConnectPageState extends State<MachineConnectPage> {
   TextEditingController macCode = TextEditingController();
   GlobalKey<FormState> form = GlobalKey<FormState>();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -24,7 +27,7 @@ class _MachineConnectState extends State<MachineConnect> {
               child: Text(
                 "Connect with your machine",
                 style: TextStyle(
-                  fontSize: size(context: context, type: Type.width) * 0.06,
+                  fontSize: width(context) * 0.06,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -99,7 +102,7 @@ class _MachineConnectState extends State<MachineConnect> {
                 navigate(
                   type: Type.push,
                   context: context,
-                  page: const MachineConnect(),
+                  page: const HomePage(),
                 );
               },
               child: Padding(

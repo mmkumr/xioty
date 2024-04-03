@@ -14,6 +14,7 @@ dependencies:
 
   cupertino_icons: ^1.0.6
   font_awesome_flutter: ^10.7.0
+  simple_speed_dial: ^0.1.7
 
 dev_dependencies:
   flutter_test:
