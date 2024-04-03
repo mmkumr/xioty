@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 import '../commons.dart';
+import '../partials/appbar.dart';
 import '../partials/menu.dart';
 
 class YourRecipesPage extends StatefulWidget {
@@ -16,7 +17,8 @@ class _YourRecipesPageState extends State<YourRecipesPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
+      backgroundColor: bgC,
+      appBar: appbar,
       body: Center(
         child: Column(
           children: [
@@ -60,18 +62,16 @@ class _YourRecipesPageState extends State<YourRecipesPage> {
             ),
             Column(
               children: [
-                // Row for left aligning the subtitle
-                const Row(
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.all(15.0),
-                      child: Text(
-                        "Your Recipes",
-                        style: TextStyle(
-                            fontSize: 20, fontWeight: FontWeight.bold),
-                      ),
+                const Align(
+                  alignment: Alignment.topLeft,
+                  child: Padding(
+                    padding: EdgeInsets.all(15.0),
+                    child: Text(
+                      "Your Recipes",
+                      style:
+                          TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
                     ),
-                  ],
+                  ),
                 ),
                 SizedBox(
                   height: height(context) * 0.3,
@@ -94,7 +94,11 @@ class _YourRecipesPageState extends State<YourRecipesPage> {
                           child: GridTile(
                             footer: Container(
                               color: Colors.white,
-                              child: const Text("Chicken Pakoda"),
+                              child: const Text(
+                                "Chicken Pakoda",
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                                textAlign: TextAlign.center,
+                              ),
                             ),
                             child: Image.network(
                               "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRtVS-yJjgRy8IKB6HIs497p-IYFXQweSa7ww&usqp=CAU",
@@ -106,18 +110,16 @@ class _YourRecipesPageState extends State<YourRecipesPage> {
                     },
                   ),
                 ),
-                // Row for left aligning the subtitle
-                const Row(
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.only(left: 15.0, top: 30, bottom: 20),
-                      child: Text(
-                        "Published Recipes",
-                        style: TextStyle(
-                            fontSize: 20, fontWeight: FontWeight.bold),
-                      ),
+                const Align(
+                  alignment: Alignment.topLeft,
+                  child: Padding(
+                    padding: EdgeInsets.only(left: 15.0, top: 30, bottom: 20),
+                    child: Text(
+                      "Published Recipes",
+                      style:
+                          TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
                     ),
-                  ],
+                  ),
                 ),
                 SizedBox(
                   height: height(context) * 0.3,
@@ -133,7 +135,11 @@ class _YourRecipesPageState extends State<YourRecipesPage> {
                         child: GridTile(
                           footer: Container(
                             color: Colors.white,
-                            child: const Text("Chicken Pakoda"),
+                            child: const Text(
+                              "Chicken Pakoda",
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                              textAlign: TextAlign.center,
+                            ),
                           ),
                           child: Image.network(
                             "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRtVS-yJjgRy8IKB6HIs497p-IYFXQweSa7ww&usqp=CAU",
