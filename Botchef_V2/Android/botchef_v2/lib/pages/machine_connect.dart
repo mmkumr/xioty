@@ -1,5 +1,6 @@
 import 'package:botchef_v2/commons.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 import 'home.dart';
@@ -44,6 +45,10 @@ class _MachineConnectPageState extends State<MachineConnectPage> {
                 padding: const EdgeInsets.all(20.0),
                 child: TextFormField(
                   controller: macCode,
+                  keyboardType: TextInputType.number,
+                  inputFormatters: <TextInputFormatter>[
+                    FilteringTextInputFormatter.digitsOnly,
+                  ],
                   validator: (value) {
                     if (value!.isEmpty) {
                       return "Enter valid code for connecting";
@@ -75,7 +80,13 @@ class _MachineConnectPageState extends State<MachineConnectPage> {
                 ),
                 color: elementsC,
                 onPressed: () {
-                  if (form.currentState!.validate()) {}
+                  if (form.currentState!.validate()) {
+                    navigate(
+                      type: Type.push,
+                      context: context,
+                      page: const HomePage(),
+                    );
+                  }
                 },
                 child: Padding(
                   padding: const EdgeInsets.only(

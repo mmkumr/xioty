@@ -132,18 +132,26 @@ class _YourRecipesPageState extends State<YourRecipesPage> {
                     itemBuilder: (context, index) {
                       return Padding(
                         padding: const EdgeInsets.all(10.0),
-                        child: GridTile(
-                          footer: Container(
-                            color: Colors.white,
-                            child: const Text(
-                              "Chicken Pakoda",
-                              style: TextStyle(fontWeight: FontWeight.bold),
-                              textAlign: TextAlign.center,
+                        child: InkWell(
+                          onTap: () {
+                            navigate(
+                                type: Type.push,
+                                context: context,
+                                page: const VariantsPage());
+                          },
+                          child: GridTile(
+                            footer: Container(
+                              color: Colors.white,
+                              child: const Text(
+                                "Chicken Pakoda",
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                                textAlign: TextAlign.center,
+                              ),
                             ),
-                          ),
-                          child: Image.network(
-                            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRtVS-yJjgRy8IKB6HIs497p-IYFXQweSa7ww&usqp=CAU",
-                            fit: BoxFit.fill,
+                            child: Image.network(
+                              "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRtVS-yJjgRy8IKB6HIs497p-IYFXQweSa7ww&usqp=CAU",
+                              fit: BoxFit.fill,
+                            ),
                           ),
                         ),
                       );

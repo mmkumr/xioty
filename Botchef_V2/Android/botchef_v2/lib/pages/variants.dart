@@ -1,7 +1,9 @@
+import 'package:botchef_v2/pages/variant.dart';
 import 'package:botchef_v2/partials/appbar.dart';
 import 'package:flutter/material.dart';
 
 import '../commons.dart';
+import '../partials/menu.dart';
 
 class VariantsPage extends StatefulWidget {
   const VariantsPage({super.key});
@@ -69,7 +71,13 @@ class _VariantsPageState extends State<VariantsPage> {
                     borderRadius: BorderRadius.circular(40),
                   ),
                   color: elementsC,
-                  onPressed: () {},
+                  onPressed: () {
+                    navigate(
+                      type: Type.push,
+                      context: context,
+                      page: const VariantPage(),
+                    );
+                  },
                   child: Padding(
                     padding: const EdgeInsets.only(top: 10, bottom: 10),
                     child: Text(
@@ -102,8 +110,13 @@ class _VariantsPageState extends State<VariantsPage> {
                   return Padding(
                     padding: const EdgeInsets.all(10.0),
                     child: ListTile(
-                      onTap: () {},
-                      title: Text("spicy for ${index + 1}"),
+                      onTap: () {
+                        navigate(
+                          type: Type.push,
+                          context: context,
+                          page: const VariantPage(),
+                        );
+                      },
                       leading: Image.network(
                         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRtVS-yJjgRy8IKB6HIs497p-IYFXQweSa7ww&usqp=CAU",
                         fit: BoxFit.fill,
@@ -177,6 +190,8 @@ class _VariantsPageState extends State<VariantsPage> {
           ],
         ),
       ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+      floatingActionButton: menu(context),
     );
   }
 }
