@@ -1,31 +1,25 @@
 import 'package:botchef_v2/commons.dart';
-import 'package:botchef_v2/pages/chef_solid_micros.dart';
 import 'package:botchef_v2/partials/appbar.dart';
 import 'package:flutter/material.dart';
 
 import '../partials/menu.dart';
 
-class ChefMacroPage extends StatefulWidget {
-  const ChefMacroPage({super.key});
+class ChefSolidMicro extends StatefulWidget {
+  const ChefSolidMicro({super.key});
 
   @override
-  State<ChefMacroPage> createState() => _ChefMacroPageState();
+  State<ChefSolidMicro> createState() => _ChefSolidMicroState();
 }
 
-class _ChefMacroPageState extends State<ChefMacroPage> {
-  List<TextEditingController> macros =
-      List.generate(4, (index) => TextEditingController());
+class _ChefSolidMicroState extends State<ChefSolidMicro> {
   GlobalKey<FormState> form = GlobalKey<FormState>();
-  List<String> quantities = [
-    "1 cup",
-    "1/4 cup",
-    "1/2 cup",
-    "3/4 cup",
-  ];
-  List<String>? quantity;
+  List<TextEditingController>? solidMicros;
+  List<TextEditingController>? quantity;
+  int nos = 8;
   @override
   void initState() {
-    quantity = List.generate(4, (index) => quantities[0]);
+    solidMicros = List.generate(nos, (index) => TextEditingController());
+    quantity = List.generate(nos, (index) => TextEditingController());
     super.initState();
   }
 
@@ -61,14 +55,14 @@ class _ChefMacroPageState extends State<ChefMacroPage> {
                 ),
               ),
               const Text(
-                "Macros",
+                "Solid Micros",
                 style: TextStyle(fontSize: 40),
               ),
               Form(
                 key: form,
                 child: Column(
                   children: [
-                    for (int i = 0; i < 4; i++)
+                    for (int i = 0; i < nos; i++)
                       Padding(
                         padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
                         child: Row(
@@ -79,10 +73,11 @@ class _ChefMacroPageState extends State<ChefMacroPage> {
                               child: SizedBox(
                                 width: width(context) * 0.5,
                                 child: TextFormField(
-                                  controller: macros[i],
+                                  autofocus: i == 0 ? true : false,
+                                  controller: solidMicros![i],
                                   decoration: InputDecoration(
-                                    hintText: "Macro ${i + 1}",
-                                    label: Text("Macro ${i + 1}"),
+                                    hintText: "Solid Micro ${i + 1}",
+                                    label: Text("Solid Micro ${i + 1}"),
                                     filled: true,
                                     border: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(10.0),
@@ -96,22 +91,11 @@ class _ChefMacroPageState extends State<ChefMacroPage> {
                               padding: const EdgeInsets.all(5.0),
                               child: SizedBox(
                                 width: width(context) * 0.3,
-                                child: DropdownButtonFormField(
-                                  value: quantity![i],
-                                  items: quantities.map((String items) {
-                                    return DropdownMenuItem(
-                                      value: items,
-                                      child: Text(items),
-                                    );
-                                  }).toList(),
-                                  onChanged: (String? value) {
-                                    setState(() {
-                                      quantity![0] = value!;
-                                    });
-                                  },
+                                child: TextFormField(
+                                  controller: quantity![i],
                                   decoration: InputDecoration(
-                                    hintText: "Quantity",
-                                    label: const Text("Quantity"),
+                                    hintText: "tsp",
+                                    label: const Text("tsp"),
                                     filled: true,
                                     border: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(10.0),
@@ -140,13 +124,7 @@ class _ChefMacroPageState extends State<ChefMacroPage> {
                     borderRadius: BorderRadius.circular(40),
                   ),
                   color: elementsC,
-                  onPressed: () {
-                    navigate(
-                      type: Type.push,
-                      context: context,
-                      page: const ChefSolidMicro(),
-                    );
-                  },
+                  onPressed: () {},
                   child: Padding(
                     padding: const EdgeInsets.only(top: 10, bottom: 10),
                     child: Text(
