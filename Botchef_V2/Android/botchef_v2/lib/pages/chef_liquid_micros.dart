@@ -1,4 +1,5 @@
 import 'package:botchef_v2/commons.dart';
+import 'package:botchef_v2/pages/process.dart';
 import 'package:botchef_v2/partials/appbar.dart';
 import 'package:flutter/material.dart';
 
@@ -74,7 +75,6 @@ class _ChefLiquidMicroState extends State<ChefLiquidMicro> {
                               child: SizedBox(
                                 width: width(context) * 0.5,
                                 child: TextFormField(
-                                  autofocus: i == 0 ? true : false,
                                   controller: liquidMicros![i],
                                   decoration: InputDecoration(
                                     hintText: "Liquid Micro ${i + 1}",
@@ -130,7 +130,12 @@ class _ChefLiquidMicroState extends State<ChefLiquidMicro> {
                     borderRadius: BorderRadius.circular(40),
                   ),
                   color: elementsC,
-                  onPressed: () {},
+                  onPressed: () {
+                    navigate(
+                        type: Type.push,
+                        context: context,
+                        page: const ProcessPage());
+                  },
                   child: Padding(
                     padding: const EdgeInsets.only(top: 10, bottom: 10),
                     child: Text(

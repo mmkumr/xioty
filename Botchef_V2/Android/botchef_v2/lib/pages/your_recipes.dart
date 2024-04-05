@@ -5,6 +5,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../commons.dart';
 import '../partials/appbar.dart';
 import '../partials/menu.dart';
+import 'recipe.dart';
 
 class YourRecipesPage extends StatefulWidget {
   const YourRecipesPage({super.key});
@@ -31,7 +32,12 @@ class _YourRecipesPageState extends State<YourRecipesPage> {
                     borderRadius: BorderRadius.circular(40),
                   ),
                   color: elementsC,
-                  onPressed: () {},
+                  onPressed: () {
+                    navigate(
+                        type: Type.replace,
+                        context: context,
+                        page: const RecipePage());
+                  },
                   child: Padding(
                     padding: const EdgeInsets.only(top: 10, bottom: 10),
                     child: Text(

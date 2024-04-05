@@ -1,6 +1,7 @@
+import 'package:botchef_v2/pages/recipe.dart';
 import 'package:botchef_v2/pages/variant.dart';
-import 'package:botchef_v2/partials/appbar.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 import '../commons.dart';
 import '../partials/menu.dart';
@@ -17,7 +18,34 @@ class _VariantsPageState extends State<VariantsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: bgC,
-      appBar: appbar,
+      appBar: AppBar(
+        backgroundColor: bgC,
+        actions: [
+          InkWell(
+            onTap: () {
+              navigate(
+                  type: Type.replace,
+                  context: context,
+                  page: const RecipePage());
+            },
+            child: const Padding(
+              padding: EdgeInsets.all(15.0),
+              child: Icon(FontAwesomeIcons.pen),
+            ),
+          ),
+          InkWell(
+            onTap: () {},
+            child: const Padding(
+              padding: EdgeInsets.all(15.0),
+              child: Icon(
+                FontAwesomeIcons.trash,
+                color: Colors.red,
+              ),
+            ),
+          ),
+        ],
+        elevation: 0,
+      ),
       body: Center(
         child: Column(
           children: [
