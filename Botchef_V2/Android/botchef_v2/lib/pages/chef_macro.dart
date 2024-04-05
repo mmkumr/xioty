@@ -1,5 +1,6 @@
 import 'package:botchef_v2/commons.dart';
 import 'package:botchef_v2/pages/chef_solid_micros.dart';
+import 'package:botchef_v2/pages/mima_description.dart';
 import 'package:botchef_v2/partials/appbar.dart';
 import 'package:flutter/material.dart';
 
@@ -122,7 +123,12 @@ class _ChefMacroPageState extends State<ChefMacroPage> {
                               ),
                             ),
                             InkWell(
-                              onTap: () {},
+                              onTap: () {
+                                navigate(
+                                    type: Type.push,
+                                    context: context,
+                                    page: const MiMaDescription());
+                              },
                               child: const Icon(Icons.info_rounded),
                             ),
                           ],

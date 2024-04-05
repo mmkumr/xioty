@@ -4,6 +4,7 @@ import 'package:botchef_v2/partials/appbar.dart';
 import 'package:flutter/material.dart';
 
 import '../partials/menu.dart';
+import 'mima_description.dart';
 
 class ChefSolidMicro extends StatefulWidget {
   const ChefSolidMicro({super.key});
@@ -107,7 +108,12 @@ class _ChefSolidMicroState extends State<ChefSolidMicro> {
                               ),
                             ),
                             InkWell(
-                              onTap: () {},
+                              onTap: () {
+                                navigate(
+                                    type: Type.push,
+                                    context: context,
+                                    page: const MiMaDescription());
+                              },
                               child: const Icon(Icons.info_rounded),
                             ),
                           ],

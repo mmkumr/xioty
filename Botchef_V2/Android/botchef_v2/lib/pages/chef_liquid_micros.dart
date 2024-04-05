@@ -3,6 +3,7 @@ import 'package:botchef_v2/partials/appbar.dart';
 import 'package:flutter/material.dart';
 
 import '../partials/menu.dart';
+import 'mima_description.dart';
 
 class ChefLiquidMicro extends StatefulWidget {
   const ChefLiquidMicro({super.key});
@@ -106,7 +107,12 @@ class _ChefLiquidMicroState extends State<ChefLiquidMicro> {
                               ),
                             ),
                             InkWell(
-                              onTap: () {},
+                              onTap: () {
+                                navigate(
+                                    type: Type.push,
+                                    context: context,
+                                    page: const MiMaDescription());
+                              },
                               child: const Icon(Icons.info_rounded),
                             ),
                           ],
