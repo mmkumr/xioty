@@ -1,25 +1,24 @@
 import 'package:botchef_v2/commons.dart';
-import 'package:botchef_v2/pages/chef_liquid_micros.dart';
 import 'package:botchef_v2/partials/appbar.dart';
 import 'package:flutter/material.dart';
 
 import '../partials/menu.dart';
 
-class ChefSolidMicro extends StatefulWidget {
-  const ChefSolidMicro({super.key});
+class ChefLiquidMicro extends StatefulWidget {
+  const ChefLiquidMicro({super.key});
 
   @override
-  State<ChefSolidMicro> createState() => _ChefSolidMicroState();
+  State<ChefLiquidMicro> createState() => _ChefLiquidMicroState();
 }
 
-class _ChefSolidMicroState extends State<ChefSolidMicro> {
+class _ChefLiquidMicroState extends State<ChefLiquidMicro> {
   GlobalKey<FormState> form = GlobalKey<FormState>();
-  List<TextEditingController>? solidMicros;
+  List<TextEditingController>? liquidMicros;
   List<TextEditingController>? quantity;
-  int nos = 8;
+  int nos = 4;
   @override
   void initState() {
-    solidMicros = List.generate(nos, (index) => TextEditingController());
+    liquidMicros = List.generate(nos, (index) => TextEditingController());
     quantity = List.generate(nos, (index) => TextEditingController());
     super.initState();
   }
@@ -56,7 +55,7 @@ class _ChefSolidMicroState extends State<ChefSolidMicro> {
                 ),
               ),
               const Text(
-                "Solid Micros",
+                "Liquid Micros",
                 style: TextStyle(fontSize: 40),
               ),
               Form(
@@ -75,10 +74,10 @@ class _ChefSolidMicroState extends State<ChefSolidMicro> {
                                 width: width(context) * 0.5,
                                 child: TextFormField(
                                   autofocus: i == 0 ? true : false,
-                                  controller: solidMicros![i],
+                                  controller: liquidMicros![i],
                                   decoration: InputDecoration(
-                                    hintText: "Solid Micro ${i + 1}",
-                                    label: Text("Solid Micro ${i + 1}"),
+                                    hintText: "Liquid Micro ${i + 1}",
+                                    label: Text("Liquid Micro ${i + 1}"),
                                     filled: true,
                                     border: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(10.0),
@@ -125,12 +124,7 @@ class _ChefSolidMicroState extends State<ChefSolidMicro> {
                     borderRadius: BorderRadius.circular(40),
                   ),
                   color: elementsC,
-                  onPressed: () {
-                    navigate(
-                        type: Type.push,
-                        context: context,
-                        page: const ChefLiquidMicro());
-                  },
+                  onPressed: () {},
                   child: Padding(
                     padding: const EdgeInsets.only(top: 10, bottom: 10),
                     child: Text(
