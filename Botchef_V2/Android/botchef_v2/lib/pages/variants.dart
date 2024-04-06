@@ -133,7 +133,7 @@ class _VariantsPageState extends State<VariantsPage> {
             ),
             Flexible(
               child: ListView.builder(
-                itemCount: 10,
+                itemCount: 3,
                 itemBuilder: (context, index) {
                   return Padding(
                     padding: const EdgeInsets.all(10.0),

@@ -18,13 +18,22 @@ class _ChefSolidMicroState extends State<ChefSolidMicro> {
   List<TextEditingController>? solidMicros;
   List<TextEditingController>? quantity;
   int nos = 8;
+  ScrollController scrollController = ScrollController();
   @override
   void initState() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      scrollController.animateTo(
+        scrollController.position.minScrollExtent,
+        curve: Curves.easeOut,
+        duration: const Duration(milliseconds: 500),
+      );
+    });
     solidMicros = List.generate(nos, (index) => TextEditingController());
     quantity = List.generate(nos, (index) => TextEditingController());
     super.initState();
   }
 
+  bool start = false;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -32,7 +41,7 @@ class _ChefSolidMicroState extends State<ChefSolidMicro> {
       backgroundColor: bgC,
       appBar: appbar,
       body: SingleChildScrollView(
-        reverse: true,
+        reverse: start,
         child: Padding(
           padding:
               EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
@@ -75,7 +84,13 @@ class _ChefSolidMicroState extends State<ChefSolidMicro> {
                               child: SizedBox(
                                 width: width(context) * 0.5,
                                 child: TextFormField(
-                                  autofocus: i == 0 ? true : false,
+                                  onTap: () {
+                                    if (!start) {
+                                      setState(() {
+                                        start = true;
+                                      });
+                                    }
+                                  },
                                   controller: solidMicros![i],
                                   decoration: InputDecoration(
                                     hintText: "Solid Micro ${i + 1}",

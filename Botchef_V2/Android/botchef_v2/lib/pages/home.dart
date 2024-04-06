@@ -3,6 +3,8 @@ import 'package:botchef_v2/partials/menu.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
+import 'recipe_info.dart';
+
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
@@ -133,6 +135,12 @@ class _HomePageState extends State<HomePage> {
                               const BorderRadius.all(Radius.circular(40)),
                         ),
                         child: ListTile(
+                          onTap: () {
+                            navigate(
+                                type: Type.push,
+                                context: context,
+                                page: const RecipeInfoPage());
+                          },
                           titleAlignment: ListTileTitleAlignment.center,
                           contentPadding: const EdgeInsets.all(0),
                           leading: CircleAvatar(

@@ -1,4 +1,5 @@
 import 'package:botchef_v2/commons.dart';
+import 'package:botchef_v2/pages/home.dart';
 import 'package:botchef_v2/pages/your_recipes.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -62,7 +63,9 @@ Widget menu(BuildContext context) {
         foregroundColor: Colors.white,
         backgroundColor: Colors.blueAccent,
         label: 'Home',
-        onPressed: () {},
+        onPressed: () {
+          navigate(type: Type.push, context: context, page: const HomePage());
+        },
       ),
       SpeedDialChild(
         child: const Icon(Icons.headset_mic),
