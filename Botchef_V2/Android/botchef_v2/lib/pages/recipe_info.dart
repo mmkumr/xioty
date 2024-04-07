@@ -1,3 +1,4 @@
+import 'package:botchef_v2/pages/user_macro.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
@@ -190,7 +191,12 @@ class _RecipeInfoPageState extends State<RecipeInfoPage> {
                   return Padding(
                     padding: const EdgeInsets.all(10.0),
                     child: ListTile(
-                      onTap: () {},
+                      onTap: () {
+                        navigate(
+                            type: Type.push,
+                            context: context,
+                            page: const UserMacroPage());
+                      },
                       leading: Image.network(
                         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRtVS-yJjgRy8IKB6HIs497p-IYFXQweSa7ww&usqp=CAU",
                         fit: BoxFit.fill,
