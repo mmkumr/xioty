@@ -3,6 +3,7 @@ import 'package:botchef_v2/partials/description_popup.dart';
 import 'package:flutter/material.dart';
 
 import '../commons.dart';
+import '../partials/menu.dart';
 import 'user_micro.dart';
 
 class UserMacroPage extends StatefulWidget {
@@ -42,7 +43,7 @@ class _UserMacroPageState extends State<UserMacroPage> {
                         ),
                       ),
                       child: const Text(
-                        "Onions",
+                        "Onions 1/2 cup",
                         style: TextStyle(fontSize: 20),
                         softWrap: true,
                         textAlign: TextAlign.center,
@@ -90,6 +91,8 @@ class _UserMacroPageState extends State<UserMacroPage> {
           )
         ],
       ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+      floatingActionButton: menu(context),
     );
   }
 }
