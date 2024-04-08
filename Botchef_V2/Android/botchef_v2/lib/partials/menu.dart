@@ -1,4 +1,5 @@
 import 'package:botchef_v2/commons.dart';
+import 'package:botchef_v2/pages/contact_us.dart';
 import 'package:botchef_v2/pages/edited_recipes.dart';
 import 'package:botchef_v2/pages/home.dart';
 import 'package:botchef_v2/pages/your_recipes.dart';
@@ -83,7 +84,10 @@ Widget menu(BuildContext context) {
         foregroundColor: Colors.white,
         backgroundColor: Colors.lightBlueAccent,
         label: 'Contact Us',
-        onPressed: () {},
+        onPressed: () {
+          navigate(
+              type: Type.push, context: context, page: const ContactUsPage());
+        },
       ),
       SpeedDialChild(
         child: const Icon(Icons.logout),

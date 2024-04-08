@@ -52,6 +52,10 @@ class _HomePageState extends State<HomePage> {
                         setState(() {
                           catindex--;
                         });
+                      } else {
+                        setState(() {
+                          catindex = categories.length - 1;
+                        });
                       }
                     },
                     child: const Icon(
@@ -83,6 +87,10 @@ class _HomePageState extends State<HomePage> {
                       if (catindex < categories.length - 1) {
                         setState(() {
                           catindex++;
+                        });
+                      } else {
+                        setState(() {
+                          catindex = 0;
                         });
                       }
                     },
