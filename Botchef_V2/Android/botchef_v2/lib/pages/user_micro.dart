@@ -1,3 +1,4 @@
+import 'package:botchef_v2/pages/cooking.dart';
 import 'package:flutter/material.dart';
 
 import '../commons.dart';
@@ -190,7 +191,7 @@ class _UserMicroPageState extends State<UserMicroPage> {
                     navigate(
                         type: Type.push,
                         context: context,
-                        page: const UserMicroPage());
+                        page: const CookingPage());
                   },
                   child: Padding(
                     padding: const EdgeInsets.only(top: 10, bottom: 10),

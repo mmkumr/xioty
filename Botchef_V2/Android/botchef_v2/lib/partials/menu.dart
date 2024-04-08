@@ -1,9 +1,12 @@
 import 'package:botchef_v2/commons.dart';
+import 'package:botchef_v2/pages/edited_recipes.dart';
 import 'package:botchef_v2/pages/home.dart';
 import 'package:botchef_v2/pages/your_recipes.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:simple_speed_dial/simple_speed_dial.dart';
+
+import '../pages/favorites.dart';
 
 Widget menu(BuildContext context) {
   return SpeedDial(
@@ -38,7 +41,10 @@ Widget menu(BuildContext context) {
         foregroundColor: Colors.white,
         backgroundColor: Colors.yellow,
         label: 'Favorites',
-        onPressed: () {},
+        onPressed: () {
+          navigate(
+              type: Type.push, context: context, page: const FavoritesPage());
+        },
         closeSpeedDialOnPressed: false,
       ),
       SpeedDialChild(
@@ -56,7 +62,12 @@ Widget menu(BuildContext context) {
         foregroundColor: Colors.white,
         backgroundColor: Colors.lightGreen,
         label: 'Edited recipes',
-        onPressed: () {},
+        onPressed: () {
+          navigate(
+              type: Type.push,
+              context: context,
+              page: const EditedRecipesPage());
+        },
       ),
       SpeedDialChild(
         child: const Icon(Icons.home),
