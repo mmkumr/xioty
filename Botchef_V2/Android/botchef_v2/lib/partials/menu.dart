@@ -1,6 +1,7 @@
 import 'package:botchef_v2/commons.dart';
 import 'package:botchef_v2/pages/contact_us.dart';
 import 'package:botchef_v2/pages/edited_recipes.dart';
+import 'package:botchef_v2/pages/history.dart';
 import 'package:botchef_v2/pages/home.dart';
 import 'package:botchef_v2/pages/your_recipes.dart';
 import 'package:flutter/material.dart';
@@ -34,7 +35,10 @@ Widget menu(BuildContext context) {
         foregroundColor: Colors.white,
         backgroundColor: Colors.red,
         label: 'History',
-        onPressed: () {},
+        onPressed: () {
+          navigate(
+              type: Type.push, context: context, page: const HistoryPage());
+        },
         closeSpeedDialOnPressed: false,
       ),
       SpeedDialChild(

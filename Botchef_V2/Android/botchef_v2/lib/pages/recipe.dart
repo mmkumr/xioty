@@ -1,5 +1,6 @@
 import 'package:botchef_v2/commons.dart';
 import 'package:botchef_v2/pages/chef_macro.dart';
+import 'package:botchef_v2/pages/your_recipes.dart';
 import 'package:botchef_v2/partials/appbar.dart';
 import 'package:flutter/material.dart';
 
@@ -148,13 +149,13 @@ class _RecipePageState extends State<RecipePage> {
                     navigate(
                       type: Type.push,
                       context: context,
-                      page: const ChefMacroPage(),
+                      page: const YourRecipesPage(),
                     );
                   },
                   child: Padding(
                     padding: const EdgeInsets.only(top: 10, bottom: 10),
                     child: Text(
-                      "Next",
+                      "Save",
                       style: TextStyle(
                         fontSize: 20,
                         color: elementsC.computeLuminance() > 0.5

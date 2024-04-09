@@ -116,7 +116,8 @@ class _HomePageState extends State<HomePage> {
                       onChanged: (value) {},
                       decoration: const InputDecoration(
                         focusedBorder: InputBorder.none,
-                        hintText: "Search by Micro ingredients",
+                        hintText: "Search by Macro, Chef name, Recipe name",
+                        hintMaxLines: 2,
                         icon: Icon(FontAwesomeIcons.magnifyingGlass),
                         enabledBorder: InputBorder.none,
                       ),

@@ -31,7 +31,6 @@ class _CookingPageState extends State<CookingPage> {
       start = true;
     }
     return Scaffold(
-      appBar: appbar,
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,

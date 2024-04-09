@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import '../commons.dart';
 import '../partials/description_popup.dart';
+import '../partials/menu.dart';
 
 class UserMicroPage extends StatefulWidget {
   const UserMicroPage({super.key});
@@ -53,7 +54,7 @@ class _UserMicroPageState extends State<UserMicroPage> {
           child: Column(
             children: [
               const Text(
-                "Liquid Macros",
+                "Liquid Micros",
                 style: TextStyle(fontSize: 30),
               ),
               ListView.builder(
@@ -116,7 +117,7 @@ class _UserMicroPageState extends State<UserMicroPage> {
                 },
               ),
               const Text(
-                "Solid Macros",
+                "Solid Micros",
                 style: TextStyle(fontSize: 30),
               ),
               ListView.builder(
@@ -211,6 +212,8 @@ class _UserMicroPageState extends State<UserMicroPage> {
           ),
         ),
       ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+      floatingActionButton: menu(context),
     );
   }
 }

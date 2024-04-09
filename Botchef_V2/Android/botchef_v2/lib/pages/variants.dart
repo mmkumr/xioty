@@ -80,7 +80,7 @@ class _VariantsPageState extends State<VariantsPage> {
                   padding: EdgeInsets.all(15.0),
                   child: Center(
                     child: Text(
-                      "No. of times cookes: 28 \n\nEarnings: ₹245",
+                      "No. of times cooked: 28 \n\nEarnings: ₹245", // Price/recipe will be set by admin.
                       textAlign: TextAlign.center,
                       style: TextStyle(fontSize: 15),
                       softWrap: true,
@@ -151,25 +151,6 @@ class _VariantsPageState extends State<VariantsPage> {
                       ),
                       subtitle: Wrap(
                         children: [
-                          Padding(
-                            padding:
-                                const EdgeInsets.only(left: 5.0, right: 5.0),
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: primaryC,
-                                borderRadius:
-                                    const BorderRadius.all(Radius.circular(60)),
-                              ),
-                              child: const Padding(
-                                padding: EdgeInsets.all(5.0),
-                                child: Text(
-                                  "One Pot Meal",
-                                  textAlign: TextAlign.center,
-                                  softWrap: true,
-                                ),
-                              ),
-                            ),
-                          ),
                           Padding(
                             padding:
                                 const EdgeInsets.only(left: 8.0, right: 8.0),

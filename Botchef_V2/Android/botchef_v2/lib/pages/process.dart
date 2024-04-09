@@ -36,8 +36,13 @@ class _ProcessPageState extends State<ProcessPage> {
   String? heatLevel = "180";
   List<String> waterLevels = ["1cup", "1/4cup", "1/2cup", "3/4cup"];
   String? waterLevel = "1";
+  int? selected;
+  List<String> changeableParam = ["Induction", "Water", "Wait"];
   @override
   void initState() {
+    setState(() {
+      selected = operations.length - 1;
+    });
     super.initState();
   }
 
@@ -50,6 +55,22 @@ class _ProcessPageState extends State<ProcessPage> {
         backgroundColor: bgC,
         centerTitle: true,
         title: const Text("Process"),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 20.0),
+            child: InkWell(
+              onTap: () {
+                setState(() {
+                  operations.removeAt(selected!);
+                });
+              },
+              child: const Icon(
+                Icons.delete,
+                color: Colors.red,
+              ),
+            ),
+          ),
+        ],
         elevation: 0,
       ),
       body: Column(
@@ -77,31 +98,41 @@ class _ProcessPageState extends State<ProcessPage> {
                       border: Border.all(),
                       borderRadius: const BorderRadius.all(Radius.circular(20)),
                     ),
-                    child: ListTile(
-                      onTap: () {
-                        setParam(index);
-                      },
-                      title: Text(
-                        operations[index].name!,
-                        textAlign: TextAlign.center,
-                      ),
-                      trailing: Text(
-                        operations[index].param! == "0"
-                            ? ""
-                            : operations[index].param!,
-                        style: const TextStyle(fontSize: 15),
-                      ),
-                      leading: InkWell(
-                        onTap: operations[index].param! == "0"
-                            ? () {}
-                            : () {
-                                setState(() {
-                                  operations.removeAt(index);
-                                });
-                              },
-                        child: const Icon(
-                          Icons.delete,
-                          color: Colors.red,
+                    child: GestureDetector(
+                      onDoubleTap:
+                          !changeableParam.contains(operations[index].name!)
+                              ? () {}
+                              : () {
+                                  setParam(index);
+                                },
+                      child: ListTile(
+                        onTap: () {
+                          setState(() {
+                            selected = index;
+                          });
+                        },
+                        title: Text(
+                          operations[index].name!,
+                          textAlign: TextAlign.center,
+                        ),
+                        trailing: Text(
+                          operations[index].param! == "0"
+                              ? ""
+                              : operations[index].param!,
+                          style: const TextStyle(fontSize: 15),
+                        ),
+                        leading: InkWell(
+                          onTap: operations[index].param! == "0"
+                              ? () {}
+                              : () {
+                                  setState(() {
+                                    operations.removeAt(index);
+                                  });
+                                },
+                          child: const Icon(
+                            Icons.delete,
+                            color: Colors.red,
+                          ),
                         ),
                       ),
                     ),
@@ -119,7 +150,9 @@ class _ProcessPageState extends State<ProcessPage> {
                 borderRadius: BorderRadius.circular(40),
               ),
               color: elementsC,
-              onPressed: () {},
+              onPressed: () {
+                addOperationsPopup(context);
+              },
               child: Padding(
                 padding: const EdgeInsets.only(top: 10, bottom: 10),
                 child: Text(
@@ -279,5 +312,168 @@ class _ProcessPageState extends State<ProcessPage> {
       },
     );
     setState(() {});
+  }
+
+  Future<dynamic> addOperationsPopup(BuildContext context) {
+    return showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Add Operations"),
+          content: SizedBox(
+            height: 500,
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: ExpansionTile(
+                      collapsedShape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      collapsedBackgroundColor: primaryC,
+                      title: const Text(
+                        "Macros",
+                        style: TextStyle(
+                            fontSize: 15, fontWeight: FontWeight.bold),
+                      ),
+                      children: [
+                        for (int i = 0; i < 4; i++)
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Container(
+                              alignment: Alignment.center,
+                              width: width(context) * 0.5,
+                              decoration: BoxDecoration(
+                                color: primaryC,
+                                border: Border.all(),
+                                borderRadius:
+                                    const BorderRadius.all(Radius.circular(40)),
+                              ),
+                              child: const ListTile(
+                                title: Text("Onions"),
+                                trailing: Text("1/2cup"),
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: ExpansionTile(
+                      collapsedShape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      collapsedBackgroundColor: primaryC,
+                      title: const Text(
+                        "Solid Micros",
+                        style: TextStyle(
+                            fontSize: 15, fontWeight: FontWeight.bold),
+                      ),
+                      children: [
+                        for (int i = 0; i < 4; i++)
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Container(
+                              alignment: Alignment.center,
+                              width: width(context) * 0.5,
+                              decoration: BoxDecoration(
+                                color: primaryC,
+                                border: Border.all(),
+                                borderRadius:
+                                    const BorderRadius.all(Radius.circular(40)),
+                              ),
+                              child: const ListTile(
+                                title: Text("Salt"),
+                                trailing: Text("4 tsp"),
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: ExpansionTile(
+                      collapsedShape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      collapsedBackgroundColor: primaryC,
+                      title: const Text(
+                        "Liquid Micros",
+                        style: TextStyle(
+                            fontSize: 15, fontWeight: FontWeight.bold),
+                      ),
+                      children: [
+                        for (int i = 0; i < 8; i++)
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Container(
+                              alignment: Alignment.center,
+                              width: width(context) * 0.5,
+                              decoration: BoxDecoration(
+                                color: primaryC,
+                                border: Border.all(),
+                                borderRadius:
+                                    const BorderRadius.all(Radius.circular(40)),
+                              ),
+                              child: const ListTile(
+                                title: Text("Oil"),
+                                trailing: Text("6 tsp"),
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: ExpansionTile(
+                      collapsedShape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      collapsedBackgroundColor: primaryC,
+                      title: const Text(
+                        "Others",
+                        style: TextStyle(
+                            fontSize: 15, fontWeight: FontWeight.bold),
+                      ),
+                      children: [
+                        for (int i = 0; i < 6; i++)
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Container(
+                              alignment: Alignment.center,
+                              width: width(context) * 0.5,
+                              decoration: BoxDecoration(
+                                color: primaryC,
+                                border: Border.all(),
+                                borderRadius:
+                                    const BorderRadius.all(Radius.circular(40)),
+                              ),
+                              child: ListTile(
+                                title: Text("Others $i"),
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text("Close"),
+            ),
+          ],
+        );
+      },
+    );
   }
 }

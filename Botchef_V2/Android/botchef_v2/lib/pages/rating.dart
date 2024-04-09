@@ -18,6 +18,7 @@ class _RatingPageState extends State<RatingPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(20.0),

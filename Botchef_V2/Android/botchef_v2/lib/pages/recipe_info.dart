@@ -140,49 +140,6 @@ class _RecipeInfoPageState extends State<RecipeInfoPage> {
                   textAlign: TextAlign.justify,
                 ),
               ),
-              const Padding(
-                padding: EdgeInsets.only(left: 20.0, top: 20),
-                child: ListTile(
-                  leading: Text(""),
-                  title: Wrap(
-                    children: [
-                      Padding(
-                        padding: EdgeInsets.only(left: 5.0, right: 5.0),
-                        child: Padding(
-                          padding: EdgeInsets.all(5.0),
-                          child: Text(
-                            "Category",
-                            textAlign: TextAlign.center,
-                            softWrap: true,
-                          ),
-                        ),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.only(left: 8.0, right: 8.0),
-                        child: Padding(
-                          padding: EdgeInsets.all(5.0),
-                          child: Text(
-                            "Spicy",
-                            textAlign: TextAlign.center,
-                            softWrap: true,
-                          ),
-                        ),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.only(left: 8.0, right: 8.0),
-                        child: Padding(
-                          padding: EdgeInsets.all(5.0),
-                          child: Text(
-                            "Portion Size",
-                            textAlign: TextAlign.center,
-                            softWrap: true,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
               ListView.builder(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
@@ -203,25 +160,6 @@ class _RecipeInfoPageState extends State<RecipeInfoPage> {
                       ),
                       subtitle: Wrap(
                         children: [
-                          Padding(
-                            padding:
-                                const EdgeInsets.only(left: 5.0, right: 5.0),
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: primaryC,
-                                borderRadius:
-                                    const BorderRadius.all(Radius.circular(60)),
-                              ),
-                              child: const Padding(
-                                padding: EdgeInsets.all(5.0),
-                                child: Text(
-                                  "One Pot Meal",
-                                  textAlign: TextAlign.center,
-                                  softWrap: true,
-                                ),
-                              ),
-                            ),
-                          ),
                           Padding(
                             padding:
                                 const EdgeInsets.only(left: 8.0, right: 8.0),
