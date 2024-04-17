@@ -22,6 +22,7 @@ class _HistoryPageState extends State<HistoryPage> {
         backgroundColor: bgC,
         elevation: 0,
       ),
+      drawer: menu(context),
       body: ListView.builder(
         itemCount: 20,
         itemBuilder: (context, index) {
@@ -44,8 +45,6 @@ class _HistoryPageState extends State<HistoryPage> {
           );
         },
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-      floatingActionButton: menu(context),
     );
   }
 }

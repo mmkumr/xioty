@@ -73,6 +73,7 @@ class _ProcessPageState extends State<ProcessPage> {
         ],
         elevation: 0,
       ),
+      drawer: menu(context),
       body: Column(
         children: [
           SizedBox(

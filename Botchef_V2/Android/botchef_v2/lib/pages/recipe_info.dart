@@ -1,4 +1,3 @@
-import 'package:botchef_v2/pages/user_macro.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
@@ -46,6 +45,7 @@ class _RecipeInfoPageState extends State<RecipeInfoPage> {
         ],
         elevation: 0,
       ),
+      drawer: menu(context),
       body: SingleChildScrollView(
         controller: scrollController,
         child: Padding(
@@ -140,76 +140,128 @@ class _RecipeInfoPageState extends State<RecipeInfoPage> {
                   textAlign: TextAlign.justify,
                 ),
               ),
-              ListView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: 3,
-                itemBuilder: (context, index) {
-                  return Padding(
-                    padding: const EdgeInsets.all(10.0),
-                    child: ListTile(
-                      onTap: () {
-                        navigate(
-                            type: Type.push,
-                            context: context,
-                            page: const UserMacroPage());
-                      },
-                      leading: Image.network(
-                        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRtVS-yJjgRy8IKB6HIs497p-IYFXQweSa7ww&usqp=CAU",
-                        fit: BoxFit.fill,
+              Wrap(
+                children: [
+                  Padding(
+                    padding:
+                        const EdgeInsets.only(left: 8.0, right: 8.0, top: 20),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: primaryC,
+                        borderRadius:
+                            const BorderRadius.all(Radius.circular(60)),
                       ),
-                      subtitle: Wrap(
-                        children: [
-                          Padding(
-                            padding:
-                                const EdgeInsets.only(left: 8.0, right: 8.0),
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: primaryC,
-                                borderRadius:
-                                    const BorderRadius.all(Radius.circular(60)),
-                              ),
-                              child: const Padding(
-                                padding: EdgeInsets.all(5.0),
-                                child: Text(
-                                  "Extreme",
-                                  textAlign: TextAlign.center,
-                                  softWrap: true,
-                                ),
-                              ),
-                            ),
-                          ),
-                          Padding(
-                            padding:
-                                const EdgeInsets.only(left: 8.0, right: 8.0),
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: primaryC,
-                                borderRadius:
-                                    const BorderRadius.all(Radius.circular(60)),
-                              ),
-                              child: Padding(
-                                padding: const EdgeInsets.all(5.0),
-                                child: Text(
-                                  "${index + 1}",
-                                  textAlign: TextAlign.center,
-                                  softWrap: true,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
+                      child: const Padding(
+                        padding: EdgeInsets.all(10.0),
+                        child: Text(
+                          "Mild",
+                          style: TextStyle(fontSize: 20),
+                          textAlign: TextAlign.center,
+                          softWrap: true,
+                        ),
                       ),
                     ),
-                  );
-                },
+                  ),
+                  Padding(
+                    padding:
+                        const EdgeInsets.only(left: 8.0, right: 8.0, top: 20),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: primaryC,
+                        borderRadius:
+                            const BorderRadius.all(Radius.circular(60)),
+                      ),
+                      child: const Padding(
+                        padding: EdgeInsets.all(10.0),
+                        child: Text(
+                          "Medium",
+                          style: TextStyle(fontSize: 20),
+                          textAlign: TextAlign.center,
+                          softWrap: true,
+                        ),
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding:
+                        const EdgeInsets.only(left: 8.0, right: 8.0, top: 20),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: primaryC,
+                        borderRadius:
+                            const BorderRadius.all(Radius.circular(60)),
+                      ),
+                      child: const Padding(
+                        padding: EdgeInsets.all(10.0),
+                        child: Text(
+                          "Extreme",
+                          style: TextStyle(fontSize: 20),
+                          textAlign: TextAlign.center,
+                          softWrap: true,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
+              Wrap(
+                children: [
+                  const Padding(
+                    padding: EdgeInsets.only(top: 20.0, right: 20),
+                    child: Text(
+                      "Portion Size",
+                      style: TextStyle(fontSize: 30),
+                      textAlign: TextAlign.center,
+                      softWrap: true,
+                    ),
+                  ),
+                  Padding(
+                    padding:
+                        const EdgeInsets.only(left: 8.0, right: 8.0, top: 20),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        border: Border.all(width: 3),
+                        borderRadius: const BorderRadius.all(
+                          Radius.circular(60),
+                        ),
+                      ),
+                      child: const Padding(
+                        padding: EdgeInsets.all(10.0),
+                        child: Text(
+                          "2",
+                          style: TextStyle(fontSize: 20),
+                          textAlign: TextAlign.center,
+                          softWrap: true,
+                        ),
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding:
+                        const EdgeInsets.only(left: 8.0, right: 8.0, top: 20),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        border: Border.all(width: 3),
+                        borderRadius:
+                            const BorderRadius.all(Radius.circular(60)),
+                      ),
+                      child: const Padding(
+                        padding: EdgeInsets.all(10.0),
+                        child: Text(
+                          "4",
+                          style: TextStyle(fontSize: 20),
+                          textAlign: TextAlign.center,
+                          softWrap: true,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              )
             ],
           ),
         ),
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-      floatingActionButton: menu(context),
     );
   }
 }

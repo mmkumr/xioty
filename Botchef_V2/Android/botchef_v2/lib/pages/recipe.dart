@@ -1,5 +1,4 @@
 import 'package:botchef_v2/commons.dart';
-import 'package:botchef_v2/pages/chef_macro.dart';
 import 'package:botchef_v2/pages/your_recipes.dart';
 import 'package:botchef_v2/partials/appbar.dart';
 import 'package:flutter/material.dart';

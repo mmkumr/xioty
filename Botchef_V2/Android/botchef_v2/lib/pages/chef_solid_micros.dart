@@ -40,6 +40,7 @@ class _ChefSolidMicroState extends State<ChefSolidMicro> {
       resizeToAvoidBottomInset: false,
       backgroundColor: bgC,
       appBar: appbar,
+      drawer: menu(context),
       body: SingleChildScrollView(
         reverse: start,
         child: Padding(
@@ -170,8 +171,6 @@ class _ChefSolidMicroState extends State<ChefSolidMicro> {
           ),
         ),
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-      floatingActionButton: menu(context),
     );
   }
 }

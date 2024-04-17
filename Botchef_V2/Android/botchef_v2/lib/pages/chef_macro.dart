@@ -36,6 +36,7 @@ class _ChefMacroPageState extends State<ChefMacroPage> {
       resizeToAvoidBottomInset: false,
       backgroundColor: bgC,
       appBar: appbar,
+      drawer: menu(context),
       body: SingleChildScrollView(
         reverse: true,
         child: Padding(
@@ -171,8 +172,6 @@ class _ChefMacroPageState extends State<ChefMacroPage> {
           ),
         ),
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-      floatingActionButton: menu(context),
     );
   }
 }

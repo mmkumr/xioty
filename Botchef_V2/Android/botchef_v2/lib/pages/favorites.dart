@@ -18,6 +18,7 @@ class _FavoritesPageState extends State<FavoritesPage> {
     return Scaffold(
       backgroundColor: bgC,
       appBar: appbar,
+      drawer: menu(context),
       body: Center(
         child: Column(
           children: [
@@ -76,8 +77,6 @@ class _FavoritesPageState extends State<FavoritesPage> {
           ],
         ),
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-      floatingActionButton: menu(context),
     );
   }
 }

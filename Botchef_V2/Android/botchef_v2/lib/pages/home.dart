@@ -1,4 +1,5 @@
 import 'package:botchef_v2/commons.dart';
+import 'package:botchef_v2/partials/appbar.dart';
 import 'package:botchef_v2/partials/menu.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -27,6 +28,8 @@ class _HomePageState extends State<HomePage> {
     String category = categories[catindex];
     return Scaffold(
       backgroundColor: bgC,
+      appBar: appbar,
+      drawer: menu(context),
       body: Center(
         child: Padding(
           padding: const EdgeInsets.only(top: 60.0),
@@ -180,8 +183,6 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-      floatingActionButton: menu(context),
     );
   }
 }

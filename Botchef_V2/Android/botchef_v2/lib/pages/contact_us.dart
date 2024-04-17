@@ -24,6 +24,7 @@ class _ContactUsPageState extends State<ContactUsPage> {
         backgroundColor: bgC,
         elevation: 0,
       ),
+      drawer: menu(context),
       body: SingleChildScrollView(
         child: SizedBox(
           height: MediaQuery.of(context).size.height * 0.8,
@@ -139,8 +140,6 @@ class _ContactUsPageState extends State<ContactUsPage> {
           ),
         ),
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-      floatingActionButton: menu(context),
     );
   }
 }

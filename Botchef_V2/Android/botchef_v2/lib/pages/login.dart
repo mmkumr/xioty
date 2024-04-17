@@ -1,7 +1,9 @@
-import 'package:botchef_v2/pages/machine_connect.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:provider/provider.dart';
 
 import '../commons.dart';
+import '../providers/user_provider.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -13,6 +15,7 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
+    final userProvider = Provider.of<UserProvider>(context);
     return Scaffold(
       backgroundColor: bgC,
       body: Center(
@@ -47,11 +50,18 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 color: elementsC,
                 onPressed: () {
-                  navigate(
-                    type: Type.push,
-                    context: context,
-                    page: const MachineConnectPage(),
-                  );
+                  userProvider.signInWithGoogle().then((value) {
+                    if (value == "new") {
+                      Fluttertoast.showToast(msg: "Welcome to Xara.");
+                    }
+                    if (value == "old") {
+                      Fluttertoast.showToast(msg: "Welcome back....");
+                    } else {
+                      Fluttertoast.showToast(
+                          msg:
+                              "Error while login, please try after some time.");
+                    }
+                  });
                 },
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,

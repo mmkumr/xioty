@@ -4,7 +4,6 @@ import 'package:botchef_v2/pages/rating.dart';
 import 'package:flutter/material.dart';
 
 import '../commons.dart';
-import '../partials/appbar.dart';
 
 class CookingPage extends StatefulWidget {
   const CookingPage({super.key});

@@ -31,6 +31,7 @@ class _ChefLiquidMicroState extends State<ChefLiquidMicro> {
       resizeToAvoidBottomInset: false,
       backgroundColor: bgC,
       appBar: appbar,
+      drawer: menu(context),
       body: SingleChildScrollView(
         reverse: true,
         child: Padding(
@@ -154,8 +155,6 @@ class _ChefLiquidMicroState extends State<ChefLiquidMicro> {
           ),
         ),
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-      floatingActionButton: menu(context),
     );
   }
 }

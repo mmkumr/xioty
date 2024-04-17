@@ -6,101 +6,85 @@ import 'package:botchef_v2/pages/home.dart';
 import 'package:botchef_v2/pages/your_recipes.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:simple_speed_dial/simple_speed_dial.dart';
+import 'package:provider/provider.dart';
 
 import '../pages/favorites.dart';
+import '../providers/user_provider.dart';
 
 Widget menu(BuildContext context) {
-  return SpeedDial(
-    closedForegroundColor: Colors.black,
-    openForegroundColor: Colors.white,
-    closedBackgroundColor: Colors.white,
-    openBackgroundColor: Colors.black,
-    labelsBackgroundColor: Colors.white,
-    speedDialChildren: <SpeedDialChild>[
-      SpeedDialChild(
-        child: CircleAvatar(
-          backgroundImage: Image.network(
-            "https://pics.craiyon.com/2023-07-15/dc2ec5a571974417a5551420a4fb0587.webp",
-          ).image,
+  final user = Provider.of<UserProvider>(context);
+  return Drawer(
+    child: ListView(
+      padding: const EdgeInsets.all(10.0),
+      children: [
+        UserAccountsDrawerHeader(
+          accountName: const Text('Xara Solutions'),
+          accountEmail: const Text("rxhundred@gmail.com"),
+          currentAccountPicture: CircleAvatar(
+            backgroundImage: Image.network(
+              "https://pics.craiyon.com/2023-07-15/dc2ec5a571974417a5551420a4fb0587.webp",
+            ).image,
+          ),
         ),
-        foregroundColor: Colors.white,
-        backgroundColor: Colors.lightGreen.withOpacity(0),
-        label: 'Xara Solutions',
-        onPressed: () {},
-        closeSpeedDialOnPressed: false,
-      ),
-      SpeedDialChild(
-        child: const Icon(Icons.history),
-        foregroundColor: Colors.white,
-        backgroundColor: Colors.red,
-        label: 'History',
-        onPressed: () {
-          navigate(
-              type: Type.push, context: context, page: const HistoryPage());
-        },
-        closeSpeedDialOnPressed: false,
-      ),
-      SpeedDialChild(
-        child: const Icon(Icons.favorite),
-        foregroundColor: Colors.white,
-        backgroundColor: Colors.yellow,
-        label: 'Favorites',
-        onPressed: () {
-          navigate(
-              type: Type.push, context: context, page: const FavoritesPage());
-        },
-        closeSpeedDialOnPressed: false,
-      ),
-      SpeedDialChild(
-        child: const Icon(FontAwesomeIcons.utensils),
-        foregroundColor: Colors.white,
-        backgroundColor: Colors.purple,
-        label: 'Your recipes',
-        onPressed: () {
-          navigate(
-              type: Type.push, context: context, page: const YourRecipesPage());
-        },
-      ),
-      SpeedDialChild(
-        child: const Icon(FontAwesomeIcons.spoon),
-        foregroundColor: Colors.white,
-        backgroundColor: Colors.lightGreen,
-        label: 'Edited recipes',
-        onPressed: () {
-          navigate(
-              type: Type.push,
-              context: context,
-              page: const EditedRecipesPage());
-        },
-      ),
-      SpeedDialChild(
-        child: const Icon(Icons.home),
-        foregroundColor: Colors.white,
-        backgroundColor: Colors.blueAccent,
-        label: 'Home',
-        onPressed: () {
-          navigate(type: Type.push, context: context, page: const HomePage());
-        },
-      ),
-      SpeedDialChild(
-        child: const Icon(Icons.headset_mic),
-        foregroundColor: Colors.white,
-        backgroundColor: Colors.lightBlueAccent,
-        label: 'Contact Us',
-        onPressed: () {
-          navigate(
-              type: Type.push, context: context, page: const ContactUsPage());
-        },
-      ),
-      SpeedDialChild(
-        child: const Icon(Icons.logout),
-        foregroundColor: Colors.white,
-        backgroundColor: Colors.green,
-        label: 'Log Out',
-        onPressed: () {},
-      ),
-    ],
-    child: const Icon(Icons.menu),
+        ListTile(
+          leading: const Icon(Icons.history),
+          title: const Text('History'),
+          onTap: () {
+            navigate(
+                type: Type.push, context: context, page: const HistoryPage());
+          },
+        ),
+        ListTile(
+          title: const Text('Favorites'),
+          onTap: () {
+            navigate(
+                type: Type.push, context: context, page: const FavoritesPage());
+          },
+          leading: const Icon(Icons.favorite),
+        ),
+        ListTile(
+          title: const Text('Your recipes'),
+          onTap: () {
+            navigate(
+                type: Type.push,
+                context: context,
+                page: const YourRecipesPage());
+          },
+          leading: const Icon(FontAwesomeIcons.utensils),
+        ),
+        ListTile(
+          title: const Text('Edited recipes'),
+          onTap: () {
+            navigate(
+                type: Type.push,
+                context: context,
+                page: const EditedRecipesPage());
+          },
+          leading: const Icon(FontAwesomeIcons.spoon),
+        ),
+        ListTile(
+          title: const Text('Home'),
+          onTap: () {
+            navigate(type: Type.push, context: context, page: const HomePage());
+          },
+          leading: const Icon(Icons.home),
+        ),
+        ListTile(
+          title: const Text('Contact Us'),
+          onTap: () {
+            navigate(
+                type: Type.push, context: context, page: const ContactUsPage());
+          },
+          leading: const Icon(Icons.headset_mic),
+        ),
+        ListTile(
+          title: const Text('Log Out'),
+          onTap: () {
+            user.signOut();
+          },
+          leading: const Icon(Icons.logout),
+        ),
+      ],
+    ),
   );
 }
