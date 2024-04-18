@@ -4,6 +4,7 @@ import 'package:botchef_v2/pages/edited_recipes.dart';
 import 'package:botchef_v2/pages/history.dart';
 import 'package:botchef_v2/pages/home.dart';
 import 'package:botchef_v2/pages/your_recipes.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
@@ -18,12 +19,23 @@ Widget menu(BuildContext context) {
       padding: const EdgeInsets.all(10.0),
       children: [
         UserAccountsDrawerHeader(
-          accountName: const Text('Xara Solutions'),
-          accountEmail: const Text("rxhundred@gmail.com"),
+          decoration: BoxDecoration(color: primaryC),
+          accountName: Text(
+            user.userModel.name,
+            style: const TextStyle(
+              color: Colors.black,
+            ),
+          ),
+          accountEmail: Text(
+            user.userModel.email,
+            style: const TextStyle(
+              color: Colors.black,
+            ),
+          ),
           currentAccountPicture: CircleAvatar(
-            backgroundImage: Image.network(
-              "https://pics.craiyon.com/2023-07-15/dc2ec5a571974417a5551420a4fb0587.webp",
-            ).image,
+            backgroundImage: CachedNetworkImageProvider(
+              user.userModel.profileUrl,
+            ),
           ),
         ),
         ListTile(

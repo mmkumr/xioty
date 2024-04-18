@@ -111,5 +111,6 @@ class UserProvider with ChangeNotifier {
         debugPrint("error login  ${e.toString()}");
       }
     }
+    notifyListeners();
   }
 }

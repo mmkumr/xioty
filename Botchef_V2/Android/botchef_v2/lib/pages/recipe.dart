@@ -1,12 +1,15 @@
 import 'package:botchef_v2/commons.dart';
+import 'package:botchef_v2/models/recipe.dart';
 import 'package:botchef_v2/pages/your_recipes.dart';
 import 'package:botchef_v2/partials/appbar.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../partials/menu.dart';
 
 class RecipePage extends StatefulWidget {
-  const RecipePage({super.key});
+  final RecipeModel? data;
+  const RecipePage({super.key, this.data});
 
   @override
   State<RecipePage> createState() => _RecipePageState();
@@ -14,12 +17,21 @@ class RecipePage extends StatefulWidget {
 
 class _RecipePageState extends State<RecipePage> {
   TextEditingController description = TextEditingController();
-  TextEditingController name = TextEditingController();
+  TextEditingController recipeName = TextEditingController();
   TextEditingController chefName = TextEditingController();
   TextEditingController calories = TextEditingController();
   GlobalKey<FormState> form = GlobalKey<FormState>();
   @override
   void initState() {
+    if (widget.data != null) {
+      RecipeModel recipe = widget.data!;
+      setState(() {
+        description.text = recipe.description!;
+        recipeName.text = recipe.recipeName!;
+        chefName.text = recipe.chefName!;
+        calories.text = recipe.calories!;
+      });
+    }
     super.initState();
   }
 
@@ -29,6 +41,7 @@ class _RecipePageState extends State<RecipePage> {
       resizeToAvoidBottomInset: false,
       backgroundColor: bgC,
       appBar: appbar,
+      drawer: menu(context),
       body: SingleChildScrollView(
         reverse: true,
         child: Padding(
@@ -50,7 +63,7 @@ class _RecipePageState extends State<RecipePage> {
                     Padding(
                       padding: const EdgeInsets.all(20.0),
                       child: TextFormField(
-                        controller: description,
+                        controller: recipeName,
                         validator: (value) {
                           if (value!.isEmpty) {
                             return "Field can't be empty";
@@ -71,7 +84,7 @@ class _RecipePageState extends State<RecipePage> {
                     Padding(
                       padding: const EdgeInsets.all(20.0),
                       child: TextFormField(
-                        controller: description,
+                        controller: chefName,
                         validator: (value) {
                           if (value!.isEmpty) {
                             return "Field can't be empty";
@@ -114,7 +127,11 @@ class _RecipePageState extends State<RecipePage> {
                     Padding(
                       padding: const EdgeInsets.all(20.0),
                       child: TextFormField(
-                        controller: description,
+                        controller: calories,
+                        keyboardType: TextInputType.number,
+                        inputFormatters: <TextInputFormatter>[
+                          FilteringTextInputFormatter.digitsOnly,
+                        ],
                         validator: (value) {
                           if (value!.isEmpty) {
                             return "Field can't be empty";
@@ -169,8 +186,6 @@ class _RecipePageState extends State<RecipePage> {
           ),
         ),
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-      floatingActionButton: menu(context),
     );
   }
 }

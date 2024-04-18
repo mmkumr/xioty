@@ -46,6 +46,7 @@ class _VariantsPageState extends State<VariantsPage> {
         ],
         elevation: 0,
       ),
+      drawer: menu(context),
       body: Center(
         child: Column(
           children: [
@@ -199,8 +200,6 @@ class _VariantsPageState extends State<VariantsPage> {
           ],
         ),
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-      floatingActionButton: menu(context),
     );
   }
 }

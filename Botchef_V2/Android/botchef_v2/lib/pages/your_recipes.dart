@@ -20,6 +20,7 @@ class _YourRecipesPageState extends State<YourRecipesPage> {
     return Scaffold(
       backgroundColor: bgC,
       appBar: appbar,
+      drawer: menu(context),
       body: Center(
         child: Column(
           children: [
@@ -169,8 +170,6 @@ class _YourRecipesPageState extends State<YourRecipesPage> {
           ],
         ),
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-      floatingActionButton: menu(context),
     );
   }
 }

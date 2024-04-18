@@ -40,8 +40,14 @@ Future<void> main() async {
   );
 }
 
-class ScreensController extends StatelessWidget {
+class ScreensController extends StatefulWidget {
   const ScreensController({super.key});
+
+  @override
+  State<ScreensController> createState() => _ScreensControllerState();
+}
+
+class _ScreensControllerState extends State<ScreensController> {
   @override
   Widget build(BuildContext context) {
     final user = Provider.of<UserProvider>(context);
