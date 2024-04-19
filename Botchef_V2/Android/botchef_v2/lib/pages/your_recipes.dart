@@ -1,6 +1,11 @@
+import 'package:botchef_v2/db/recipe.dart';
+import 'package:botchef_v2/models/recipe.dart';
 import 'package:botchef_v2/pages/variants.dart';
+import 'package:botchef_v2/providers/user_provider.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:provider/provider.dart';
 
 import '../commons.dart';
 import '../partials/appbar.dart';
@@ -15,6 +20,13 @@ class YourRecipesPage extends StatefulWidget {
 }
 
 class _YourRecipesPageState extends State<YourRecipesPage> {
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    getRecipes();
+  }
+
+  List<RecipeModel>? recipes;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -83,12 +95,13 @@ class _YourRecipesPageState extends State<YourRecipesPage> {
                 SizedBox(
                   height: height(context) * 0.3,
                   child: GridView.builder(
-                    itemCount: 5,
+                    itemCount: recipes!.length,
                     gridDelegate:
                         const SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 3,
                     ),
                     itemBuilder: (context, index) {
+                      RecipeModel recipe = recipes![index];
                       return Padding(
                         padding: const EdgeInsets.all(10.0),
                         child: InkWell(
@@ -96,19 +109,20 @@ class _YourRecipesPageState extends State<YourRecipesPage> {
                             navigate(
                                 type: Type.push,
                                 context: context,
-                                page: const VariantsPage());
+                                page: VariantsPage(data: recipe));
                           },
                           child: GridTile(
                             footer: Container(
                               color: Colors.white,
-                              child: const Text(
-                                "Chicken Pakoda",
-                                style: TextStyle(fontWeight: FontWeight.bold),
+                              child: Text(
+                                recipe.recipeName!,
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold),
                                 textAlign: TextAlign.center,
                               ),
                             ),
-                            child: Image.network(
-                              "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRtVS-yJjgRy8IKB6HIs497p-IYFXQweSa7ww&usqp=CAU",
+                            child: CachedNetworkImage(
+                              imageUrl: recipe.photoUrl!,
                               fit: BoxFit.fill,
                             ),
                           ),
@@ -131,12 +145,13 @@ class _YourRecipesPageState extends State<YourRecipesPage> {
                 SizedBox(
                   height: height(context) * 0.3,
                   child: GridView.builder(
-                    itemCount: 5,
+                    itemCount: 0,
                     gridDelegate:
                         const SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 3,
                     ),
                     itemBuilder: (context, index) {
+                      RecipeModel recipe = recipes![index];
                       return Padding(
                         padding: const EdgeInsets.all(10.0),
                         child: InkWell(
@@ -144,7 +159,9 @@ class _YourRecipesPageState extends State<YourRecipesPage> {
                             navigate(
                                 type: Type.push,
                                 context: context,
-                                page: const VariantsPage());
+                                page: VariantsPage(
+                                  data: recipe,
+                                ));
                           },
                           child: GridTile(
                             footer: Container(
@@ -171,5 +188,14 @@ class _YourRecipesPageState extends State<YourRecipesPage> {
         ),
       ),
     );
+  }
+
+  getRecipes() async {
+    final user = Provider.of<UserProvider>(context);
+    RecipeServices recipeServices = RecipeServices();
+    recipes = await recipeServices.myRecipes(user.user.uid);
+    setState(() {
+      recipes;
+    });
   }
 }

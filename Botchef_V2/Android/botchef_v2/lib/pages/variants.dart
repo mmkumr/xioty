@@ -1,19 +1,25 @@
+import 'package:botchef_v2/db/recipe.dart';
+import 'package:botchef_v2/models/recipe.dart';
 import 'package:botchef_v2/pages/recipe.dart';
 import 'package:botchef_v2/pages/variant.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 import '../commons.dart';
 import '../partials/menu.dart';
 
 class VariantsPage extends StatefulWidget {
-  const VariantsPage({super.key});
+  final RecipeModel data;
+  const VariantsPage({super.key, required this.data});
 
   @override
   State<VariantsPage> createState() => _VariantsPageState();
 }
 
 class _VariantsPageState extends State<VariantsPage> {
+  RecipeServices recipeServices = RecipeServices();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -26,7 +32,7 @@ class _VariantsPageState extends State<VariantsPage> {
               navigate(
                   type: Type.replace,
                   context: context,
-                  page: const RecipePage());
+                  page: RecipePage(data: widget.data));
             },
             child: const Padding(
               padding: EdgeInsets.all(15.0),
@@ -34,7 +40,10 @@ class _VariantsPageState extends State<VariantsPage> {
             ),
           ),
           InkWell(
-            onTap: () {},
+            onTap: () {
+              recipeServices.delete(
+                  id: widget.data.rid!, photoUrl: widget.data.photoUrl!);
+            },
             child: const Padding(
               padding: EdgeInsets.all(15.0),
               child: Icon(
@@ -56,14 +65,14 @@ class _VariantsPageState extends State<VariantsPage> {
               child: GridTile(
                 footer: Container(
                   color: Colors.white,
-                  child: const Text(
-                    "Chicken Pakoda",
-                    style: TextStyle(fontWeight: FontWeight.bold),
+                  child: Text(
+                    widget.data.recipeName!,
+                    style: const TextStyle(fontWeight: FontWeight.bold),
                     textAlign: TextAlign.center,
                   ),
                 ),
-                child: Image.network(
-                  "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRtVS-yJjgRy8IKB6HIs497p-IYFXQweSa7ww&usqp=CAU",
+                child: CachedNetworkImage(
+                  imageUrl: widget.data.photoUrl!,
                   fit: BoxFit.fill,
                 ),
               ),
@@ -77,13 +86,13 @@ class _VariantsPageState extends State<VariantsPage> {
                   color: primaryC,
                   borderRadius: const BorderRadius.all(Radius.circular(60)),
                 ),
-                child: const Padding(
-                  padding: EdgeInsets.all(15.0),
+                child: Padding(
+                  padding: const EdgeInsets.all(15.0),
                   child: Center(
                     child: Text(
-                      "No. of times cooked: 28 \n\nEarnings: ₹245", // Price/recipe will be set by admin.
+                      "No. of times cooked: ${widget.data.noOfTimes} \n\nEarnings: ₹${widget.data.earnings}", // Price/recipe will be set by admin.
                       textAlign: TextAlign.center,
-                      style: TextStyle(fontSize: 15),
+                      style: const TextStyle(fontSize: 15),
                       softWrap: true,
                     ),
                   ),
@@ -104,7 +113,7 @@ class _VariantsPageState extends State<VariantsPage> {
                     navigate(
                       type: Type.push,
                       context: context,
-                      page: const VariantPage(),
+                      page: VariantPage(rid: widget.data.rid!),
                     );
                   },
                   child: Padding(
@@ -143,7 +152,7 @@ class _VariantsPageState extends State<VariantsPage> {
                         navigate(
                           type: Type.push,
                           context: context,
-                          page: const VariantPage(),
+                          page: VariantPage(rid: widget.data.rid!),
                         );
                       },
                       leading: Image.network(

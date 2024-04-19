@@ -1,10 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 
 import '../models/recipe.dart';
 
-class RecipeServices {
+class VariantServices {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   String collection = "recipe";
 
@@ -24,9 +23,7 @@ class RecipeServices {
         "chefName": chefName,
         "description": description,
         "calories": calories,
-        "published": false,
-        "no_of_times": 0,
-        "earnings": 0,
+        "pulished": false,
       });
       debugPrint("Recipe has CREATED");
     } catch (e) {
@@ -68,11 +65,6 @@ class RecipeServices {
         return RecipeModel.fromSnapshot(e);
       }).toList();
     });
-  }
-
-  delete({required String id, required String photoUrl}) {
-    _firestore.collection(collection).doc(id).delete();
-    FirebaseStorage.instance.refFromURL(photoUrl).delete();
   }
 
   Future<RecipeModel> getById(String id) =>

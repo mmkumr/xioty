@@ -1,7 +1,7 @@
 // ignore_for_file: constant_identifier_names
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class RecipeModel {
+class VariantModel {
   static const PHOTOURL = "photoUrl";
   static const RID = "rid";
   static const UID = "uid";
@@ -9,9 +9,6 @@ class RecipeModel {
   static const CHEFNAME = "chefName";
   static const DESCRIPTION = "description";
   static const CALORIES = "calories";
-  static const PUBLISHED = "published";
-  static const NOOFTIMES = "no_of_times";
-  static const EARNINGS = "earnings";
 
   String? _photoUrl;
   String? _rid;
@@ -20,9 +17,6 @@ class RecipeModel {
   String? _chefName;
   String? _description;
   String? _calories;
-  bool? _published;
-  int? _noOfTimes;
-  int? _earings;
 
   //  getters
   String? get photoUrl => _photoUrl;
@@ -32,21 +26,14 @@ class RecipeModel {
   String? get chefName => _chefName;
   String? get description => _description;
   String? get calories => _calories;
-  bool? get published => _published;
-  int? get noOfTimes => _noOfTimes;
-  int? get earnings => _earings;
 
   // public variables
-  RecipeModel.fromSnapshot(DocumentSnapshot snapshot) {
+  VariantModel.fromSnapshot(DocumentSnapshot snapshot) {
     _photoUrl = snapshot[PHOTOURL];
     _rid = snapshot.id;
     _uid = snapshot[UID];
     _recipeName = snapshot[RECIPENAME];
     _chefName = snapshot[CHEFNAME];
-    _description = snapshot[DESCRIPTION];
-    _calories = snapshot[CALORIES];
-    _published = snapshot[PUBLISHED];
-    _noOfTimes = snapshot[NOOFTIMES];
-    _earings = snapshot[EARNINGS];
+    _description = snapshot[CALORIES];
   }
 }

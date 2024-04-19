@@ -15,8 +15,13 @@ class _SplashScreenState extends State<SplashScreen> {
       backgroundColor: const Color(0xff010a1c),
       body: Center(
         child: Animate(
-          effects: const [ScaleEffect()],
-          child: Image.asset("assets/imgs/logo.png"),
+          effects: const [
+            ScaleEffect(duration: Duration(seconds: 5)),
+          ],
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Image.asset("assets/imgs/logo.png"),
+          ),
         ),
       ),
     );

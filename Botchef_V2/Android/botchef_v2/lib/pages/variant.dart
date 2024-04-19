@@ -6,7 +6,8 @@ import 'package:flutter/material.dart';
 import '../partials/menu.dart';
 
 class VariantPage extends StatefulWidget {
-  const VariantPage({super.key});
+  final String rid;
+  const VariantPage({super.key, required this.rid});
 
   @override
   State<VariantPage> createState() => _VariantPageState();
@@ -51,6 +52,7 @@ class _VariantPageState extends State<VariantPage> {
       resizeToAvoidBottomInset: false,
       backgroundColor: bgC,
       appBar: appbar,
+      drawer: menu(context),
       body: SingleChildScrollView(
         reverse: true,
         child: Padding(
@@ -217,8 +219,6 @@ class _VariantPageState extends State<VariantPage> {
           ),
         ),
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-      floatingActionButton: menu(context),
     );
   }
 }
