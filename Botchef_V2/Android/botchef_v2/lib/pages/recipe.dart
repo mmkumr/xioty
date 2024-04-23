@@ -10,6 +10,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:provider/provider.dart';
@@ -34,6 +35,13 @@ class _RecipePageState extends State<RecipePage> {
   XFile? image;
   String? photoUrl;
   bool loading = false;
+  List<String> categories = [
+    "Rice",
+    "One Pot Meal",
+    "Curry",
+    "Stir fry",
+  ];
+  String? category;
   @override
   void initState() {
     if (widget.data != null) {
@@ -45,7 +53,10 @@ class _RecipePageState extends State<RecipePage> {
         chefName.text = recipe.chefName!;
         calories.text = recipe.calories!;
         photoUrl = recipe.photoUrl;
+        category = recipe.type;
       });
+    } else {
+      category = categories[0];
     }
     super.initState();
   }
@@ -123,6 +134,32 @@ class _RecipePageState extends State<RecipePage> {
                               decoration: InputDecoration(
                                 hintText: "Recipe Name",
                                 label: const Text("Recipe Name"),
+                                filled: true,
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10.0),
+                                ),
+                                fillColor: primaryC,
+                              ),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(20.0),
+                            child: DropdownButtonFormField(
+                              value: category,
+                              items: categories.map((String items) {
+                                return DropdownMenuItem(
+                                  value: items,
+                                  child: Text(items),
+                                );
+                              }).toList(),
+                              onChanged: (String? value) {
+                                setState(() {
+                                  category = value;
+                                });
+                              },
+                              decoration: InputDecoration(
+                                hintText: "Type",
+                                label: const Text("Type"),
                                 filled: true,
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(10.0),
@@ -222,21 +259,28 @@ class _RecipePageState extends State<RecipePage> {
                             }
                             if (widget.data == null) {
                               recipeServices.create(
-                                  photoUrl: photoUrl!,
-                                  uid: user.user.uid,
-                                  recipeName: recipeName.text,
-                                  chefName: chefName.text,
-                                  description: description.text,
-                                  calories: calories.text);
+                                photoUrl: photoUrl!,
+                                uid: user.user.uid,
+                                recipeName: recipeName.text,
+                                chefName: chefName.text,
+                                description: description.text,
+                                calories: calories.text,
+                                type: category!,
+                              );
+                              Fluttertoast.showToast(
+                                  msg: "successfully created new recipe");
                             } else {
                               recipeServices.update(
-                                  id: widget.data!.rid!,
-                                  photoUrl: photoUrl!,
-                                  uid: user.user.uid,
-                                  recipeName: recipeName.text,
-                                  chefName: chefName.text,
-                                  description: description.text,
-                                  calories: calories.text);
+                                id: widget.data!.rid!,
+                                photoUrl: photoUrl!,
+                                recipeName: recipeName.text,
+                                chefName: chefName.text,
+                                description: description.text,
+                                calories: calories.text,
+                                type: category!,
+                              );
+                              Fluttertoast.showToast(
+                                  msg: "successfully updated new recipe");
                             }
                             setState(() {
                               loading = false;

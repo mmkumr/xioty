@@ -5,12 +5,13 @@ class RecipeModel {
   static const PHOTOURL = "photoUrl";
   static const RID = "rid";
   static const UID = "uid";
-  static const RECIPENAME = "recipeName";
-  static const CHEFNAME = "chefName";
+  static const RECIPE_NAME = "recipeName";
+  static const CHEF_NAME = "chefName";
   static const DESCRIPTION = "description";
   static const CALORIES = "calories";
+  static const TYPE = "type";
   static const PUBLISHED = "published";
-  static const NOOFTIMES = "no_of_times";
+  static const NO_OF_TIMES = "no_of_times";
   static const EARNINGS = "earnings";
 
   String? _photoUrl;
@@ -20,6 +21,7 @@ class RecipeModel {
   String? _chefName;
   String? _description;
   String? _calories;
+  String? _type;
   bool? _published;
   int? _noOfTimes;
   int? _earings;
@@ -32,6 +34,7 @@ class RecipeModel {
   String? get chefName => _chefName;
   String? get description => _description;
   String? get calories => _calories;
+  String? get type => _type;
   bool? get published => _published;
   int? get noOfTimes => _noOfTimes;
   int? get earnings => _earings;
@@ -41,12 +44,13 @@ class RecipeModel {
     _photoUrl = snapshot[PHOTOURL];
     _rid = snapshot.id;
     _uid = snapshot[UID];
-    _recipeName = snapshot[RECIPENAME];
-    _chefName = snapshot[CHEFNAME];
+    _recipeName = snapshot[RECIPE_NAME];
+    _chefName = snapshot[CHEF_NAME];
     _description = snapshot[DESCRIPTION];
     _calories = snapshot[CALORIES];
+    _type = snapshot[TYPE];
     _published = snapshot[PUBLISHED];
-    _noOfTimes = snapshot[NOOFTIMES];
+    _noOfTimes = snapshot[NO_OF_TIMES];
     _earings = snapshot[EARNINGS];
   }
 }

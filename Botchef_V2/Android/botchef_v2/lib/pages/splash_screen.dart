@@ -16,10 +16,10 @@ class _SplashScreenState extends State<SplashScreen> {
       body: Center(
         child: Animate(
           effects: const [
-            ScaleEffect(duration: Duration(seconds: 5)),
+            ScaleEffect(duration: Duration(seconds: 1)),
           ],
           child: Padding(
-            padding: const EdgeInsets.all(20.0),
+            padding: const EdgeInsets.all(10.0),
             child: Image.asset("assets/imgs/logo.png"),
           ),
         ),

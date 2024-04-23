@@ -6,7 +6,7 @@ import '../models/recipe.dart';
 
 class RecipeServices {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  String collection = "recipe";
+  String collection = "recipes";
 
   create({
     required String photoUrl,
@@ -15,6 +15,7 @@ class RecipeServices {
     required String chefName,
     required String description,
     required String calories,
+    required String type,
   }) async {
     try {
       await _firestore.collection(collection).add({
@@ -24,11 +25,11 @@ class RecipeServices {
         "chefName": chefName,
         "description": description,
         "calories": calories,
+        "type": type,
         "published": false,
         "no_of_times": 0,
         "earnings": 0,
       });
-      debugPrint("Recipe has CREATED");
     } catch (e) {
       debugPrint('ERROR: ${e.toString()}');
     }
@@ -37,20 +38,20 @@ class RecipeServices {
   update({
     required String id,
     required String photoUrl,
-    required String uid,
     required String recipeName,
     required String chefName,
     required String description,
     required String calories,
+    required String type,
   }) async {
     try {
       await _firestore.collection(collection).doc(id).update({
-        "uid": uid,
         "photoUrl": photoUrl,
         "recipeName": recipeName,
         "chefName": chefName,
         "description": description,
-        "calories": calories
+        "calories": calories,
+        "type": type,
       });
       debugPrint("Recipe has Updated");
     } catch (e) {

@@ -1,4 +1,7 @@
 import 'package:botchef_v2/commons.dart';
+import 'package:botchef_v2/db/variant.dart';
+import 'package:botchef_v2/models/recipe.dart';
+import 'package:botchef_v2/models/variant.dart';
 import 'package:botchef_v2/pages/home.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -14,35 +17,47 @@ class Operation {
 }
 
 class ProcessPage extends StatefulWidget {
-  const ProcessPage({super.key});
+  final VariantModel variant;
+  final RecipeModel recipe;
+  const ProcessPage({super.key, required this.variant, required this.recipe});
 
   @override
   State<ProcessPage> createState() => _ProcessPageState();
 }
 
 class _ProcessPageState extends State<ProcessPage> {
-  List<Operation> operations = [
-    Operation(name: "Induction", label: "Other", param: "180"),
-    Operation(name: "Lid_Up", label: "Micro"),
-    Operation(name: "Oil", label: "Liquid Micro", param: "3tsp"),
-    Operation(name: "Onion", label: "Macro", param: "1cup"),
-    Operation(name: "Stir", label: "Other"),
-    Operation(name: "Wait", label: "Other", param: "30"),
-    Operation(name: "Water", label: "Other", param: "1/2cup"),
-  ];
+  List<Operation> operations = [];
   GlobalKey<FormState> form = GlobalKey<FormState>();
   TextEditingController delay = TextEditingController();
   List<String> heatLevels = ["100", "130", "160", "180", "200", "220", "240"];
   String? heatLevel = "180";
   List<String> waterLevels = ["1cup", "1/4cup", "1/2cup", "3/4cup"];
-  String? waterLevel = "1";
-  int? selected;
+  String? waterLevel = "1cup";
+  int selected = 0;
   List<String> changeableParam = ["Induction", "Water", "Wait"];
+  List<String> others = [
+    "Lid up",
+    "Lid down",
+    "Induction",
+    "Water",
+    "Stir",
+    "Wait",
+    "Preset",
+    "Arm home",
+    "Disable arm",
+  ];
   @override
   void initState() {
-    setState(() {
+    if (widget.variant.operations!.isNotEmpty) {
+      for (var e in widget.variant.operations!) {
+        operations.add(Operation(
+          label: e["label"],
+          name: e["name"],
+          param: e["param"],
+        ));
+      }
       selected = operations.length - 1;
-    });
+    }
     super.initState();
   }
 
@@ -60,9 +75,12 @@ class _ProcessPageState extends State<ProcessPage> {
             padding: const EdgeInsets.only(right: 20.0),
             child: InkWell(
               onTap: () {
-                setState(() {
-                  operations.removeAt(selected!);
-                });
+                if (operations.isNotEmpty) {
+                  setState(() {
+                    operations.removeAt(selected);
+                    selected = operations.isEmpty ? 0 : operations.length - 1;
+                  });
+                }
               },
               child: const Icon(
                 Icons.delete,
@@ -95,7 +113,7 @@ class _ProcessPageState extends State<ProcessPage> {
                   padding: const EdgeInsets.all(10.0),
                   child: Container(
                     decoration: BoxDecoration(
-                      color: primaryC,
+                      color: selected == index ? Colors.white : primaryC,
                       border: Border.all(),
                       borderRadius: const BorderRadius.all(Radius.circular(20)),
                     ),
@@ -122,19 +140,7 @@ class _ProcessPageState extends State<ProcessPage> {
                               : operations[index].param!,
                           style: const TextStyle(fontSize: 15),
                         ),
-                        leading: InkWell(
-                          onTap: operations[index].param! == "0"
-                              ? () {}
-                              : () {
-                                  setState(() {
-                                    operations.removeAt(index);
-                                  });
-                                },
-                          child: const Icon(
-                            Icons.delete,
-                            color: Colors.red,
-                          ),
-                        ),
+                        leading: Text(operations[index].label!),
                       ),
                     ),
                   ),
@@ -178,6 +184,13 @@ class _ProcessPageState extends State<ProcessPage> {
               ),
               color: elementsC,
               onPressed: () {
+                List<Map> updateOperations = operations.map((e) {
+                  return {"name": e.name, "label": e.label, "param": e.param};
+                }).toList();
+                VariantServices().updateOperations(
+                  vid: widget.variant.vid!,
+                  operations: updateOperations,
+                );
                 navigate(
                     type: Type.replace,
                     context: context,
@@ -199,8 +212,6 @@ class _ProcessPageState extends State<ProcessPage> {
           ),
         ],
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-      floatingActionButton: menu(context),
     );
   }
 
@@ -339,24 +350,47 @@ class _ProcessPageState extends State<ProcessPage> {
                             fontSize: 15, fontWeight: FontWeight.bold),
                       ),
                       children: [
-                        for (int i = 0; i < 4; i++)
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Container(
-                              alignment: Alignment.center,
-                              width: width(context) * 0.5,
-                              decoration: BoxDecoration(
-                                color: primaryC,
-                                border: Border.all(),
-                                borderRadius:
-                                    const BorderRadius.all(Radius.circular(40)),
-                              ),
-                              child: const ListTile(
-                                title: Text("Onions"),
-                                trailing: Text("1/2cup"),
-                              ),
-                            ),
-                          ),
+                        for (int i = 0; i < widget.variant.macros!.length; i++)
+                          widget.variant.macros![i]["name"].isEmpty
+                              ? Container()
+                              : Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Container(
+                                    alignment: Alignment.center,
+                                    width: width(context) * 0.5,
+                                    decoration: BoxDecoration(
+                                      color: primaryC,
+                                      border: Border.all(),
+                                      borderRadius: const BorderRadius.all(
+                                          Radius.circular(40)),
+                                    ),
+                                    child: ListTile(
+                                      onTap: () {
+                                        int index = selected + 1;
+                                        if (operations.isEmpty) {
+                                          index = 0;
+                                        }
+                                        operations.insert(
+                                            index,
+                                            Operation(
+                                                label: "M$i",
+                                                name: widget.variant.macros![i]
+                                                    ["name"],
+                                                param: widget.variant.macros![i]
+                                                    ["quantity"]));
+                                        selected = operations.isEmpty
+                                            ? 0
+                                            : operations.length - 1;
+                                        setState(() {});
+                                        Navigator.of(context).pop();
+                                      },
+                                      title: Text(
+                                          widget.variant.macros![i]["name"]),
+                                      trailing: Text(widget.variant.macros![i]
+                                          ["quantity"]),
+                                    ),
+                                  ),
+                                ),
                       ],
                     ),
                   ),
@@ -373,24 +407,50 @@ class _ProcessPageState extends State<ProcessPage> {
                             fontSize: 15, fontWeight: FontWeight.bold),
                       ),
                       children: [
-                        for (int i = 0; i < 4; i++)
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Container(
-                              alignment: Alignment.center,
-                              width: width(context) * 0.5,
-                              decoration: BoxDecoration(
-                                color: primaryC,
-                                border: Border.all(),
-                                borderRadius:
-                                    const BorderRadius.all(Radius.circular(40)),
-                              ),
-                              child: const ListTile(
-                                title: Text("Salt"),
-                                trailing: Text("4 tsp"),
-                              ),
-                            ),
-                          ),
+                        for (int i = 0;
+                            i < widget.variant.solidMicros![i]["name"].length;
+                            i++)
+                          widget.variant.solidMicros![i].isEmpty
+                              ? Container()
+                              : Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Container(
+                                    alignment: Alignment.center,
+                                    width: width(context) * 0.5,
+                                    decoration: BoxDecoration(
+                                      color: primaryC,
+                                      border: Border.all(),
+                                      borderRadius: const BorderRadius.all(
+                                          Radius.circular(40)),
+                                    ),
+                                    child: ListTile(
+                                      onTap: () {
+                                        int index = selected + 1;
+                                        if (operations.isEmpty) {
+                                          index = 0;
+                                        }
+                                        operations.insert(
+                                            index,
+                                            Operation(
+                                                label: "sm$i",
+                                                name: widget.variant
+                                                    .solidMicros![i]["name"],
+                                                param: widget
+                                                        .variant.solidMicros![i]
+                                                    ["quantity"]));
+                                        selected = operations.isEmpty
+                                            ? 0
+                                            : operations.length - 1;
+                                        setState(() {});
+                                        Navigator.of(context).pop();
+                                      },
+                                      title: Text(widget.variant.solidMicros![i]
+                                          ["name"]),
+                                      trailing: Text(
+                                          "${widget.variant.solidMicros![i]['quantity']} tsp"),
+                                    ),
+                                  ),
+                                ),
                       ],
                     ),
                   ),
@@ -407,24 +467,49 @@ class _ProcessPageState extends State<ProcessPage> {
                             fontSize: 15, fontWeight: FontWeight.bold),
                       ),
                       children: [
-                        for (int i = 0; i < 8; i++)
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Container(
-                              alignment: Alignment.center,
-                              width: width(context) * 0.5,
-                              decoration: BoxDecoration(
-                                color: primaryC,
-                                border: Border.all(),
-                                borderRadius:
-                                    const BorderRadius.all(Radius.circular(40)),
-                              ),
-                              child: const ListTile(
-                                title: Text("Oil"),
-                                trailing: Text("6 tsp"),
-                              ),
-                            ),
-                          ),
+                        for (int i = 0;
+                            i < widget.variant.liquidMicros![i]["name"].length;
+                            i++)
+                          widget.variant.liquidMicros![i].isEmpty
+                              ? Container()
+                              : Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Container(
+                                    alignment: Alignment.center,
+                                    width: width(context) * 0.5,
+                                    decoration: BoxDecoration(
+                                      color: primaryC,
+                                      border: Border.all(),
+                                      borderRadius: const BorderRadius.all(
+                                          Radius.circular(40)),
+                                    ),
+                                    child: ListTile(
+                                      onTap: () {
+                                        int index = selected + 1;
+                                        if (operations.isEmpty) {
+                                          index = 0;
+                                        }
+                                        operations.insert(
+                                            index,
+                                            Operation(
+                                                label: "lm$i",
+                                                name: widget.variant
+                                                    .liquidMicros![i]["name"],
+                                                param:
+                                                    "${widget.variant.liquidMicros![i]["quantity"]} tsp"));
+                                        selected = operations.isEmpty
+                                            ? 0
+                                            : operations.length - 1;
+                                        setState(() {});
+                                        Navigator.of(context).pop();
+                                      },
+                                      title: Text(widget
+                                          .variant.liquidMicros![i]["name"]),
+                                      trailing: Text(
+                                          "${widget.variant.liquidMicros![i]['quantity']} tsp"),
+                                    ),
+                                  ),
+                                ),
                       ],
                     ),
                   ),
@@ -441,7 +526,7 @@ class _ProcessPageState extends State<ProcessPage> {
                             fontSize: 15, fontWeight: FontWeight.bold),
                       ),
                       children: [
-                        for (int i = 0; i < 6; i++)
+                        for (int i = 0; i < others.length; i++)
                           Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: Container(
@@ -454,7 +539,32 @@ class _ProcessPageState extends State<ProcessPage> {
                                     const BorderRadius.all(Radius.circular(40)),
                               ),
                               child: ListTile(
-                                title: Text("Others $i"),
+                                onTap: () {
+                                  String param = "0";
+                                  if (others[i] == "Induction") {
+                                    param = "180";
+                                  } else if (others[i] == "Water") {
+                                    param = "1cup";
+                                  } else if (others[i] == "Wait") {
+                                    param = "1";
+                                  }
+                                  int index = selected + 1;
+                                  if (operations.isEmpty) {
+                                    index = 0;
+                                  }
+                                  operations.insert(
+                                      index,
+                                      Operation(
+                                          label: "o$i",
+                                          name: others[i],
+                                          param: param));
+                                  selected = operations.isEmpty
+                                      ? 0
+                                      : operations.length - 1;
+                                  setState(() {});
+                                  Navigator.of(context).pop();
+                                },
+                                title: Text(others[i]),
                               ),
                             ),
                           ),

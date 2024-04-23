@@ -1,18 +1,20 @@
 import 'package:botchef_v2/db/recipe.dart';
+import 'package:botchef_v2/db/variant.dart';
 import 'package:botchef_v2/models/recipe.dart';
+import 'package:botchef_v2/models/variant.dart';
 import 'package:botchef_v2/pages/recipe.dart';
 import 'package:botchef_v2/pages/variant.dart';
+import 'package:botchef_v2/pages/your_recipes.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 import '../commons.dart';
 import '../partials/menu.dart';
 
 class VariantsPage extends StatefulWidget {
-  final RecipeModel data;
-  const VariantsPage({super.key, required this.data});
+  final RecipeModel recipe;
+  const VariantsPage({super.key, required this.recipe});
 
   @override
   State<VariantsPage> createState() => _VariantsPageState();
@@ -20,6 +22,13 @@ class VariantsPage extends StatefulWidget {
 
 class _VariantsPageState extends State<VariantsPage> {
   RecipeServices recipeServices = RecipeServices();
+  List<VariantModel>? variants;
+  @override
+  void didChangeDependencies() {
+    getVariants();
+    super.didChangeDependencies();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -32,7 +41,7 @@ class _VariantsPageState extends State<VariantsPage> {
               navigate(
                   type: Type.replace,
                   context: context,
-                  page: RecipePage(data: widget.data));
+                  page: RecipePage(data: widget.recipe));
             },
             child: const Padding(
               padding: EdgeInsets.all(15.0),
@@ -42,7 +51,11 @@ class _VariantsPageState extends State<VariantsPage> {
           InkWell(
             onTap: () {
               recipeServices.delete(
-                  id: widget.data.rid!, photoUrl: widget.data.photoUrl!);
+                  id: widget.recipe.rid!, photoUrl: widget.recipe.photoUrl!);
+              navigate(
+                  type: Type.replace,
+                  context: context,
+                  page: const YourRecipesPage());
             },
             child: const Padding(
               padding: EdgeInsets.all(15.0),
@@ -66,13 +79,13 @@ class _VariantsPageState extends State<VariantsPage> {
                 footer: Container(
                   color: Colors.white,
                   child: Text(
-                    widget.data.recipeName!,
+                    widget.recipe.recipeName!,
                     style: const TextStyle(fontWeight: FontWeight.bold),
                     textAlign: TextAlign.center,
                   ),
                 ),
                 child: CachedNetworkImage(
-                  imageUrl: widget.data.photoUrl!,
+                  imageUrl: widget.recipe.photoUrl!,
                   fit: BoxFit.fill,
                 ),
               ),
@@ -90,7 +103,7 @@ class _VariantsPageState extends State<VariantsPage> {
                   padding: const EdgeInsets.all(15.0),
                   child: Center(
                     child: Text(
-                      "No. of times cooked: ${widget.data.noOfTimes} \n\nEarnings: ₹${widget.data.earnings}", // Price/recipe will be set by admin.
+                      "No. of times cooked: ${widget.recipe.noOfTimes} \n\nEarnings: ₹${widget.recipe.earnings}", // Price/recipe will be set by admin.
                       textAlign: TextAlign.center,
                       style: const TextStyle(fontSize: 15),
                       softWrap: true,
@@ -113,7 +126,7 @@ class _VariantsPageState extends State<VariantsPage> {
                     navigate(
                       type: Type.push,
                       context: context,
-                      page: VariantPage(rid: widget.data.rid!),
+                      page: VariantPage(recipe: widget.recipe),
                     );
                   },
                   child: Padding(
@@ -143,8 +156,9 @@ class _VariantsPageState extends State<VariantsPage> {
             ),
             Flexible(
               child: ListView.builder(
-                itemCount: 3,
+                itemCount: variants!.length,
                 itemBuilder: (context, index) {
+                  VariantModel variant = variants![index];
                   return Padding(
                     padding: const EdgeInsets.all(10.0),
                     child: ListTile(
@@ -152,11 +166,14 @@ class _VariantsPageState extends State<VariantsPage> {
                         navigate(
                           type: Type.push,
                           context: context,
-                          page: VariantPage(rid: widget.data.rid!),
+                          page: VariantPage(
+                            recipe: widget.recipe,
+                            variant: variant,
+                          ),
                         );
                       },
-                      leading: Image.network(
-                        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRtVS-yJjgRy8IKB6HIs497p-IYFXQweSa7ww&usqp=CAU",
+                      leading: CachedNetworkImage(
+                        imageUrl: widget.recipe.photoUrl!,
                         fit: BoxFit.fill,
                       ),
                       subtitle: Wrap(
@@ -170,10 +187,10 @@ class _VariantsPageState extends State<VariantsPage> {
                                 borderRadius:
                                     const BorderRadius.all(Radius.circular(60)),
                               ),
-                              child: const Padding(
-                                padding: EdgeInsets.all(5.0),
+                              child: Padding(
+                                padding: const EdgeInsets.all(5.0),
                                 child: Text(
-                                  "Extreme",
+                                  "Spricy: ${variant.spicy}",
                                   textAlign: TextAlign.center,
                                   softWrap: true,
                                 ),
@@ -192,7 +209,7 @@ class _VariantsPageState extends State<VariantsPage> {
                               child: Padding(
                                 padding: const EdgeInsets.all(5.0),
                                 child: Text(
-                                  "${index + 1}",
+                                  "Portion size: ${variant.portionSize}",
                                   textAlign: TextAlign.center,
                                   softWrap: true,
                                 ),
@@ -210,5 +227,13 @@ class _VariantsPageState extends State<VariantsPage> {
         ),
       ),
     );
+  }
+
+  getVariants() async {
+    VariantServices variantServices = VariantServices();
+    variants = await variantServices.getVariants(widget.recipe.rid!);
+    setState(() {
+      variants;
+    });
   }
 }
