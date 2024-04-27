@@ -1,3 +1,7 @@
+import 'package:botchef_v2/db/variant.dart';
+import 'package:botchef_v2/models/recipe.dart';
+import 'package:botchef_v2/models/variant.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
@@ -5,7 +9,8 @@ import '../commons.dart';
 import '../partials/menu.dart';
 
 class RecipeInfoPage extends StatefulWidget {
-  const RecipeInfoPage({super.key});
+  final RecipeModel recipe;
+  const RecipeInfoPage({super.key, required this.recipe});
 
   @override
   State<RecipeInfoPage> createState() => _RecipeInfoPageState();
@@ -13,18 +18,10 @@ class RecipeInfoPage extends StatefulWidget {
 
 class _RecipeInfoPageState extends State<RecipeInfoPage> {
   ScrollController scrollController = ScrollController();
-  @override
-  void initState() {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      scrollController.animateTo(
-        scrollController.position.minScrollExtent,
-        curve: Curves.easeOut,
-        duration: const Duration(milliseconds: 500),
-      );
-    });
-    super.initState();
-  }
-
+  List<VariantModel> variants = [];
+  Map variantButtons = {};
+  String selectedSpicy = "";
+  String selectedPortionSize = "";
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -59,18 +56,17 @@ class _RecipeInfoPageState extends State<RecipeInfoPage> {
                 child: GridTile(
                   footer: Container(
                     color: Colors.white,
-                    child: const Text(
-                      "Chicken Pakoda",
-                      style:
-                          TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+                    child: Text(
+                      widget.recipe.recipeName!,
+                      style: const TextStyle(
+                          fontWeight: FontWeight.bold, fontSize: 20),
                       textAlign: TextAlign.center,
                     ),
                   ),
                   child: CircleAvatar(
-                    backgroundImage: Image.network(
-                      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRtVS-yJjgRy8IKB6HIs497p-IYFXQweSa7ww&usqp=CAU",
-                      fit: BoxFit.fill,
-                    ).image,
+                    backgroundImage: CachedNetworkImageProvider(
+                      widget.recipe.photoUrl!,
+                    ),
                   ),
                 ),
               ),
@@ -78,9 +74,9 @@ class _RecipeInfoPageState extends State<RecipeInfoPage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   RichText(
-                    text: const TextSpan(
+                    text: TextSpan(
                       children: [
-                        WidgetSpan(
+                        const WidgetSpan(
                           child: Padding(
                             padding: EdgeInsets.only(right: 5.0),
                             child: Icon(
@@ -89,14 +85,14 @@ class _RecipeInfoPageState extends State<RecipeInfoPage> {
                             ),
                           ),
                         ),
-                        TextSpan(
+                        const TextSpan(
                           text: "2 hours",
                           style: TextStyle(
                             color: Colors.black,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        WidgetSpan(
+                        const WidgetSpan(
                           child: Padding(
                             padding: EdgeInsets.only(left: 20.0, right: 5.0),
                             child: Icon(
@@ -105,14 +101,14 @@ class _RecipeInfoPageState extends State<RecipeInfoPage> {
                             ),
                           ),
                         ),
-                        TextSpan(
+                        const TextSpan(
                           text: "4.8",
                           style: TextStyle(
                             color: Colors.black,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        WidgetSpan(
+                        const WidgetSpan(
                           child: Padding(
                             padding: EdgeInsets.only(left: 20.0, right: 5.0),
                             child: Icon(
@@ -122,8 +118,8 @@ class _RecipeInfoPageState extends State<RecipeInfoPage> {
                           ),
                         ),
                         TextSpan(
-                          text: "345 Kcal",
-                          style: TextStyle(
+                          text: widget.recipe.calories,
+                          style: const TextStyle(
                             color: Colors.black,
                             fontWeight: FontWeight.bold,
                           ),
@@ -133,75 +129,53 @@ class _RecipeInfoPageState extends State<RecipeInfoPage> {
                   ),
                 ],
               ),
-              const Padding(
-                padding: EdgeInsets.only(left: 40.0, right: 40.0, top: 20),
+              Padding(
+                padding:
+                    const EdgeInsets.only(left: 40.0, right: 40.0, top: 20),
                 child: Text(
-                  "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
+                  widget.recipe.description!,
+                  maxLines: 15,
                   textAlign: TextAlign.justify,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
               Wrap(
                 children: [
-                  Padding(
-                    padding:
-                        const EdgeInsets.only(left: 8.0, right: 8.0, top: 20),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: primaryC,
-                        borderRadius:
-                            const BorderRadius.all(Radius.circular(60)),
-                      ),
-                      child: const Padding(
-                        padding: EdgeInsets.all(10.0),
-                        child: Text(
-                          "Mild",
-                          style: TextStyle(fontSize: 20),
-                          textAlign: TextAlign.center,
-                          softWrap: true,
+                  for (int i = 0; i < variantButtons.keys.length; i++)
+                    Padding(
+                      padding:
+                          const EdgeInsets.only(left: 8.0, right: 8.0, top: 20),
+                      child: InkWell(
+                        onTap: () {
+                          setState(() {
+                            selectedSpicy = variantButtons.keys.toList()[i];
+                            selectedPortionSize =
+                                variantButtons[selectedSpicy][0];
+                          });
+                        },
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color:
+                                selectedSpicy == variantButtons.keys.toList()[i]
+                                    ? primaryC
+                                    : Colors.white,
+                            border: Border.all(width: 1),
+                            borderRadius:
+                                const BorderRadius.all(Radius.circular(30)),
+                          ),
+                          child: Padding(
+                            padding:
+                                const EdgeInsets.only(left: 10.0, right: 10.0),
+                            child: Text(
+                              variantButtons.keys.toList()[i],
+                              style: const TextStyle(fontSize: 20),
+                              textAlign: TextAlign.center,
+                              softWrap: true,
+                            ),
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                  Padding(
-                    padding:
-                        const EdgeInsets.only(left: 8.0, right: 8.0, top: 20),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: primaryC,
-                        borderRadius:
-                            const BorderRadius.all(Radius.circular(60)),
-                      ),
-                      child: const Padding(
-                        padding: EdgeInsets.all(10.0),
-                        child: Text(
-                          "Medium",
-                          style: TextStyle(fontSize: 20),
-                          textAlign: TextAlign.center,
-                          softWrap: true,
-                        ),
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding:
-                        const EdgeInsets.only(left: 8.0, right: 8.0, top: 20),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: primaryC,
-                        borderRadius:
-                            const BorderRadius.all(Radius.circular(60)),
-                      ),
-                      child: const Padding(
-                        padding: EdgeInsets.all(10.0),
-                        child: Text(
-                          "Extreme",
-                          style: TextStyle(fontSize: 20),
-                          textAlign: TextAlign.center,
-                          softWrap: true,
-                        ),
-                      ),
-                    ),
-                  ),
                 ],
               ),
               Wrap(
@@ -215,53 +189,109 @@ class _RecipeInfoPageState extends State<RecipeInfoPage> {
                       softWrap: true,
                     ),
                   ),
-                  Padding(
-                    padding:
-                        const EdgeInsets.only(left: 8.0, right: 8.0, top: 20),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        border: Border.all(width: 3),
-                        borderRadius: const BorderRadius.all(
-                          Radius.circular(60),
-                        ),
-                      ),
-                      child: const Padding(
-                        padding: EdgeInsets.all(10.0),
-                        child: Text(
-                          "2",
-                          style: TextStyle(fontSize: 20),
-                          textAlign: TextAlign.center,
-                          softWrap: true,
-                        ),
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding:
-                        const EdgeInsets.only(left: 8.0, right: 8.0, top: 20),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        border: Border.all(width: 3),
-                        borderRadius:
-                            const BorderRadius.all(Radius.circular(60)),
-                      ),
-                      child: const Padding(
-                        padding: EdgeInsets.all(10.0),
-                        child: Text(
-                          "4",
-                          style: TextStyle(fontSize: 20),
-                          textAlign: TextAlign.center,
-                          softWrap: true,
+                  for (int i = 0; i < variantButtons[selectedSpicy].length; i++)
+                    Padding(
+                      padding:
+                          const EdgeInsets.only(left: 8.0, right: 8.0, top: 20),
+                      child: InkWell(
+                        onTap: () {
+                          setState(() {
+                            selectedPortionSize =
+                                variantButtons[selectedSpicy][i];
+                          });
+                        },
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: selectedPortionSize ==
+                                    variantButtons[selectedSpicy][i]
+                                ? Colors.grey
+                                : Colors.white,
+                            border: Border.all(width: 3),
+                            borderRadius: const BorderRadius.all(
+                              Radius.circular(60),
+                            ),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(10.0),
+                            child: Text(
+                              variantButtons[selectedSpicy][i],
+                              style: const TextStyle(fontSize: 20),
+                              textAlign: TextAlign.center,
+                              softWrap: true,
+                            ),
+                          ),
                         ),
                       ),
                     ),
-                  ),
                 ],
-              )
+              ),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 10.0, top: 30),
+                child: MaterialButton(
+                  elevation: 10,
+                  minWidth: 250,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(40),
+                  ),
+                  color: elementsC,
+                  onPressed: () async {
+                    VariantModel variant = variants
+                        .where((element) =>
+                            element.spicy == selectedSpicy &&
+                            element.portionSize == selectedPortionSize)
+                        .toList()[0];
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 10, bottom: 10),
+                    child: Text(
+                      "Next",
+                      style: TextStyle(
+                        fontSize: 20,
+                        color: elementsC.computeLuminance() > 0.5
+                            ? Colors.black
+                            : Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
             ],
           ),
         ),
       ),
     );
+  }
+
+  @override
+  void didChangeDependencies() {
+    getVariants();
+    super.didChangeDependencies();
+  }
+
+  getVariants() async {
+    VariantServices variantServices = VariantServices();
+    variants = await variantServices.getVariants(widget.recipe.rid!);
+    for (VariantModel variant in variants) {
+      variantButtons[variant.spicy] = [];
+    }
+    for (VariantModel variant in variants) {
+      variantButtons[variant.spicy].add(variant.portionSize);
+    }
+    setState(() {
+      selectedSpicy = variantButtons.keys.toList()[0];
+      selectedPortionSize = variantButtons[selectedSpicy][0];
+    });
+  }
+
+  @override
+  void initState() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      scrollController.animateTo(
+        scrollController.position.minScrollExtent,
+        curve: Curves.easeOut,
+        duration: const Duration(milliseconds: 500),
+      );
+    });
+    super.initState();
   }
 }

@@ -34,9 +34,11 @@ dependencies:
   cached_network_image: ^3.3.1
   google_sign_in: ^6.1.0
   provider: ^6.0.5
-  uuid: ^4.4.0
   flutter_animate: ^4.5.0
   loading_animation_widget: ^1.2.1
+  algolia_helper_flutter: ^1.0.0
+  infinite_scroll_pagination: ^3.2.0
+  algolia: ^1.1.2
 
 dev_dependencies:
   flutter_test:

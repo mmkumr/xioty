@@ -6,6 +6,7 @@ import 'package:botchef_v2/pages/process.dart';
 import 'package:botchef_v2/partials/appbar.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 import '../partials/menu.dart';
@@ -121,6 +122,11 @@ class _ChefLiquidMicroState extends State<ChefLiquidMicro> {
                                       width: width(context) * 0.3,
                                       child: TextFormField(
                                         controller: quantity[i],
+                                        keyboardType: TextInputType.number,
+                                        inputFormatters: <TextInputFormatter>[
+                                          FilteringTextInputFormatter
+                                              .digitsOnly,
+                                        ],
                                         decoration: InputDecoration(
                                           hintText: "tsp",
                                           label: const Text("tsp"),
@@ -158,7 +164,7 @@ class _ChefLiquidMicroState extends State<ChefLiquidMicro> {
                           borderRadius: BorderRadius.circular(40),
                         ),
                         color: elementsC,
-                        onPressed: () {
+                        onPressed: () async {
                           setState(() {
                             loading = true;
                           });
@@ -171,17 +177,20 @@ class _ChefLiquidMicroState extends State<ChefLiquidMicro> {
                               },
                             );
                           }
-                          VariantServices().updateLiquidMicros(
+                          await VariantServices().updateLiquidMicros(
                               vid: widget.variant.vid!,
                               liquidMicros: liquidMicrosList);
+                          VariantModel variant = await VariantServices()
+                              .getById(widget.variant.vid!);
                           setState(() {
                             loading = false;
                           });
+                          if (!context.mounted) return;
                           navigate(
                               type: Type.replace,
                               context: context,
                               page: ProcessPage(
-                                variant: widget.variant,
+                                variant: variant,
                                 recipe: widget.recipe,
                               ));
                         },

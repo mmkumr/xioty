@@ -47,12 +47,7 @@ class _FavoritesPageState extends State<FavoritesPage> {
                       return Padding(
                         padding: const EdgeInsets.all(10.0),
                         child: InkWell(
-                          onTap: () {
-                            navigate(
-                                type: Type.push,
-                                context: context,
-                                page: const RecipeInfoPage());
-                          },
+                          onTap: () {},
                           child: GridTile(
                             footer: Container(
                               color: Colors.white,

@@ -1,3 +1,5 @@
+import 'package:algolia/algolia.dart';
+import 'package:botchef_v2/models/recipe.dart';
 import 'package:botchef_v2/models/variant.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -5,6 +7,10 @@ import 'package:flutter/material.dart';
 class VariantServices {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   String collection = "variants";
+  Algolia algoliaApp = const Algolia.init(
+    applicationId: 'KWPCAWUHDW', //ApplicationID,
+    apiKey: 'bf30ae35483ea194e02366cd3bf0737e', //Admin api key in flutter code
+  );
 
   create({
     required String rid,
@@ -22,6 +28,7 @@ class VariantServices {
         "liquidMicros": [],
         "solidMicros": [],
         "operations": [],
+        "cookingTime": "",
       });
       debugPrint("Variant has CREATED");
     } catch (e) {
@@ -93,14 +100,42 @@ class VariantServices {
   }
 
   updateOperations({
-    required String vid,
+    required VariantModel variant,
+    required RecipeModel recipe,
     required List<Map>? operations,
   }) async {
     try {
       await _firestore
           .collection(collection)
-          .doc(vid)
+          .doc(variant.vid)
           .update({"operations": operations});
+      List algoMacros = [];
+      try {
+        algoMacros = await algoliaApp.instance
+            .index("xara")
+            .getObjectsByIds([variant.rid!]);
+      } catch (e) {
+        algoMacros = [];
+      }
+
+      List macros = variant.macros!.map((e) {
+        if (e["name"].isNotEmpty) {
+          return e["name"];
+        }
+      }).toList();
+      if (algoMacros.isNotEmpty) {
+        algoMacros = algoMacros[0].data["macros"];
+        algoMacros.removeWhere(
+            (element) => macros.contains(element) || element == null);
+      }
+      algoliaApp.instance.index("xara").addObject({
+        "objectID": variant.rid,
+        'macros': macros + algoMacros,
+        'recipeName': recipe.recipeName,
+        'chefName': recipe.chefName,
+        "photo": recipe.photoUrl,
+        "type": recipe.type,
+      });
       debugPrint("Operations has Updated");
     } catch (e) {
       debugPrint('ERROR: ${e.toString()}');

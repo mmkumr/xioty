@@ -59,10 +59,10 @@ class RecipeServices {
     }
   }
 
-  Future<List<RecipeModel>> myRecipes(String id) {
+  Future<List<RecipeModel>> myRecipes(String uid) {
     return _firestore
         .collection(collection)
-        .where("uid", isEqualTo: id)
+        .where("uid", isEqualTo: uid)
         .get()
         .then((value) {
       return value.docs.map((e) {

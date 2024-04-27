@@ -173,7 +173,7 @@ class _ChefMacroPageState extends State<ChefMacroPage> {
                           borderRadius: BorderRadius.circular(40),
                         ),
                         color: elementsC,
-                        onPressed: () {
+                        onPressed: () async {
                           setState(() {
                             loading = true;
                           });
@@ -186,11 +186,12 @@ class _ChefMacroPageState extends State<ChefMacroPage> {
                               },
                             );
                           }
-                          VariantServices().updateMacros(
+                          await VariantServices().updateMacros(
                               vid: widget.variant.vid!, macros: macrosList);
                           setState(() {
                             loading = false;
                           });
+                          if (!context.mounted) return;
                           navigate(
                             type: Type.replace,
                             context: context,

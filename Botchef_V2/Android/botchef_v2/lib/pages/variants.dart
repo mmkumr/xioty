@@ -124,7 +124,7 @@ class _VariantsPageState extends State<VariantsPage> {
                   color: elementsC,
                   onPressed: () {
                     navigate(
-                      type: Type.push,
+                      type: Type.replace,
                       context: context,
                       page: VariantPage(recipe: widget.recipe),
                     );

@@ -5,6 +5,7 @@ import 'package:botchef_v2/models/variant.dart';
 import 'package:botchef_v2/pages/home.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 import '../partials/menu.dart';
 
@@ -46,6 +47,7 @@ class _ProcessPageState extends State<ProcessPage> {
     "Arm home",
     "Disable arm",
   ];
+  bool loading = false;
   @override
   void initState() {
     if (widget.variant.operations!.isNotEmpty) {
@@ -63,156 +65,177 @@ class _ProcessPageState extends State<ProcessPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      resizeToAvoidBottomInset: false,
-      backgroundColor: bgC,
-      appBar: AppBar(
-        backgroundColor: bgC,
-        centerTitle: true,
-        title: const Text("Process"),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 20.0),
-            child: InkWell(
-              onTap: () {
-                if (operations.isNotEmpty) {
-                  setState(() {
-                    operations.removeAt(selected);
-                    selected = operations.isEmpty ? 0 : operations.length - 1;
-                  });
-                }
-              },
-              child: const Icon(
-                Icons.delete,
-                color: Colors.red,
-              ),
+    return loading
+        ? Center(
+            child: LoadingAnimationWidget.newtonCradle(
+              color: Colors.blue,
+              size: 200,
             ),
-          ),
-        ],
-        elevation: 0,
-      ),
-      drawer: menu(context),
-      body: Column(
-        children: [
-          SizedBox(
-            height: height(context) * 0.7,
-            child: ReorderableListView.builder(
-              onReorder: (oldIndex, newIndex) {
-                setState(() {
-                  if (oldIndex < newIndex) {
-                    newIndex -= 1;
-                  }
-                  Operation item = operations.removeAt(oldIndex);
-                  operations.insert(newIndex, item);
-                });
-              },
-              itemCount: operations.length,
-              itemBuilder: (context, index) {
-                return Padding(
-                  key: ValueKey(index),
-                  padding: const EdgeInsets.all(10.0),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: selected == index ? Colors.white : primaryC,
-                      border: Border.all(),
-                      borderRadius: const BorderRadius.all(Radius.circular(20)),
+          )
+        : Scaffold(
+            resizeToAvoidBottomInset: false,
+            backgroundColor: bgC,
+            appBar: AppBar(
+              backgroundColor: bgC,
+              centerTitle: true,
+              title: const Text("Process"),
+              actions: [
+                Padding(
+                  padding: const EdgeInsets.only(right: 20.0),
+                  child: InkWell(
+                    onTap: () {
+                      if (operations.isNotEmpty) {
+                        setState(() {
+                          operations.removeAt(selected);
+                          selected =
+                              operations.isEmpty ? 0 : operations.length - 1;
+                        });
+                      }
+                    },
+                    child: const Icon(
+                      Icons.delete,
+                      color: Colors.red,
                     ),
-                    child: GestureDetector(
-                      onDoubleTap:
-                          !changeableParam.contains(operations[index].name!)
-                              ? () {}
-                              : () {
-                                  setParam(index);
-                                },
-                      child: ListTile(
-                        onTap: () {
-                          setState(() {
-                            selected = index;
-                          });
-                        },
-                        title: Text(
-                          operations[index].name!,
-                          textAlign: TextAlign.center,
+                  ),
+                ),
+              ],
+              elevation: 0,
+            ),
+            drawer: menu(context),
+            body: Column(
+              children: [
+                SizedBox(
+                  height: height(context) * 0.7,
+                  child: ReorderableListView.builder(
+                    onReorder: (oldIndex, newIndex) {
+                      setState(() {
+                        if (oldIndex < newIndex) {
+                          newIndex -= 1;
+                        }
+                        Operation item = operations.removeAt(oldIndex);
+                        operations.insert(newIndex, item);
+                      });
+                    },
+                    itemCount: operations.length,
+                    itemBuilder: (context, index) {
+                      return Padding(
+                        key: ValueKey(index),
+                        padding: const EdgeInsets.all(10.0),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: selected == index ? Colors.white : primaryC,
+                            border: Border.all(),
+                            borderRadius:
+                                const BorderRadius.all(Radius.circular(20)),
+                          ),
+                          child: GestureDetector(
+                            onDoubleTap: !changeableParam
+                                    .contains(operations[index].name!)
+                                ? () {}
+                                : () {
+                                    setParam(index);
+                                  },
+                            child: ListTile(
+                              onTap: () {
+                                setState(() {
+                                  selected = index;
+                                });
+                              },
+                              title: Text(
+                                operations[index].name!,
+                                textAlign: TextAlign.center,
+                              ),
+                              trailing: Text(
+                                operations[index].param! == "0"
+                                    ? ""
+                                    : operations[index].param!,
+                                style: const TextStyle(fontSize: 15),
+                              ),
+                              leading: Text(operations[index].label!),
+                            ),
+                          ),
                         ),
-                        trailing: Text(
-                          operations[index].param! == "0"
-                              ? ""
-                              : operations[index].param!,
-                          style: const TextStyle(fontSize: 15),
+                      );
+                    },
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 10.0, top: 10.0),
+                  child: MaterialButton(
+                    elevation: 10,
+                    minWidth: 250,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(40),
+                    ),
+                    color: elementsC,
+                    onPressed: () {
+                      addOperationsPopup(context);
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: 10, bottom: 10),
+                      child: Text(
+                        "Add",
+                        style: TextStyle(
+                          fontSize: 20,
+                          color: elementsC.computeLuminance() > 0.5
+                              ? Colors.black
+                              : Colors.white,
                         ),
-                        leading: Text(operations[index].label!),
                       ),
                     ),
                   ),
-                );
-              },
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(bottom: 10.0, top: 10.0),
-            child: MaterialButton(
-              elevation: 10,
-              minWidth: 250,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(40),
-              ),
-              color: elementsC,
-              onPressed: () {
-                addOperationsPopup(context);
-              },
-              child: Padding(
-                padding: const EdgeInsets.only(top: 10, bottom: 10),
-                child: Text(
-                  "Add",
-                  style: TextStyle(
-                    fontSize: 20,
-                    color: elementsC.computeLuminance() > 0.5
-                        ? Colors.black
-                        : Colors.white,
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 10.0, top: 10.0),
+                  child: MaterialButton(
+                    elevation: 10,
+                    minWidth: 250,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(40),
+                    ),
+                    color: elementsC,
+                    onPressed: () async {
+                      setState(() {
+                        loading = true;
+                      });
+                      List<Map> updateOperations = operations.map((e) {
+                        return {
+                          "name": e.name,
+                          "label": e.label,
+                          "param": e.param
+                        };
+                      }).toList();
+                      await VariantServices().updateOperations(
+                        recipe: widget.recipe,
+                        variant: widget.variant,
+                        operations: updateOperations,
+                      );
+                      if (!context.mounted) return;
+                      navigate(
+                          type: Type.replace,
+                          context: context,
+                          page: const HomePage());
+                      setState(() {
+                        loading = false;
+                      });
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: 10, bottom: 10),
+                      child: Text(
+                        "Save",
+                        style: TextStyle(
+                          fontSize: 20,
+                          color: elementsC.computeLuminance() > 0.5
+                              ? Colors.black
+                              : Colors.white,
+                        ),
+                      ),
+                    ),
                   ),
                 ),
-              ),
+              ],
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(bottom: 10.0, top: 10.0),
-            child: MaterialButton(
-              elevation: 10,
-              minWidth: 250,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(40),
-              ),
-              color: elementsC,
-              onPressed: () {
-                List<Map> updateOperations = operations.map((e) {
-                  return {"name": e.name, "label": e.label, "param": e.param};
-                }).toList();
-                VariantServices().updateOperations(
-                  vid: widget.variant.vid!,
-                  operations: updateOperations,
-                );
-                navigate(
-                    type: Type.replace,
-                    context: context,
-                    page: const HomePage());
-              },
-              child: Padding(
-                padding: const EdgeInsets.only(top: 10, bottom: 10),
-                child: Text(
-                  "Save",
-                  style: TextStyle(
-                    fontSize: 20,
-                    color: elementsC.computeLuminance() > 0.5
-                        ? Colors.black
-                        : Colors.white,
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
+          );
   }
 
   setParam(int index) async {
@@ -408,9 +431,9 @@ class _ProcessPageState extends State<ProcessPage> {
                       ),
                       children: [
                         for (int i = 0;
-                            i < widget.variant.solidMicros![i]["name"].length;
+                            i < widget.variant.solidMicros!.length;
                             i++)
-                          widget.variant.solidMicros![i].isEmpty
+                          widget.variant.solidMicros![i]["name"].isEmpty
                               ? Container()
                               : Padding(
                                   padding: const EdgeInsets.all(8.0),
@@ -468,9 +491,9 @@ class _ProcessPageState extends State<ProcessPage> {
                       ),
                       children: [
                         for (int i = 0;
-                            i < widget.variant.liquidMicros![i]["name"].length;
+                            i < widget.variant.liquidMicros!.length;
                             i++)
-                          widget.variant.liquidMicros![i].isEmpty
+                          widget.variant.liquidMicros![i]["name"].isEmpty
                               ? Container()
                               : Padding(
                                   padding: const EdgeInsets.all(8.0),

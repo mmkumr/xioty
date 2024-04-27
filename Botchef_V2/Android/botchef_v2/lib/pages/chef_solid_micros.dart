@@ -181,7 +181,7 @@ class _ChefSolidMicroState extends State<ChefSolidMicro> {
                           borderRadius: BorderRadius.circular(40),
                         ),
                         color: elementsC,
-                        onPressed: () {
+                        onPressed: () async {
                           setState(() {
                             loading = true;
                           });
@@ -194,12 +194,13 @@ class _ChefSolidMicroState extends State<ChefSolidMicro> {
                               },
                             );
                           }
-                          VariantServices().updateSolidMicros(
+                          await VariantServices().updateSolidMicros(
                               vid: widget.variant.vid!,
                               solidMicros: solidMicrosList);
                           setState(() {
                             loading = false;
                           });
+                          if (!context.mounted) return;
                           navigate(
                               type: Type.replace,
                               context: context,

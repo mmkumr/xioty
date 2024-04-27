@@ -249,11 +249,11 @@ class _RecipePageState extends State<RecipePage> {
                         ),
                         color: elementsC,
                         onPressed: () async {
-                          setState(() {
-                            loading = true;
-                          });
                           if (form.currentState!.validate() &&
                               (image != null || photoUrl != null)) {
+                            setState(() {
+                              loading = true;
+                            });
                             if (image != null) {
                               await uploadPic();
                             }

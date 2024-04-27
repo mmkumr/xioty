@@ -11,12 +11,14 @@ class VariantModel {
   static const SOLIDMiCROS = "solidMicros";
   static const LIQUIDMiCROS = "liquidMicros";
   static const OPERATIONS = "operations";
+  static const COOKING_TIME = "cookingTime";
 
   String? _rid;
   String? _vid;
   String? _description;
   String? _spicy;
   String? _portionSize;
+  String? _cookingTime;
   List? _macros;
   List? _liquidMicros;
   List? _solidMicros;
@@ -28,6 +30,7 @@ class VariantModel {
   String? get description => _description;
   String? get spicy => _spicy;
   String? get portionSize => _portionSize;
+  String? get cookingTime => _cookingTime;
   List? get macros => _macros;
   List? get liquidMicros => _liquidMicros;
   List? get solidMicros => _solidMicros;
@@ -44,5 +47,6 @@ class VariantModel {
     _liquidMicros = snapshot[LIQUIDMiCROS];
     _solidMicros = snapshot[SOLIDMiCROS];
     _operations = snapshot[OPERATIONS];
+    _cookingTime = snapshot[COOKING_TIME];
   }
 }
