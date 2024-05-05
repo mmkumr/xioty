@@ -62,7 +62,7 @@ class _VariantPageState extends State<VariantPage> {
             onTap: () {
               variantServices.delete(widget.variant!.vid!);
               navigate(
-                  type: Type.replace,
+                  type: PageType.replace,
                   context: context,
                   page: VariantsPage(
                     recipe: widget.recipe,
@@ -226,7 +226,7 @@ class _VariantPageState extends State<VariantPage> {
                             });
                             if (widget.variant != null) {
                               navigate(
-                                type: Type.replace,
+                                type: PageType.replace,
                                 context: context,
                                 page: ChefMacroPage(
                                   variant: widget.variant!,
@@ -238,7 +238,7 @@ class _VariantPageState extends State<VariantPage> {
                                   .getById(widget.recipe.rid!);
                               if (!context.mounted) return;
                               navigate(
-                                type: Type.replace,
+                                type: PageType.replace,
                                 context: context,
                                 page: VariantsPage(recipe: recipe),
                               );

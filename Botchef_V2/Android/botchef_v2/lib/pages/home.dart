@@ -287,7 +287,7 @@ class _HomePageState extends State<HomePage> {
                 RecipeModel recipe = await RecipeServices().getById(objectID!);
                 if (!mounted) return;
                 navigate(
-                    type: Type.push,
+                    type: PageType.push,
                     context: context,
                     page: RecipeInfoPage(recipe: recipe));
               },

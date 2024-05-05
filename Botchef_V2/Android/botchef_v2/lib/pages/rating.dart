@@ -127,7 +127,7 @@ class _RatingPageState extends State<RatingPage> {
                   color: primaryC,
                   onPressed: () {
                     navigate(
-                        type: Type.replace,
+                        type: PageType.replace,
                         context: context,
                         page: const FavoritesPage());
                   },
@@ -156,7 +156,7 @@ class _RatingPageState extends State<RatingPage> {
                   color: elementsC,
                   onPressed: () {
                     navigate(
-                        type: Type.push,
+                        type: PageType.push,
                         context: context,
                         page: const HomePage());
                   },

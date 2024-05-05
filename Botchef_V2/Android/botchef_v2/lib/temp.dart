@@ -227,7 +227,7 @@ Widget temp = ListView.builder(
         child: ListTile(
           onTap: () {
             navigate(
-                type: Type.push,
+                type: PageType.push,
                 context: context,
                 page: const RecipeInfoPage());
           },

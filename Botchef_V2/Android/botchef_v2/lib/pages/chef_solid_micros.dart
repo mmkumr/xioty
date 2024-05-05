@@ -26,6 +26,8 @@ class _ChefSolidMicroState extends State<ChefSolidMicro> {
   GlobalKey<FormState> form = GlobalKey<FormState>();
   List<TextEditingController> solidMicros = [];
   List<TextEditingController> quantity = [];
+  TextEditingController description = TextEditingController();
+  GlobalKey<FormState> popUpForm = GlobalKey<FormState>();
   int nos = 8;
   ScrollController scrollController = ScrollController();
   bool loading = false;
@@ -159,10 +161,7 @@ class _ChefSolidMicroState extends State<ChefSolidMicro> {
                                   ),
                                   InkWell(
                                     onTap: () {
-                                      navigate(
-                                          type: Type.push,
-                                          context: context,
-                                          page: const MiMaDescription());
+                                      mimaDescriptionPopup();
                                     },
                                     child: const Icon(Icons.info_rounded),
                                   ),
@@ -202,7 +201,7 @@ class _ChefSolidMicroState extends State<ChefSolidMicro> {
                           });
                           if (!context.mounted) return;
                           navigate(
-                              type: Type.replace,
+                              type: PageType.replace,
                               context: context,
                               page: ChefLiquidMicro(
                                 variant: widget.variant,
@@ -227,6 +226,55 @@ class _ChefSolidMicroState extends State<ChefSolidMicro> {
                 ),
               ),
             ),
+    );
+  }
+
+  Future<dynamic> mimaDescriptionPopup() {
+    return showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Description"),
+          content: SingleChildScrollView(
+            child: Padding(
+              padding: EdgeInsets.only(
+                  bottom: MediaQuery.of(context).viewInsets.bottom),
+              child: SizedBox(
+                height: 500,
+                child: Column(
+                  children: [
+                    const Icon(
+                      Icons.image_rounded,
+                      size: 200,
+                    ),
+                    Form(
+                      key: popUpForm,
+                      child: Padding(
+                        padding: const EdgeInsets.all(20.0),
+                        child: TextFormField(
+                          maxLines: 5,
+                          controller: description,
+                          validator: (value) {
+                            if (value!.isEmpty) {
+                              return "Field can't be empty";
+                            }
+                            return null;
+                          },
+                          decoration: InputDecoration(
+                            hintText: "Details",
+                            label: const Text("Details"),
+                            fillColor: primaryC,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 }

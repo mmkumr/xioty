@@ -1,10 +1,13 @@
+import 'package:botchef_v2/db/favorite.dart';
 import 'package:botchef_v2/db/variant.dart';
 import 'package:botchef_v2/models/recipe.dart';
 import 'package:botchef_v2/models/variant.dart';
 import 'package:botchef_v2/pages/user_macro.dart';
+import 'package:botchef_v2/providers/user_provider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:provider/provider.dart';
 
 import '../commons.dart';
 import '../partials/menu.dart';
@@ -23,19 +26,34 @@ class _RecipeInfoPageState extends State<RecipeInfoPage> {
   Map variantButtons = {};
   String selectedSpicy = "";
   String selectedPortionSize = "";
+  List favorites = [];
   @override
   Widget build(BuildContext context) {
+    final user = Provider.of<UserProvider>(context);
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
         backgroundColor: bgC,
         actions: [
           InkWell(
-            onTap: () {},
-            child: const Padding(
-              padding: EdgeInsets.all(15.0),
+            onTap: () async {
+              FavoriteServices favoriteServices = FavoriteServices();
+              if (favorites.contains(widget.recipe.rid)) {
+                await favoriteServices.delete(
+                    uid: user.user.uid, rid: widget.recipe.rid!);
+              } else {
+                await favoriteServices.update(
+                    uid: user.user.uid, rid: widget.recipe.rid!);
+              }
+              favorites = await FavoriteServices().getById(uid: user.user.uid);
+              setState(() {});
+            },
+            child: Padding(
+              padding: const EdgeInsets.all(15.0),
               child: Icon(
-                Icons.favorite_outline,
+                favorites.contains(widget.recipe.rid)
+                    ? Icons.favorite_sharp
+                    : Icons.favorite_outline,
                 color: Colors.red,
               ),
             ),
@@ -77,22 +95,6 @@ class _RecipeInfoPageState extends State<RecipeInfoPage> {
                   RichText(
                     text: TextSpan(
                       children: [
-                        const WidgetSpan(
-                          child: Padding(
-                            padding: EdgeInsets.only(right: 5.0),
-                            child: Icon(
-                              Icons.alarm_rounded,
-                              color: Colors.green,
-                            ),
-                          ),
-                        ),
-                        const TextSpan(
-                          text: "2 hours",
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
                         const WidgetSpan(
                           child: Padding(
                             padding: EdgeInsets.only(left: 20.0, right: 5.0),
@@ -242,7 +244,7 @@ class _RecipeInfoPageState extends State<RecipeInfoPage> {
                             element.portionSize == selectedPortionSize)
                         .toList()[0];
                     navigate(
-                        type: Type.push,
+                        type: PageType.push,
                         context: context,
                         page: UserMacroPage(
                           variant: variant,
@@ -278,6 +280,7 @@ class _RecipeInfoPageState extends State<RecipeInfoPage> {
 
   getVariants() async {
     VariantServices variantServices = VariantServices();
+    final user = Provider.of<UserProvider>(context);
     variants = await variantServices.getVariants(widget.recipe.rid!);
     for (VariantModel variant in variants) {
       variantButtons[variant.spicy] = [];
@@ -285,6 +288,7 @@ class _RecipeInfoPageState extends State<RecipeInfoPage> {
     for (VariantModel variant in variants) {
       variantButtons[variant.spicy].add(variant.portionSize);
     }
+    favorites = await FavoriteServices().getById(uid: user.user.uid);
     setState(() {
       selectedSpicy = variantButtons.keys.toList()[0];
       selectedPortionSize = variantButtons[selectedSpicy][0];

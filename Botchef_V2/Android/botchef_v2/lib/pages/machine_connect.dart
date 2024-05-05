@@ -82,7 +82,7 @@ class _MachineConnectPageState extends State<MachineConnectPage> {
                 onPressed: () {
                   if (form.currentState!.validate()) {
                     navigate(
-                      type: Type.push,
+                      type: PageType.push,
                       context: context,
                       page: const HomePage(),
                     );
@@ -111,7 +111,7 @@ class _MachineConnectPageState extends State<MachineConnectPage> {
               color: elementsC,
               onPressed: () {
                 navigate(
-                  type: Type.push,
+                  type: PageType.push,
                   context: context,
                   page: const HomePage(),
                 );

@@ -48,7 +48,7 @@ class _YourRecipesPageState extends State<YourRecipesPage> {
                     color: elementsC,
                     onPressed: () {
                       navigate(
-                          type: Type.replace,
+                          type: PageType.replace,
                           context: context,
                           page: const RecipePage());
                     },
@@ -110,7 +110,7 @@ class _YourRecipesPageState extends State<YourRecipesPage> {
                             child: InkWell(
                               onTap: () {
                                 navigate(
-                                    type: Type.push,
+                                    type: PageType.push,
                                     context: context,
                                     page: VariantsPage(recipe: recipe));
                               },
@@ -160,7 +160,7 @@ class _YourRecipesPageState extends State<YourRecipesPage> {
                             child: InkWell(
                               onTap: () {
                                 navigate(
-                                    type: Type.push,
+                                    type: PageType.push,
                                     context: context,
                                     page: VariantsPage(
                                       recipe: recipe,

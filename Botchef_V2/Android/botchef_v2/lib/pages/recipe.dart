@@ -287,7 +287,7 @@ class _RecipePageState extends State<RecipePage> {
                             });
                             if (!context.mounted) return;
                             navigate(
-                              type: Type.replace,
+                              type: PageType.replace,
                               context: context,
                               page: const YourRecipesPage(),
                             );

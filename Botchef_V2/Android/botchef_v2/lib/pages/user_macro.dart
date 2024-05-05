@@ -53,7 +53,7 @@ class _UserMacroPageState extends State<UserMacroPage> {
                     ),
                     trailing: InkWell(
                       onTap: () {
-                        descriptionPopup(context);
+                        mimaDescriptionPopup(context);
                       },
                       child: const Icon(Icons.info),
                     ),
@@ -73,7 +73,7 @@ class _UserMacroPageState extends State<UserMacroPage> {
               color: elementsC,
               onPressed: () {
                 navigate(
-                    type: Type.replace,
+                    type: PageType.replace,
                     context: context,
                     page: UserMicroPage(
                       recipe: widget.recipe,

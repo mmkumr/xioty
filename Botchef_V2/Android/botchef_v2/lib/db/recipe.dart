@@ -1,3 +1,4 @@
+import 'package:algolia/algolia.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
@@ -7,6 +8,10 @@ import '../models/recipe.dart';
 class RecipeServices {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   String collection = "recipes";
+  Algolia algoliaApp = const Algolia.init(
+    applicationId: 'KWPCAWUHDW', //ApplicationID,
+    apiKey: 'bf30ae35483ea194e02366cd3bf0737e', //Admin api key in flutter code
+  );
 
   create({
     required String photoUrl,
@@ -74,6 +79,7 @@ class RecipeServices {
   delete({required String id, required String photoUrl}) {
     _firestore.collection(collection).doc(id).delete();
     FirebaseStorage.instance.refFromURL(photoUrl).delete();
+    algoliaApp.instance.index("xara").object(id).deleteObject();
   }
 
   Future<RecipeModel> getById(String id) =>

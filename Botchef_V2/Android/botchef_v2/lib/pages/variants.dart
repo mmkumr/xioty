@@ -38,8 +38,9 @@ class _VariantsPageState extends State<VariantsPage> {
         actions: [
           InkWell(
             onTap: () {
+              Navigator.of(context).pop();
               navigate(
-                  type: Type.replace,
+                  type: PageType.replace,
                   context: context,
                   page: RecipePage(data: widget.recipe));
             },
@@ -50,10 +51,11 @@ class _VariantsPageState extends State<VariantsPage> {
           ),
           InkWell(
             onTap: () {
+              Navigator.of(context).pop();
               recipeServices.delete(
                   id: widget.recipe.rid!, photoUrl: widget.recipe.photoUrl!);
               navigate(
-                  type: Type.replace,
+                  type: PageType.replace,
                   context: context,
                   page: const YourRecipesPage());
             },
@@ -125,7 +127,7 @@ class _VariantsPageState extends State<VariantsPage> {
                   onPressed: () async {
                     if (!context.mounted) return;
                     navigate(
-                      type: Type.replace,
+                      type: PageType.replace,
                       context: context,
                       page: VariantPage(recipe: widget.recipe),
                     );
@@ -165,7 +167,7 @@ class _VariantsPageState extends State<VariantsPage> {
                     child: ListTile(
                       onTap: () {
                         navigate(
-                          type: Type.push,
+                          type: PageType.push,
                           context: context,
                           page: VariantPage(
                             recipe: widget.recipe,

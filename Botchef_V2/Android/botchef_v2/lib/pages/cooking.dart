@@ -73,7 +73,9 @@ class _CookingPageState extends State<CookingPage> {
             );
             sendData('', 'response', true);
             navigate(
-                type: Type.replace, context: context, page: const HomePage());
+                type: PageType.replace,
+                context: context,
+                page: const HomePage());
           });
         }
       });
@@ -83,7 +85,7 @@ class _CookingPageState extends State<CookingPage> {
       sendData('', 'response', true);
       Future.delayed(Duration.zero, () {
         navigate(
-            type: Type.replace,
+            type: PageType.replace,
             context: context,
             page: RatingPage(
               variant: widget.variant,

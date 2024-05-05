@@ -10,7 +10,6 @@ import 'package:flutter/services.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 import '../partials/menu.dart';
-import 'mima_description.dart';
 
 class ChefLiquidMicro extends StatefulWidget {
   final VariantModel variant;
@@ -26,6 +25,9 @@ class _ChefLiquidMicroState extends State<ChefLiquidMicro> {
   GlobalKey<FormState> form = GlobalKey<FormState>();
   List<TextEditingController> liquidMicros = [];
   List<TextEditingController> quantity = [];
+  TextEditingController description = TextEditingController();
+  GlobalKey<FormState> popUpForm = GlobalKey<FormState>();
+
   int nos = 4;
   bool loading = false;
   @override
@@ -142,10 +144,7 @@ class _ChefLiquidMicroState extends State<ChefLiquidMicro> {
                                   ),
                                   InkWell(
                                     onTap: () {
-                                      navigate(
-                                          type: Type.push,
-                                          context: context,
-                                          page: const MiMaDescription());
+                                      mimaDescriptionPopup();
                                     },
                                     child: const Icon(Icons.info_rounded),
                                   ),
@@ -187,7 +186,7 @@ class _ChefLiquidMicroState extends State<ChefLiquidMicro> {
                           });
                           if (!context.mounted) return;
                           navigate(
-                              type: Type.replace,
+                              type: PageType.replace,
                               context: context,
                               page: ProcessPage(
                                 variant: variant,
@@ -212,6 +211,55 @@ class _ChefLiquidMicroState extends State<ChefLiquidMicro> {
                 ),
               ),
             ),
+    );
+  }
+
+  Future<dynamic> mimaDescriptionPopup() {
+    return showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Description"),
+          content: SingleChildScrollView(
+            child: Padding(
+              padding: EdgeInsets.only(
+                  bottom: MediaQuery.of(context).viewInsets.bottom),
+              child: SizedBox(
+                height: 500,
+                child: Column(
+                  children: [
+                    const Icon(
+                      Icons.image_rounded,
+                      size: 200,
+                    ),
+                    Form(
+                      key: popUpForm,
+                      child: Padding(
+                        padding: const EdgeInsets.all(20.0),
+                        child: TextFormField(
+                          maxLines: 5,
+                          controller: description,
+                          validator: (value) {
+                            if (value!.isEmpty) {
+                              return "Field can't be empty";
+                            }
+                            return null;
+                          },
+                          decoration: InputDecoration(
+                            hintText: "Details",
+                            label: const Text("Details"),
+                            fillColor: primaryC,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 }

@@ -3,10 +3,10 @@ import 'package:botchef_v2/db/variant.dart';
 import 'package:botchef_v2/models/recipe.dart';
 import 'package:botchef_v2/models/variant.dart';
 import 'package:botchef_v2/pages/chef_solid_micros.dart';
-import 'package:botchef_v2/pages/mima_description.dart';
 import 'package:botchef_v2/partials/appbar.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 import '../partials/menu.dart';
@@ -23,6 +23,9 @@ class ChefMacroPage extends StatefulWidget {
 class _ChefMacroPageState extends State<ChefMacroPage> {
   List<TextEditingController> macros = [];
   GlobalKey<FormState> form = GlobalKey<FormState>();
+  TextEditingController description = TextEditingController();
+  GlobalKey<FormState> popUpForm = GlobalKey<FormState>();
+  XFile? image;
   List<String> quantities = [
     "1 cup",
     "1/2 cup",
@@ -151,10 +154,7 @@ class _ChefMacroPageState extends State<ChefMacroPage> {
                                   ),
                                   InkWell(
                                     onTap: () {
-                                      navigate(
-                                          type: Type.push,
-                                          context: context,
-                                          page: const MiMaDescription());
+                                      mimaDescriptionPopup();
                                     },
                                     child: const Icon(Icons.info_rounded),
                                   ),
@@ -193,7 +193,7 @@ class _ChefMacroPageState extends State<ChefMacroPage> {
                           });
                           if (!context.mounted) return;
                           navigate(
-                            type: Type.replace,
+                            type: PageType.replace,
                             context: context,
                             page: ChefSolidMicro(
                               recipe: widget.recipe,
@@ -219,6 +219,55 @@ class _ChefMacroPageState extends State<ChefMacroPage> {
                 ),
               ),
             ),
+    );
+  }
+
+  Future<dynamic> mimaDescriptionPopup() {
+    return showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Description"),
+          content: SingleChildScrollView(
+            child: Padding(
+              padding: EdgeInsets.only(
+                  bottom: MediaQuery.of(context).viewInsets.bottom),
+              child: SizedBox(
+                height: 500,
+                child: Column(
+                  children: [
+                    const Icon(
+                      Icons.image_rounded,
+                      size: 200,
+                    ),
+                    Form(
+                      key: popUpForm,
+                      child: Padding(
+                        padding: const EdgeInsets.all(20.0),
+                        child: TextFormField(
+                          maxLines: 5,
+                          controller: description,
+                          validator: (value) {
+                            if (value!.isEmpty) {
+                              return "Field can't be empty";
+                            }
+                            return null;
+                          },
+                          decoration: InputDecoration(
+                            hintText: "Details",
+                            label: const Text("Details"),
+                            fillColor: primaryC,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 }

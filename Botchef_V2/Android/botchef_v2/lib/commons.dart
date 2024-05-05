@@ -4,7 +4,7 @@ Color elementsC = Colors.black;
 Color primaryC = Colors.black12;
 Color bgC = Colors.white;
 
-enum Type { push, replace }
+enum PageType { push, replace }
 
 double width(BuildContext context) {
   return MediaQuery.of(context).size.width;
@@ -15,10 +15,10 @@ double height(BuildContext context) {
 }
 
 void navigate(
-    {required Type type,
+    {required PageType type,
     required BuildContext context,
     required StatefulWidget page}) {
-  if (type == Type.replace) {
+  if (type == PageType.replace) {
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(
         builder: (context) => page,

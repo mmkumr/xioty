@@ -43,14 +43,18 @@ Widget menu(BuildContext context) {
           title: const Text('History'),
           onTap: () {
             navigate(
-                type: Type.push, context: context, page: const HistoryPage());
+                type: PageType.push,
+                context: context,
+                page: const HistoryPage());
           },
         ),
         ListTile(
           title: const Text('Favorites'),
           onTap: () {
             navigate(
-                type: Type.push, context: context, page: const FavoritesPage());
+                type: PageType.push,
+                context: context,
+                page: const FavoritesPage());
           },
           leading: const Icon(Icons.favorite),
         ),
@@ -58,7 +62,7 @@ Widget menu(BuildContext context) {
           title: const Text('Your recipes'),
           onTap: () {
             navigate(
-                type: Type.push,
+                type: PageType.push,
                 context: context,
                 page: const YourRecipesPage());
           },
@@ -68,7 +72,7 @@ Widget menu(BuildContext context) {
           title: const Text('Edited recipes'),
           onTap: () {
             navigate(
-                type: Type.push,
+                type: PageType.push,
                 context: context,
                 page: const EditedRecipesPage());
           },
@@ -77,7 +81,8 @@ Widget menu(BuildContext context) {
         ListTile(
           title: const Text('Home'),
           onTap: () {
-            navigate(type: Type.push, context: context, page: const HomePage());
+            navigate(
+                type: PageType.push, context: context, page: const HomePage());
           },
           leading: const Icon(Icons.home),
         ),
@@ -85,7 +90,9 @@ Widget menu(BuildContext context) {
           title: const Text('Contact Us'),
           onTap: () {
             navigate(
-                type: Type.push, context: context, page: const ContactUsPage());
+                type: PageType.push,
+                context: context,
+                page: const ContactUsPage());
           },
           leading: const Icon(Icons.headset_mic),
         ),

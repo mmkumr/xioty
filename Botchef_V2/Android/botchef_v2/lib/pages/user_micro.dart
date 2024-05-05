@@ -122,7 +122,7 @@ class _UserMicroPageState extends State<UserMicroPage> {
                       ),
                       trailing: InkWell(
                         onTap: () {
-                          descriptionPopup(context);
+                          mimaDescriptionPopup(context);
                         },
                         child: const Icon(Icons.info),
                       ),
@@ -185,7 +185,7 @@ class _UserMicroPageState extends State<UserMicroPage> {
                       ),
                       trailing: InkWell(
                         onTap: () {
-                          descriptionPopup(context);
+                          mimaDescriptionPopup(context);
                         },
                         child: const Icon(Icons.info),
                       ),
@@ -204,7 +204,7 @@ class _UserMicroPageState extends State<UserMicroPage> {
                   color: elementsC,
                   onPressed: () {
                     navigate(
-                        type: Type.replace,
+                        type: PageType.replace,
                         context: context,
                         page: CookingPage(variant: widget.variant));
                   },

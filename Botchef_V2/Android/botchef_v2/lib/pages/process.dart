@@ -216,7 +216,7 @@ class _ProcessPageState extends State<ProcessPage> {
                         loading = false;
                       });
                       navigate(
-                          type: Type.replace,
+                          type: PageType.replace,
                           context: context,
                           page: const HomePage());
                     },
