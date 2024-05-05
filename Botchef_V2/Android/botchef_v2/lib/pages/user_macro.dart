@@ -1,3 +1,5 @@
+import 'package:botchef_v2/models/recipe.dart';
+import 'package:botchef_v2/models/variant.dart';
 import 'package:botchef_v2/partials/appbar.dart';
 import 'package:botchef_v2/partials/description_popup.dart';
 import 'package:flutter/material.dart';
@@ -7,7 +9,9 @@ import '../partials/menu.dart';
 import 'user_micro.dart';
 
 class UserMacroPage extends StatefulWidget {
-  const UserMacroPage({super.key});
+  final VariantModel variant;
+  final RecipeModel recipe;
+  const UserMacroPage({super.key, required this.recipe, required this.variant});
 
   @override
   State<UserMacroPage> createState() => _UserMacroPageState();
@@ -18,6 +22,7 @@ class _UserMacroPageState extends State<UserMacroPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: appbar,
+      drawer: menu(context),
       body: Column(
         children: [
           const Text(
@@ -26,15 +31,12 @@ class _UserMacroPageState extends State<UserMacroPage> {
           ),
           Flexible(
             child: ListView.builder(
-              itemCount: 4,
+              itemCount: widget.variant.macros!.length,
               itemBuilder: (context, index) {
+                List macros = widget.variant.macros!;
                 return Padding(
                   padding: const EdgeInsets.all(10.0),
                   child: ListTile(
-                    leading: const CircleAvatar(
-                      backgroundImage: NetworkImage(
-                          "https://www.freshpoint.com/wp-content/uploads/commodity-red-onion.jpg"),
-                    ),
                     title: Container(
                       decoration: BoxDecoration(
                         color: primaryC,
@@ -42,9 +44,9 @@ class _UserMacroPageState extends State<UserMacroPage> {
                           Radius.circular(60),
                         ),
                       ),
-                      child: const Text(
-                        "Onions 1/2 cup",
-                        style: TextStyle(fontSize: 20),
+                      child: Text(
+                        "${macros[index]["name"]} ${macros[index]["quantity"]}",
+                        style: const TextStyle(fontSize: 20),
                         softWrap: true,
                         textAlign: TextAlign.center,
                       ),
@@ -71,9 +73,12 @@ class _UserMacroPageState extends State<UserMacroPage> {
               color: elementsC,
               onPressed: () {
                 navigate(
-                    type: Type.push,
+                    type: Type.replace,
                     context: context,
-                    page: const UserMicroPage());
+                    page: UserMicroPage(
+                      recipe: widget.recipe,
+                      variant: widget.variant,
+                    ));
               },
               child: Padding(
                 padding: const EdgeInsets.only(top: 10, bottom: 10),
@@ -91,8 +96,6 @@ class _UserMacroPageState extends State<UserMacroPage> {
           )
         ],
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-      floatingActionButton: menu(context),
     );
   }
 }

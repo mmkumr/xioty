@@ -1,4 +1,5 @@
 import 'package:botchef_v2/commons.dart';
+import 'package:botchef_v2/db/recipe.dart';
 import 'package:botchef_v2/db/variant.dart';
 import 'package:botchef_v2/models/recipe.dart';
 import 'package:botchef_v2/models/variant.dart';
@@ -201,7 +202,7 @@ class _VariantPageState extends State<VariantPage> {
                           borderRadius: BorderRadius.circular(40),
                         ),
                         color: elementsC,
-                        onPressed: () {
+                        onPressed: () async {
                           if (form.currentState!.validate()) {
                             setState(() {
                               loading = true;
@@ -233,10 +234,13 @@ class _VariantPageState extends State<VariantPage> {
                                 ),
                               );
                             } else {
+                              var recipe = await RecipeServices()
+                                  .getById(widget.recipe.rid!);
+                              if (!context.mounted) return;
                               navigate(
                                 type: Type.replace,
                                 context: context,
-                                page: VariantsPage(recipe: widget.recipe),
+                                page: VariantsPage(recipe: recipe),
                               );
                             }
                           }

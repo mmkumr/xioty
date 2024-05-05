@@ -122,7 +122,8 @@ class _VariantsPageState extends State<VariantsPage> {
                     borderRadius: BorderRadius.circular(40),
                   ),
                   color: elementsC,
-                  onPressed: () {
+                  onPressed: () async {
+                    if (!context.mounted) return;
                     navigate(
                       type: Type.replace,
                       context: context,

@@ -1,12 +1,17 @@
+import 'package:botchef_v2/db/variant.dart';
+import 'package:botchef_v2/models/variant.dart';
 import 'package:botchef_v2/pages/home.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:restart_app/restart_app.dart';
 
 import '../commons.dart';
 import 'favorites.dart';
 
 class RatingPage extends StatefulWidget {
-  const RatingPage({super.key});
+  final VariantModel variant;
+  const RatingPage({super.key, required this.variant});
 
   @override
   State<RatingPage> createState() => _RatingPageState();
@@ -15,6 +20,20 @@ class RatingPage extends StatefulWidget {
 class _RatingPageState extends State<RatingPage> {
   TextEditingController rating = TextEditingController();
   GlobalKey<FormState> form = GlobalKey<FormState>();
+
+  VariantModel? variant;
+  @override
+  void initState() {
+    Fluttertoast.showToast(msg: "Enjoy Your Delicious Food");
+    super.initState();
+  }
+
+  @override
+  void didChangeDependencies() async {
+    await getVariant();
+    super.didChangeDependencies();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -25,9 +44,10 @@ class _RatingPageState extends State<RatingPage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Text(
-                "It's Done! \nTotal time taken: 35 minutes \nEnjoy Your Delicious Food",
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              Text(
+                "It's Done! \nTotal time taken: ${variant!.cookingTime} Seconds \nEnjoy Your Delicious Food",
+                style:
+                    const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 softWrap: true,
                 textAlign: TextAlign.center,
               ),
@@ -136,7 +156,7 @@ class _RatingPageState extends State<RatingPage> {
                   color: elementsC,
                   onPressed: () {
                     navigate(
-                        type: Type.replace,
+                        type: Type.push,
                         context: context,
                         page: const HomePage());
                   },
@@ -159,5 +179,10 @@ class _RatingPageState extends State<RatingPage> {
         ),
       ),
     );
+  }
+
+  getVariant() async {
+    variant = await VariantServices().getById(widget.variant.vid!);
+    setState(() {});
   }
 }

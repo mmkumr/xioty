@@ -1,6 +1,7 @@
 import 'package:botchef_v2/db/variant.dart';
 import 'package:botchef_v2/models/recipe.dart';
 import 'package:botchef_v2/models/variant.dart';
+import 'package:botchef_v2/pages/user_macro.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -240,6 +241,13 @@ class _RecipeInfoPageState extends State<RecipeInfoPage> {
                             element.spicy == selectedSpicy &&
                             element.portionSize == selectedPortionSize)
                         .toList()[0];
+                    navigate(
+                        type: Type.push,
+                        context: context,
+                        page: UserMacroPage(
+                          variant: variant,
+                          recipe: widget.recipe,
+                        ));
                   },
                   child: Padding(
                     padding: const EdgeInsets.only(top: 10, bottom: 10),

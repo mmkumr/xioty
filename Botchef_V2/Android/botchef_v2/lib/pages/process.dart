@@ -31,7 +31,7 @@ class _ProcessPageState extends State<ProcessPage> {
   GlobalKey<FormState> form = GlobalKey<FormState>();
   TextEditingController delay = TextEditingController();
   List<String> heatLevels = ["100", "130", "160", "180", "200", "220", "240"];
-  String? heatLevel = "180";
+  String? heatLevel = "160";
   List<String> waterLevels = ["1cup", "1/4cup", "1/2cup", "3/4cup"];
   String? waterLevel = "1cup";
   int selected = 0;
@@ -46,6 +46,7 @@ class _ProcessPageState extends State<ProcessPage> {
     "Preset",
     "Arm home",
     "Disable arm",
+    "indOff",
   ];
   bool loading = false;
   @override
@@ -211,13 +212,13 @@ class _ProcessPageState extends State<ProcessPage> {
                         operations: updateOperations,
                       );
                       if (!context.mounted) return;
+                      setState(() {
+                        loading = false;
+                      });
                       navigate(
                           type: Type.replace,
                           context: context,
                           page: const HomePage());
-                      setState(() {
-                        loading = false;
-                      });
                     },
                     child: Padding(
                       padding: const EdgeInsets.only(top: 10, bottom: 10),
@@ -243,7 +244,8 @@ class _ProcessPageState extends State<ProcessPage> {
       context: context,
       builder: (BuildContext context) {
         Widget content;
-        if (operations[index].name == "Induction") {
+        if (operations[index].label!.contains("o") &&
+            operations[index].name == "Induction") {
           content = Form(
             key: form,
             child: Padding(
@@ -273,7 +275,8 @@ class _ProcessPageState extends State<ProcessPage> {
               ),
             ),
           );
-        } else if (operations[index].name == "Water") {
+        } else if (operations[index].label!.contains("o") &&
+            operations[index].name == "Water") {
           content = Form(
             key: form,
             child: Padding(
@@ -303,7 +306,8 @@ class _ProcessPageState extends State<ProcessPage> {
               ),
             ),
           );
-        } else if (operations[index].name == "Wait") {
+        } else if (operations[index].label!.contains("o") &&
+            operations[index].name == "Wait") {
           delay.text = operations[index].param!;
           content = Form(
             key: form,
@@ -565,7 +569,7 @@ class _ProcessPageState extends State<ProcessPage> {
                                 onTap: () {
                                   String param = "0";
                                   if (others[i] == "Induction") {
-                                    param = "180";
+                                    param = "160";
                                   } else if (others[i] == "Water") {
                                     param = "1cup";
                                   } else if (others[i] == "Wait") {

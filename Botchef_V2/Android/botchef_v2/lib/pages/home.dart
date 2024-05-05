@@ -10,20 +10,6 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 import 'recipe_info.dart';
 
-class Recipe {
-  final String name;
-  final String image;
-  final String chefName;
-  final String objectID;
-
-  Recipe(this.objectID, this.name, this.image, this.chefName);
-
-  static Recipe fromJson(Map<String, dynamic> json) {
-    return Recipe(
-        json['objectID'], json['recipeName'], json['image'], json['chefName']);
-  }
-}
-
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
@@ -39,6 +25,8 @@ class _HomePageState extends State<HomePage> {
         '47c5b7823bb65ab1d4c7d8a4d4440776', //search-only api key in flutter code
   );
   String searchTerm = '';
+  int pageSize = 20;
+  int resultSize = 0;
   Future<List<AlgoliaObjectSnapshot>> operation(
       String input, String type, int page) async {
     AlgoliaQuery query = _algoliaApp.instance.index("xara").query(input);
@@ -46,12 +34,14 @@ class _HomePageState extends State<HomePage> {
     AlgoliaQuerySnapshot querySnap = await query.getObjects();
     List<AlgoliaObjectSnapshot> results = querySnap.hits;
     maxPages = querySnap.nbPages;
+    resultSize = querySnap.hits.length;
     return results;
   }
 
   //End of Algolia setup
   TextEditingController searchbox = TextEditingController();
   GlobalKey<FormState> form = GlobalKey<FormState>();
+  ScrollController controller = ScrollController();
   List<String> categories = [
     "Rice",
     "One Pot Meal",
@@ -61,129 +51,152 @@ class _HomePageState extends State<HomePage> {
   int catindex = 0;
   int algoliaPage = 0;
   int maxPages = 0;
+  Stream<List<AlgoliaObjectSnapshot>>? algolist;
+  String? category;
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    algolist = Stream.fromFuture(operation(searchTerm, "Rice", algoliaPage));
+    category = categories[catindex];
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
-    String category = categories[catindex];
     return Scaffold(
       backgroundColor: bgC,
       appBar: appbar,
       drawer: menu(context),
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.only(top: 60.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(10.0),
-                child: Text(
-                  "Find food for your mood",
-                  style: TextStyle(
-                    fontSize: width(context) * 0.06,
-                    fontWeight: FontWeight.bold,
-                  ),
+      body: Padding(
+        padding: const EdgeInsets.only(top: 10.0),
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: Text(
+                "Find food for your mood",
+                style: TextStyle(
+                  fontSize: width(context) * 0.06,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  InkWell(
-                    onTap: () {
-                      if (catindex > 0) {
-                        setState(() {
-                          catindex--;
-                        });
-                      } else {
-                        setState(() {
-                          catindex = categories.length - 1;
-                        });
-                      }
-                    },
-                    child: const Icon(
-                      Icons.arrow_left,
-                      size: 100,
-                    ),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                InkWell(
+                  onTap: () {
+                    if (catindex > 0) {
+                      setState(() {
+                        catindex--;
+                      });
+                    } else {
+                      setState(() {
+                        catindex = categories.length - 1;
+                      });
+                    }
+                    setState(() {
+                      category = categories[catindex];
+                    });
+                  },
+                  child: const Icon(
+                    Icons.arrow_left,
+                    size: 50,
                   ),
-                  Container(
-                    alignment: Alignment.center,
-                    width: width(context) * 0.5,
-                    decoration: BoxDecoration(
-                      color: primaryC,
-                      border: Border.all(),
-                      borderRadius: const BorderRadius.all(Radius.circular(20)),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(5.0),
-                      child: Text(
-                        category,
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(
-                          fontSize: 25,
-                        ),
-                      ),
-                    ),
-                  ),
-                  InkWell(
-                    onTap: () {
-                      if (catindex < categories.length - 1) {
-                        setState(() {
-                          catindex++;
-                        });
-                      } else {
-                        setState(() {
-                          catindex = 0;
-                        });
-                      }
-                    },
-                    child: const Icon(
-                      Icons.arrow_right,
-                      size: 100,
-                    ),
-                  ),
-                ],
-              ),
-              Padding(
-                padding: const EdgeInsets.only(
-                    left: 30, right: 30, top: 10, bottom: 30),
-                child: Container(
+                ),
+                Container(
+                  width: width(context) * 0.5,
+                  alignment: Alignment.center,
                   decoration: BoxDecoration(
                     color: primaryC,
+                    border: Border.all(),
                     borderRadius: const BorderRadius.all(Radius.circular(20)),
                   ),
                   child: Padding(
-                    padding: const EdgeInsets.only(left: 20),
-                    child: TextField(
-                      controller: searchbox,
-                      onChanged: (value) {
-                        setState(() {
-                          searchTerm = value;
-                        });
-                      },
-                      decoration: const InputDecoration(
-                        focusedBorder: InputBorder.none,
-                        hintText: "Search by Macro, Chef name, Recipe name",
-                        hintMaxLines: 2,
-                        icon: Icon(FontAwesomeIcons.magnifyingGlass),
-                        enabledBorder: InputBorder.none,
+                    padding: const EdgeInsets.all(5.0),
+                    child: Text(
+                      category!,
+                      textAlign: TextAlign.center,
+                      softWrap: true,
+                      style: const TextStyle(
+                        fontSize: 25,
                       ),
                     ),
                   ),
                 ),
+                InkWell(
+                  onTap: () {
+                    if (catindex < categories.length - 1) {
+                      setState(() {
+                        catindex++;
+                      });
+                    } else {
+                      setState(() {
+                        catindex = 0;
+                      });
+                    }
+                    setState(() {
+                      category = categories[catindex];
+                    });
+                  },
+                  child: const Icon(
+                    Icons.arrow_right,
+                    size: 50,
+                  ),
+                ),
+              ],
+            ),
+            Padding(
+              padding: const EdgeInsets.only(
+                  left: 30, right: 30, top: 10, bottom: 30),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: primaryC,
+                  borderRadius: const BorderRadius.all(Radius.circular(20)),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 20),
+                  child: TextField(
+                    controller: searchbox,
+                    onChanged: (value) {
+                      setState(() {
+                        searchTerm = value;
+                      });
+                    },
+                    decoration: const InputDecoration(
+                      focusedBorder: InputBorder.none,
+                      hintText: "Search by Macro, Chef name, Recipe name",
+                      hintMaxLines: 2,
+                      icon: Icon(FontAwesomeIcons.magnifyingGlass),
+                      enabledBorder: InputBorder.none,
+                    ),
+                  ),
+                ),
               ),
+            ),
+            if (context.mounted)
               Flexible(
                 child: StreamBuilder<List<AlgoliaObjectSnapshot>>(
                   stream: Stream.fromFuture(
-                      operation(searchTerm, category, algoliaPage)),
+                    operation(searchTerm, category!, algoliaPage),
+                  ),
                   builder: (context, snapshot) {
                     if (!snapshot.hasData) {
                       return const Padding(
                         padding: EdgeInsets.all(8.0),
                         child: Text(
-                          "Start Typing",
+                          "Loading.....",
                           style: TextStyle(color: Colors.black),
                         ),
                       );
-                    } else if (snapshot.data!.isEmpty) {
+                    } else if (snapshot.connectionState ==
+                            ConnectionState.done &&
+                        snapshot.data!.isEmpty) {
                       return const Text("No data found!");
                     } else {
                       List<AlgoliaObjectSnapshot> currSearchStuff =
@@ -193,7 +206,7 @@ class _HomePageState extends State<HomePage> {
                           return const Padding(
                             padding: EdgeInsets.all(8.0),
                             child: Text(
-                              "searching.....",
+                              "Fetching data",
                               textAlign: TextAlign.center,
                             ),
                           );
@@ -202,22 +215,25 @@ class _HomePageState extends State<HomePage> {
                             return Text('Error: ${snapshot.error}');
                           } else {
                             return CustomScrollView(
+                              controller: controller,
                               shrinkWrap: true,
                               slivers: <Widget>[
                                 SliverList(
                                   delegate: SliverChildBuilderDelegate(
                                     (context, index) {
-                                      return searchResults(
-                                        image: currSearchStuff[index]
-                                            .data["photo"],
-                                        name: currSearchStuff[index]
-                                            .data["recipeName"],
-                                        objectID: currSearchStuff[index]
-                                            .data["objectID"],
-                                        chefName: currSearchStuff[index]
-                                            .data["chefName"],
-                                        index: index,
-                                      );
+                                      if (index < resultSize) {
+                                        return searchResults(
+                                          image: currSearchStuff[index]
+                                              .data["photo"],
+                                          name: currSearchStuff[index]
+                                              .data["recipeName"],
+                                          objectID: currSearchStuff[index]
+                                              .data["objectID"],
+                                          chefName: currSearchStuff[index]
+                                              .data["chefName"],
+                                          index: index,
+                                        );
+                                      }
                                     },
                                   ),
                                 ),
@@ -229,8 +245,7 @@ class _HomePageState extends State<HomePage> {
                   },
                 ),
               ),
-            ],
-          ),
+          ],
         ),
       ),
     );
@@ -243,7 +258,6 @@ class _HomePageState extends State<HomePage> {
     final String? objectID,
     final int? index,
   }) {
-    debugPrint(maxPages.toString());
     return Padding(
       padding: const EdgeInsets.all(10.0),
       child: Container(
@@ -271,7 +285,7 @@ class _HomePageState extends State<HomePage> {
             ListTile(
               onTap: () async {
                 RecipeModel recipe = await RecipeServices().getById(objectID!);
-                if (!context.mounted) return;
+                if (!mounted) return;
                 navigate(
                     type: Type.push,
                     context: context,
@@ -295,7 +309,7 @@ class _HomePageState extends State<HomePage> {
                 textAlign: TextAlign.center,
               ),
             ),
-            if (index == 20 && algoliaPage < maxPages - 1)
+            if (index == pageSize - 1 && algoliaPage < maxPages - 1)
               TextButton(
                 onPressed: () {
                   setState(() {

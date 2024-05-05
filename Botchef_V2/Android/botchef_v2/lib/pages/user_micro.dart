@@ -1,3 +1,5 @@
+import 'package:botchef_v2/models/recipe.dart';
+import 'package:botchef_v2/models/variant.dart';
 import 'package:botchef_v2/pages/cooking.dart';
 import 'package:flutter/material.dart';
 
@@ -6,7 +8,9 @@ import '../partials/description_popup.dart';
 import '../partials/menu.dart';
 
 class UserMicroPage extends StatefulWidget {
-  const UserMicroPage({super.key});
+  final VariantModel variant;
+  final RecipeModel recipe;
+  const UserMicroPage({super.key, required this.variant, required this.recipe});
 
   @override
   State<UserMicroPage> createState() => _UserMicroPageState();
@@ -15,7 +19,15 @@ class UserMicroPage extends StatefulWidget {
 class _UserMicroPageState extends State<UserMicroPage> {
   @override
   void initState() {
-    quantity = List.generate(12, (index) => TextEditingController(text: "3"));
+    quantity = List.generate(
+        4,
+        (index) => TextEditingController(
+            text: widget.variant.liquidMicros![index]["quantity"]));
+    quantity = quantity! +
+        List.generate(
+            8,
+            (index) => TextEditingController(
+                text: widget.variant.solidMicros![index]["quantity"]));
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       scrollController.animateTo(
@@ -46,6 +58,7 @@ class _UserMicroPageState extends State<UserMicroPage> {
         ],
         elevation: 0,
       ),
+      drawer: menu(context),
       body: SingleChildScrollView(
         reverse: start,
         child: Padding(
@@ -58,10 +71,11 @@ class _UserMicroPageState extends State<UserMicroPage> {
                 style: TextStyle(fontSize: 30),
               ),
               ListView.builder(
-                itemCount: 4,
+                itemCount: widget.variant.liquidMicros!.length,
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
                 itemBuilder: (context, index) {
+                  Map liquidMicro = widget.variant.liquidMicros![index];
                   return Padding(
                     padding: const EdgeInsets.all(10.0),
                     child: ListTile(
@@ -74,13 +88,13 @@ class _UserMicroPageState extends State<UserMicroPage> {
                             Radius.circular(60),
                           ),
                         ),
-                        child: const Padding(
-                          padding: EdgeInsets.only(left: 20, right: 20),
+                        child: Padding(
+                          padding: const EdgeInsets.only(left: 20, right: 20),
                           child: Center(
                             child: Text(
-                              "Oil",
+                              liquidMicro['name'],
                               overflow: TextOverflow.ellipsis,
-                              style: TextStyle(fontSize: 20),
+                              style: const TextStyle(fontSize: 20),
                               softWrap: true,
                               textAlign: TextAlign.center,
                             ),
@@ -121,7 +135,7 @@ class _UserMicroPageState extends State<UserMicroPage> {
                 style: TextStyle(fontSize: 30),
               ),
               ListView.builder(
-                itemCount: 8,
+                itemCount: widget.variant.solidMicros!.length,
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
                 itemBuilder: (context, index) {
@@ -137,13 +151,13 @@ class _UserMicroPageState extends State<UserMicroPage> {
                             Radius.circular(60),
                           ),
                         ),
-                        child: const Padding(
-                          padding: EdgeInsets.only(left: 20, right: 20),
+                        child: Padding(
+                          padding: const EdgeInsets.only(left: 20, right: 20),
                           child: Center(
                             child: Text(
-                              "Salt",
+                              widget.variant.solidMicros![index]["name"],
                               overflow: TextOverflow.ellipsis,
-                              style: TextStyle(fontSize: 20),
+                              style: const TextStyle(fontSize: 20),
                               softWrap: true,
                               textAlign: TextAlign.center,
                             ),
@@ -158,7 +172,7 @@ class _UserMicroPageState extends State<UserMicroPage> {
                             });
                           }
                         },
-                        controller: quantity![index],
+                        controller: quantity![index + 4],
                         decoration: InputDecoration(
                           hintText: "tsp",
                           label: const Text("tsp"),
@@ -190,9 +204,9 @@ class _UserMicroPageState extends State<UserMicroPage> {
                   color: elementsC,
                   onPressed: () {
                     navigate(
-                        type: Type.push,
+                        type: Type.replace,
                         context: context,
-                        page: const CookingPage());
+                        page: CookingPage(variant: widget.variant));
                   },
                   child: Padding(
                     padding: const EdgeInsets.only(top: 10, bottom: 10),
@@ -212,8 +226,6 @@ class _UserMicroPageState extends State<UserMicroPage> {
           ),
         ),
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-      floatingActionButton: menu(context),
     );
   }
 }
