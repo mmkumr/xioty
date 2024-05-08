@@ -36,15 +36,15 @@ volatile servoInfo servos[NUM_SERVOS];
 
 // Setup for stepper motors
 int enable = LOW;
-int xd = 3, xp = 4, xe = 5, xl = 6;
-int yd = 12, yp = 8, ye = 9, yl = 10;
-int zd = 14, zp = 15, ze = 16, zl = 17;
+int xd = 25, xp = 23, xe = 27, xl = 2;
+int yd = 0, yp = 0, ye = 0, yl = 0;
+int zd = 0, zp = 0, ze = 0, zl = 0;
 int ad = 0, ap = 0, ae = 0, al = 0;
 int bd = 0, bp = 0, be = 0, bl = 0;
 long xpos = 0, ypos = 0, zpos = 0, apos = 0, bpos = 0;
 // Registers manupulation for switching steppers' step pins.
-#define x_high PORTG |= 0b00100000;
-#define x_low PORTG &= ~0b00100000;
+#define x_high PORTA |= 0b00000010;
+#define x_low PORTA &= ~0b00000010;
 
 #define y_high PORTH |= 0b00100000;
 #define y_low PORTH &= ~0b00100000;
@@ -195,8 +195,8 @@ void setup() {
 
   steppers[0].dirFunc = xDir;
   steppers[0].stepFunc = xStep;
-  steppers[0].acceleration = 50000;
-  steppers[0].minStepInterval = 200;
+  steppers[0].acceleration = 50;
+  steppers[0].minStepInterval = 10;
   steppers[0].homedir = LOW;
   steppers[0].limit_switch = xl;
 
@@ -384,8 +384,7 @@ void runAndWait() {
   adjustSpeedScales();
   setNextInterruptInterval();
   TIMER1_INTERRUPTS_ON;
-  while (remainingSteppersFlag)
-    ;
+  while (remainingSteppersFlag);
   remainingSteppersFlag = 0;
   nextStepperFlag = 0;
 }

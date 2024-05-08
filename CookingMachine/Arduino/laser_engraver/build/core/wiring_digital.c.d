@@ -1,4 +1,4 @@
-/run/media/mmkumr/MyWorkspace/Projects/xioty/CookingMachine/Arduino/laser_engraver/build/core/wiring_digital.c.o: \
+/mnt/MyWorkspace/Projects/xioty/CookingMachine/Arduino/laser_engraver/build/core/wiring_digital.c.o: \
  /home/mmkumr/.arduino15/packages/arduino/hardware/avr/1.8.6/cores/arduino/wiring_digital.c \
  /home/mmkumr/.arduino15/packages/arduino/hardware/avr/1.8.6/cores/arduino/wiring_private.h \
  /home/mmkumr/.arduino15/packages/arduino/hardware/avr/1.8.6/cores/arduino/Arduino.h \

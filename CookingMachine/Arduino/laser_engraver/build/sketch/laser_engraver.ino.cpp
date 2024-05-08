@@ -1,5 +1,5 @@
 #include <Arduino.h>
-#line 1 "/run/media/mmkumr/MyWorkspace/Projects/xioty/CookingMachine/Arduino/laser_engraver/laser_engraver.ino"
+#line 1 "/mnt/MyWorkspace/Projects/xioty/CookingMachine/Arduino/laser_engraver/laser_engraver.ino"
 #include <AccelStepper.h>
 #include <MultiStepper.h>
 #include "TimerThree.h"
@@ -41,11 +41,11 @@ commandscallback commands[NumberOfCommands] = { { "G0", runxy }, { "G1", runxy }
 gcode Commands(NumberOfCommands, commands);
 
 
-#line 42 "/run/media/mmkumr/MyWorkspace/Projects/xioty/CookingMachine/Arduino/laser_engraver/laser_engraver.ino"
+#line 42 "/mnt/MyWorkspace/Projects/xioty/CookingMachine/Arduino/laser_engraver/laser_engraver.ino"
 void setup();
-#line 81 "/run/media/mmkumr/MyWorkspace/Projects/xioty/CookingMachine/Arduino/laser_engraver/laser_engraver.ino"
+#line 81 "/mnt/MyWorkspace/Projects/xioty/CookingMachine/Arduino/laser_engraver/laser_engraver.ino"
 void loop();
-#line 42 "/run/media/mmkumr/MyWorkspace/Projects/xioty/CookingMachine/Arduino/laser_engraver/laser_engraver.ino"
+#line 42 "/mnt/MyWorkspace/Projects/xioty/CookingMachine/Arduino/laser_engraver/laser_engraver.ino"
 void setup() {
   Commands.begin(115200);
   //output pins for y axis
@@ -150,7 +150,6 @@ void inverseKinematics(float x, float y, float z, float e) {
   Serial.println(positions[0]);
   Serial.print("Current Theta2: ");
   Serial.println(positions[1]);
-/*
   Serial.print("Prev Theta1: ");
   Serial.println(prev_theta1);
   Serial.print("Prev Theta2: ");

@@ -1,4 +1,4 @@
-/run/media/mmkumr/MyWorkspace/Projects/xioty/CookingMachine/Arduino/laser_engraver/build/libraries/AccelStepper/MultiStepper.cpp.o: \
+/mnt/MyWorkspace/Projects/xioty/CookingMachine/Arduino/laser_engraver/build/libraries/AccelStepper/MultiStepper.cpp.o: \
  /home/mmkumr/Arduino/libraries/AccelStepper/src/MultiStepper.cpp \
  /home/mmkumr/Arduino/libraries/AccelStepper/src/MultiStepper.h \
  /home/mmkumr/.arduino15/packages/arduino/hardware/avr/1.8.6/cores/arduino/Arduino.h \

@@ -196,13 +196,14 @@ class _CookingPageState extends State<CookingPage> {
 
   createRecipe() {
     String prevType = "";
+    bool induction = false;
+    int indLevel = 2;
     instructions.add(widget.variant.vid);
     instructions.add("o6");
     for (Map operation in widget.variant.operations!) {
-      bool induction = false;
-      int indLevel = 2;
-      List<String> waterLevels = ["1cup", "1/4cup", "1/2cup", "3/4cup"];
-      List<String> heatLevels = [
+      const List<String> waterLevels = ["1cup", "1/4cup", "1/2cup", "3/4cup"];
+      const List<String> heatLevels = [
+        "0",
         "100",
         "130",
         "160",
@@ -249,15 +250,19 @@ class _CookingPageState extends State<CookingPage> {
           instructions.add("indOn");
           induction = true;
         }
-        int diff = indLevel - heatLevels.indexOf(operation["param"]);
-        if (diff > 0) {
-          for (var i = 0; i < diff.abs(); i++) {
-            instructions.add("indDown");
+        if (operation["param"] != "0") {
+          int diff = indLevel - heatLevels.indexOf(operation["param"]);
+          if (diff > 0) {
+            for (var i = 0; i < diff.abs(); i++) {
+              instructions.add("indDown");
+            }
+          } else if (diff < 0) {
+            for (var i = 0; i < diff.abs(); i++) {
+              instructions.add("indUp");
+            }
           }
-        } else if (diff < 0) {
-          for (var i = 0; i < diff.abs(); i++) {
-            instructions.add("indUp");
-          }
+        } else if (operation["param"] == "0") {
+          instructions.add("indOff");
         }
         indLevel = heatLevels.indexOf(operation["param"]);
       } else if (operation["label"].contains("o") &&

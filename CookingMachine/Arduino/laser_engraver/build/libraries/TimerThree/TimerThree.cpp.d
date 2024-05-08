@@ -1,4 +1,4 @@
-/run/media/mmkumr/MyWorkspace/Projects/xioty/CookingMachine/Arduino/laser_engraver/build/libraries/TimerThree/TimerThree.cpp.o: \
+/mnt/MyWorkspace/Projects/xioty/CookingMachine/Arduino/laser_engraver/build/libraries/TimerThree/TimerThree.cpp.o: \
  /home/mmkumr/Arduino/libraries/TimerThree/TimerThree.cpp \
  /home/mmkumr/Arduino/libraries/TimerThree/TimerThree.h \
  /home/mmkumr/.arduino15/packages/arduino/hardware/avr/1.8.6/cores/arduino/Arduino.h \

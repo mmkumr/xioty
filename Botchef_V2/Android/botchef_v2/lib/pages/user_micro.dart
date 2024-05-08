@@ -76,58 +76,61 @@ class _UserMicroPageState extends State<UserMicroPage> {
                 physics: const NeverScrollableScrollPhysics(),
                 itemBuilder: (context, index) {
                   Map liquidMicro = widget.variant.liquidMicros![index];
-                  return Padding(
-                    padding: const EdgeInsets.all(10.0),
-                    child: ListTile(
-                      leading: Container(
-                        width: width(context) * 0.5,
-                        height: 40,
-                        decoration: BoxDecoration(
-                          color: primaryC,
-                          borderRadius: const BorderRadius.all(
-                            Radius.circular(60),
-                          ),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.only(left: 20, right: 20),
-                          child: Center(
-                            child: Text(
-                              liquidMicro['name'],
-                              overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(fontSize: 20),
-                              softWrap: true,
-                              textAlign: TextAlign.center,
+                  return liquidMicro["name"].isEmpty
+                      ? Container()
+                      : Padding(
+                          padding: const EdgeInsets.all(10.0),
+                          child: ListTile(
+                            leading: Container(
+                              width: width(context) * 0.5,
+                              height: 40,
+                              decoration: BoxDecoration(
+                                color: primaryC,
+                                borderRadius: const BorderRadius.all(
+                                  Radius.circular(60),
+                                ),
+                              ),
+                              child: Padding(
+                                padding:
+                                    const EdgeInsets.only(left: 20, right: 20),
+                                child: Center(
+                                  child: Text(
+                                    "${index + 1} ${liquidMicro['name']}",
+                                    overflow: TextOverflow.ellipsis,
+                                    style: const TextStyle(fontSize: 20),
+                                    softWrap: true,
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            title: TextFormField(
+                              onTap: () {
+                                if (!start) {
+                                  setState(() {
+                                    start = true;
+                                  });
+                                }
+                              },
+                              controller: quantity![index],
+                              decoration: InputDecoration(
+                                hintText: "tsp",
+                                label: const Text("tsp"),
+                                filled: true,
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10.0),
+                                ),
+                                fillColor: primaryC,
+                              ),
+                            ),
+                            trailing: InkWell(
+                              onTap: () {
+                                mimaDescriptionPopup(context);
+                              },
+                              child: const Icon(Icons.info),
                             ),
                           ),
-                        ),
-                      ),
-                      title: TextFormField(
-                        onTap: () {
-                          if (!start) {
-                            setState(() {
-                              start = true;
-                            });
-                          }
-                        },
-                        controller: quantity![index],
-                        decoration: InputDecoration(
-                          hintText: "tsp",
-                          label: const Text("tsp"),
-                          filled: true,
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10.0),
-                          ),
-                          fillColor: primaryC,
-                        ),
-                      ),
-                      trailing: InkWell(
-                        onTap: () {
-                          mimaDescriptionPopup(context);
-                        },
-                        child: const Icon(Icons.info),
-                      ),
-                    ),
-                  );
+                        );
                 },
               ),
               const Text(
@@ -139,58 +142,62 @@ class _UserMicroPageState extends State<UserMicroPage> {
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
                 itemBuilder: (context, index) {
-                  return Padding(
-                    padding: const EdgeInsets.all(10.0),
-                    child: ListTile(
-                      leading: Container(
-                        width: width(context) * 0.5,
-                        height: 40,
-                        decoration: BoxDecoration(
-                          color: primaryC,
-                          borderRadius: const BorderRadius.all(
-                            Radius.circular(60),
-                          ),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.only(left: 20, right: 20),
-                          child: Center(
-                            child: Text(
-                              widget.variant.solidMicros![index]["name"],
-                              overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(fontSize: 20),
-                              softWrap: true,
-                              textAlign: TextAlign.center,
+                  Map solidMicro = widget.variant.solidMicros![index];
+                  return solidMicro["name"].isEmpty
+                      ? Container()
+                      : Padding(
+                          padding: const EdgeInsets.all(10.0),
+                          child: ListTile(
+                            leading: Container(
+                              width: width(context) * 0.5,
+                              height: 40,
+                              decoration: BoxDecoration(
+                                color: primaryC,
+                                borderRadius: const BorderRadius.all(
+                                  Radius.circular(60),
+                                ),
+                              ),
+                              child: Padding(
+                                padding:
+                                    const EdgeInsets.only(left: 20, right: 20),
+                                child: Center(
+                                  child: Text(
+                                    "${index + 1} ${solidMicro['name']}",
+                                    overflow: TextOverflow.ellipsis,
+                                    style: const TextStyle(fontSize: 20),
+                                    softWrap: true,
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            title: TextFormField(
+                              onTap: () {
+                                if (!start) {
+                                  setState(() {
+                                    start = true;
+                                  });
+                                }
+                              },
+                              controller: quantity![index + 4],
+                              decoration: InputDecoration(
+                                hintText: "tsp",
+                                label: const Text("tsp"),
+                                filled: true,
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10.0),
+                                ),
+                                fillColor: primaryC,
+                              ),
+                            ),
+                            trailing: InkWell(
+                              onTap: () {
+                                mimaDescriptionPopup(context);
+                              },
+                              child: const Icon(Icons.info),
                             ),
                           ),
-                        ),
-                      ),
-                      title: TextFormField(
-                        onTap: () {
-                          if (!start) {
-                            setState(() {
-                              start = true;
-                            });
-                          }
-                        },
-                        controller: quantity![index + 4],
-                        decoration: InputDecoration(
-                          hintText: "tsp",
-                          label: const Text("tsp"),
-                          filled: true,
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10.0),
-                          ),
-                          fillColor: primaryC,
-                        ),
-                      ),
-                      trailing: InkWell(
-                        onTap: () {
-                          mimaDescriptionPopup(context);
-                        },
-                        child: const Icon(Icons.info),
-                      ),
-                    ),
-                  );
+                        );
                 },
               ),
               Padding(

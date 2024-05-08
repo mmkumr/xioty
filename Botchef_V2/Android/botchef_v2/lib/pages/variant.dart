@@ -39,7 +39,7 @@ class _VariantPageState extends State<VariantPage> {
 
   List<String> spicyTypes = [
     "Mild",
-    "Mediium",
+    "Medium",
     "Extreme",
   ];
   String? spicy;
@@ -61,6 +61,7 @@ class _VariantPageState extends State<VariantPage> {
           InkWell(
             onTap: () {
               variantServices.delete(widget.variant!.vid!);
+              Navigator.pop(context);
               navigate(
                   type: PageType.replace,
                   context: context,
@@ -154,8 +155,8 @@ class _VariantPageState extends State<VariantPage> {
                                 });
                               },
                               decoration: InputDecoration(
-                                hintText: "Spicy",
-                                label: const Text("Spicy"),
+                                hintText: "Spice level",
+                                label: const Text("Spice level"),
                                 filled: true,
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(10.0),

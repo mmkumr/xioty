@@ -97,6 +97,22 @@ class _RecipeInfoPageState extends State<RecipeInfoPage> {
                       children: [
                         const WidgetSpan(
                           child: Padding(
+                            padding: EdgeInsets.only(right: 5.0),
+                            child: Icon(
+                              Icons.alarm_rounded,
+                              color: Colors.green,
+                            ),
+                          ),
+                        ),
+                        const TextSpan(
+                          text: "2 hours",
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const WidgetSpan(
+                          child: Padding(
                             padding: EdgeInsets.only(left: 20.0, right: 5.0),
                             child: Icon(
                               Icons.star_outline,

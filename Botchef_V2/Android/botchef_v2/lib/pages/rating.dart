@@ -1,10 +1,14 @@
+import 'package:botchef_v2/db/history.dart';
+import 'package:botchef_v2/db/recipe.dart';
 import 'package:botchef_v2/db/variant.dart';
+import 'package:botchef_v2/models/recipe.dart';
 import 'package:botchef_v2/models/variant.dart';
 import 'package:botchef_v2/pages/home.dart';
+import 'package:botchef_v2/providers/user_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:restart_app/restart_app.dart';
+import 'package:provider/provider.dart';
 
 import '../commons.dart';
 import 'favorites.dart';
@@ -18,8 +22,9 @@ class RatingPage extends StatefulWidget {
 }
 
 class _RatingPageState extends State<RatingPage> {
-  TextEditingController rating = TextEditingController();
+  TextEditingController feedback = TextEditingController();
   GlobalKey<FormState> form = GlobalKey<FormState>();
+  double rating = 0.0;
 
   VariantModel? variant;
   @override
@@ -30,6 +35,7 @@ class _RatingPageState extends State<RatingPage> {
 
   @override
   void didChangeDependencies() async {
+    await addHistory();
     await getVariant();
     super.didChangeDependencies();
   }
@@ -94,7 +100,11 @@ class _RatingPageState extends State<RatingPage> {
                         );
                     }
                   },
-                  onRatingUpdate: (rating) {},
+                  onRatingUpdate: (value) {
+                    setState(() {
+                      rating = value;
+                    });
+                  },
                 ),
               ),
               Form(
@@ -102,7 +112,7 @@ class _RatingPageState extends State<RatingPage> {
                 child: Padding(
                   padding: const EdgeInsets.all(20.0),
                   child: TextFormField(
-                    controller: rating,
+                    controller: feedback,
                     validator: (value) {
                       if (value!.isEmpty) {
                         return "Field can't be empty";
@@ -179,6 +189,16 @@ class _RatingPageState extends State<RatingPage> {
         ),
       ),
     );
+  }
+
+  addHistory() async {
+    final user = Provider.of<UserProvider>(context);
+    RecipeModel recipe = await RecipeServices().getById(widget.variant.rid!);
+    HistoryServices().add(
+        uid: user.user.uid,
+        photoUrl: recipe.photoUrl,
+        recipeName: recipe.recipeName,
+        chefName: recipe.chefName);
   }
 
   getVariant() async {

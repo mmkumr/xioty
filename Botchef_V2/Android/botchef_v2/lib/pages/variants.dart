@@ -165,7 +165,9 @@ class _VariantsPageState extends State<VariantsPage> {
                   return Padding(
                     padding: const EdgeInsets.all(10.0),
                     child: ListTile(
-                      onTap: () {
+                      onTap: () async {
+                        variant = await VariantServices().getById(variant.vid!);
+                        if (!context.mounted) return;
                         navigate(
                           type: PageType.push,
                           context: context,

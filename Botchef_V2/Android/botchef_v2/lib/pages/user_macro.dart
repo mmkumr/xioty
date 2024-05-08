@@ -33,32 +33,35 @@ class _UserMacroPageState extends State<UserMacroPage> {
             child: ListView.builder(
               itemCount: widget.variant.macros!.length,
               itemBuilder: (context, index) {
-                List macros = widget.variant.macros!;
-                return Padding(
-                  padding: const EdgeInsets.all(10.0),
-                  child: ListTile(
-                    title: Container(
-                      decoration: BoxDecoration(
-                        color: primaryC,
-                        borderRadius: const BorderRadius.all(
-                          Radius.circular(60),
+                Map macro = widget.variant.macros![index];
+                return macro.isEmpty
+                    ? Container()
+                    : Padding(
+                        padding: const EdgeInsets.all(10.0),
+                        child: ListTile(
+                          leading: Text((index + 1).toString()),
+                          title: Container(
+                            decoration: BoxDecoration(
+                              color: primaryC,
+                              borderRadius: const BorderRadius.all(
+                                Radius.circular(60),
+                              ),
+                            ),
+                            child: Text(
+                              "${macro["name"]} ${macro["quantity"]}",
+                              style: const TextStyle(fontSize: 20),
+                              softWrap: true,
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                          trailing: InkWell(
+                            onTap: () {
+                              mimaDescriptionPopup(context);
+                            },
+                            child: const Icon(Icons.info),
+                          ),
                         ),
-                      ),
-                      child: Text(
-                        "${macros[index]["name"]} ${macros[index]["quantity"]}",
-                        style: const TextStyle(fontSize: 20),
-                        softWrap: true,
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                    trailing: InkWell(
-                      onTap: () {
-                        mimaDescriptionPopup(context);
-                      },
-                      child: const Icon(Icons.info),
-                    ),
-                  ),
-                );
+                      );
               },
             ),
           ),

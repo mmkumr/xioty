@@ -1,6 +1,6 @@
 [
  {
-  "directory": "/run/media/mmkumr/MyWorkspace/Projects/xioty/CookingMachine/Arduino/laser_engraver",
+  "directory": "/home/mmkumr",
   "arguments": [
    "/home/mmkumr/.arduino15/packages/arduino/tools/avr-gcc/7.3.0-atmel3.6.1-arduino7/bin/avr-g++",
    "-c",
@@ -25,15 +25,15 @@
    "-I/home/mmkumr/.arduino15/packages/arduino/hardware/avr/1.8.6/variants/mega",
    "-I/home/mmkumr/Arduino/libraries/AccelStepper/src",
    "-I/home/mmkumr/Arduino/libraries/TimerThree",
-   "-I/home/mmkumr/Arduino/libraries/G-Code-Arduino-Library",
-   "/run/media/mmkumr/MyWorkspace/Projects/xioty/CookingMachine/Arduino/laser_engraver/build/sketch/laser_engraver.ino.cpp",
+   "-I/home/mmkumr/Arduino/libraries/G-Code-Arduino-Library-master",
+   "/mnt/MyWorkspace/Projects/xioty/CookingMachine/Arduino/laser_engraver/build/sketch/laser_engraver.ino.cpp",
    "-o",
-   "/run/media/mmkumr/MyWorkspace/Projects/xioty/CookingMachine/Arduino/laser_engraver/build/sketch/laser_engraver.ino.cpp.o"
+   "/mnt/MyWorkspace/Projects/xioty/CookingMachine/Arduino/laser_engraver/build/sketch/laser_engraver.ino.cpp.o"
   ],
-  "file": "/run/media/mmkumr/MyWorkspace/Projects/xioty/CookingMachine/Arduino/laser_engraver/build/sketch/laser_engraver.ino.cpp"
+  "file": "/mnt/MyWorkspace/Projects/xioty/CookingMachine/Arduino/laser_engraver/build/sketch/laser_engraver.ino.cpp"
  },
  {
-  "directory": "/run/media/mmkumr/MyWorkspace/Projects/xioty/CookingMachine/Arduino/laser_engraver",
+  "directory": "/home/mmkumr",
   "arguments": [
    "/home/mmkumr/.arduino15/packages/arduino/tools/avr-gcc/7.3.0-atmel3.6.1-arduino7/bin/avr-g++",
    "-c",
@@ -58,15 +58,15 @@
    "-I/home/mmkumr/.arduino15/packages/arduino/hardware/avr/1.8.6/variants/mega",
    "-I/home/mmkumr/Arduino/libraries/AccelStepper/src",
    "-I/home/mmkumr/Arduino/libraries/TimerThree",
-   "-I/home/mmkumr/Arduino/libraries/G-Code-Arduino-Library",
+   "-I/home/mmkumr/Arduino/libraries/G-Code-Arduino-Library-master",
    "/home/mmkumr/Arduino/libraries/AccelStepper/src/AccelStepper.cpp",
    "-o",
-   "/run/media/mmkumr/MyWorkspace/Projects/xioty/CookingMachine/Arduino/laser_engraver/build/libraries/AccelStepper/AccelStepper.cpp.o"
+   "/mnt/MyWorkspace/Projects/xioty/CookingMachine/Arduino/laser_engraver/build/libraries/AccelStepper/AccelStepper.cpp.o"
   ],
   "file": "/home/mmkumr/Arduino/libraries/AccelStepper/src/AccelStepper.cpp"
  },
  {
-  "directory": "/run/media/mmkumr/MyWorkspace/Projects/xioty/CookingMachine/Arduino/laser_engraver",
+  "directory": "/home/mmkumr",
   "arguments": [
    "/home/mmkumr/.arduino15/packages/arduino/tools/avr-gcc/7.3.0-atmel3.6.1-arduino7/bin/avr-g++",
    "-c",
@@ -91,15 +91,15 @@
    "-I/home/mmkumr/.arduino15/packages/arduino/hardware/avr/1.8.6/variants/mega",
    "-I/home/mmkumr/Arduino/libraries/AccelStepper/src",
    "-I/home/mmkumr/Arduino/libraries/TimerThree",
-   "-I/home/mmkumr/Arduino/libraries/G-Code-Arduino-Library",
+   "-I/home/mmkumr/Arduino/libraries/G-Code-Arduino-Library-master",
    "/home/mmkumr/Arduino/libraries/AccelStepper/src/MultiStepper.cpp",
    "-o",
-   "/run/media/mmkumr/MyWorkspace/Projects/xioty/CookingMachine/Arduino/laser_engraver/build/libraries/AccelStepper/MultiStepper.cpp.o"
+   "/mnt/MyWorkspace/Projects/xioty/CookingMachine/Arduino/laser_engraver/build/libraries/AccelStepper/MultiStepper.cpp.o"
   ],
   "file": "/home/mmkumr/Arduino/libraries/AccelStepper/src/MultiStepper.cpp"
  },
  {
-  "directory": "/run/media/mmkumr/MyWorkspace/Projects/xioty/CookingMachine/Arduino/laser_engraver",
+  "directory": "/home/mmkumr",
   "arguments": [
    "/home/mmkumr/.arduino15/packages/arduino/tools/avr-gcc/7.3.0-atmel3.6.1-arduino7/bin/avr-g++",
    "-c",
@@ -124,15 +124,15 @@
    "-I/home/mmkumr/.arduino15/packages/arduino/hardware/avr/1.8.6/variants/mega",
    "-I/home/mmkumr/Arduino/libraries/AccelStepper/src",
    "-I/home/mmkumr/Arduino/libraries/TimerThree",
-   "-I/home/mmkumr/Arduino/libraries/G-Code-Arduino-Library",
+   "-I/home/mmkumr/Arduino/libraries/G-Code-Arduino-Library-master",
    "/home/mmkumr/Arduino/libraries/TimerThree/TimerThree.cpp",
    "-o",
-   "/run/media/mmkumr/MyWorkspace/Projects/xioty/CookingMachine/Arduino/laser_engraver/build/libraries/TimerThree/TimerThree.cpp.o"
+   "/mnt/MyWorkspace/Projects/xioty/CookingMachine/Arduino/laser_engraver/build/libraries/TimerThree/TimerThree.cpp.o"
   ],
   "file": "/home/mmkumr/Arduino/libraries/TimerThree/TimerThree.cpp"
  },
  {
-  "directory": "/run/media/mmkumr/MyWorkspace/Projects/xioty/CookingMachine/Arduino/laser_engraver",
+  "directory": "/home/mmkumr",
   "arguments": [
    "/home/mmkumr/.arduino15/packages/arduino/tools/avr-gcc/7.3.0-atmel3.6.1-arduino7/bin/avr-g++",
    "-c",
@@ -157,105 +157,15 @@
    "-I/home/mmkumr/.arduino15/packages/arduino/hardware/avr/1.8.6/variants/mega",
    "-I/home/mmkumr/Arduino/libraries/AccelStepper/src",
    "-I/home/mmkumr/Arduino/libraries/TimerThree",
-   "-I/home/mmkumr/Arduino/libraries/G-Code-Arduino-Library",
-   "/home/mmkumr/Arduino/libraries/G-Code-Arduino-Library/gcode.cpp",
+   "-I/home/mmkumr/Arduino/libraries/G-Code-Arduino-Library-master",
+   "/home/mmkumr/Arduino/libraries/G-Code-Arduino-Library-master/gcode.cpp",
    "-o",
-   "/run/media/mmkumr/MyWorkspace/Projects/xioty/CookingMachine/Arduino/laser_engraver/build/libraries/G-Code-Arduino-Library/gcode.cpp.o"
+   "/mnt/MyWorkspace/Projects/xioty/CookingMachine/Arduino/laser_engraver/build/libraries/G-Code-Arduino-Library-master/gcode.cpp.o"
   ],
-  "file": "/home/mmkumr/Arduino/libraries/G-Code-Arduino-Library/gcode.cpp"
+  "file": "/home/mmkumr/Arduino/libraries/G-Code-Arduino-Library-master/gcode.cpp"
  },
  {
-  "directory": "/run/media/mmkumr/MyWorkspace/Projects/xioty/CookingMachine/Arduino/laser_engraver",
-  "arguments": [
-   "/home/mmkumr/.arduino15/packages/arduino/tools/avr-gcc/7.3.0-atmel3.6.1-arduino7/bin/avr-g++",
-   "-c",
-   "-g",
-   "-Os",
-   "-w",
-   "-std=gnu++11",
-   "-fpermissive",
-   "-fno-exceptions",
-   "-ffunction-sections",
-   "-fdata-sections",
-   "-fno-threadsafe-statics",
-   "-Wno-error=narrowing",
-   "-MMD",
-   "-flto",
-   "-mmcu=atmega2560",
-   "-DF_CPU=16000000L",
-   "-DARDUINO=10607",
-   "-DARDUINO_AVR_MEGA2560",
-   "-DARDUINO_ARCH_AVR",
-   "-I/home/mmkumr/.arduino15/packages/arduino/hardware/avr/1.8.6/cores/arduino",
-   "-I/home/mmkumr/.arduino15/packages/arduino/hardware/avr/1.8.6/variants/mega",
-   "/home/mmkumr/.arduino15/packages/arduino/hardware/avr/1.8.6/cores/arduino/HardwareSerial1.cpp",
-   "-o",
-   "/run/media/mmkumr/MyWorkspace/Projects/xioty/CookingMachine/Arduino/laser_engraver/build/core/HardwareSerial1.cpp.o"
-  ],
-  "file": "/home/mmkumr/.arduino15/packages/arduino/hardware/avr/1.8.6/cores/arduino/HardwareSerial1.cpp"
- },
- {
-  "directory": "/run/media/mmkumr/MyWorkspace/Projects/xioty/CookingMachine/Arduino/laser_engraver",
-  "arguments": [
-   "/home/mmkumr/.arduino15/packages/arduino/tools/avr-gcc/7.3.0-atmel3.6.1-arduino7/bin/avr-g++",
-   "-c",
-   "-g",
-   "-Os",
-   "-w",
-   "-std=gnu++11",
-   "-fpermissive",
-   "-fno-exceptions",
-   "-ffunction-sections",
-   "-fdata-sections",
-   "-fno-threadsafe-statics",
-   "-Wno-error=narrowing",
-   "-MMD",
-   "-flto",
-   "-mmcu=atmega2560",
-   "-DF_CPU=16000000L",
-   "-DARDUINO=10607",
-   "-DARDUINO_AVR_MEGA2560",
-   "-DARDUINO_ARCH_AVR",
-   "-I/home/mmkumr/.arduino15/packages/arduino/hardware/avr/1.8.6/cores/arduino",
-   "-I/home/mmkumr/.arduino15/packages/arduino/hardware/avr/1.8.6/variants/mega",
-   "/home/mmkumr/.arduino15/packages/arduino/hardware/avr/1.8.6/cores/arduino/HardwareSerial0.cpp",
-   "-o",
-   "/run/media/mmkumr/MyWorkspace/Projects/xioty/CookingMachine/Arduino/laser_engraver/build/core/HardwareSerial0.cpp.o"
-  ],
-  "file": "/home/mmkumr/.arduino15/packages/arduino/hardware/avr/1.8.6/cores/arduino/HardwareSerial0.cpp"
- },
- {
-  "directory": "/run/media/mmkumr/MyWorkspace/Projects/xioty/CookingMachine/Arduino/laser_engraver",
-  "arguments": [
-   "/home/mmkumr/.arduino15/packages/arduino/tools/avr-gcc/7.3.0-atmel3.6.1-arduino7/bin/avr-g++",
-   "-c",
-   "-g",
-   "-Os",
-   "-w",
-   "-std=gnu++11",
-   "-fpermissive",
-   "-fno-exceptions",
-   "-ffunction-sections",
-   "-fdata-sections",
-   "-fno-threadsafe-statics",
-   "-Wno-error=narrowing",
-   "-MMD",
-   "-flto",
-   "-mmcu=atmega2560",
-   "-DF_CPU=16000000L",
-   "-DARDUINO=10607",
-   "-DARDUINO_AVR_MEGA2560",
-   "-DARDUINO_ARCH_AVR",
-   "-I/home/mmkumr/.arduino15/packages/arduino/hardware/avr/1.8.6/cores/arduino",
-   "-I/home/mmkumr/.arduino15/packages/arduino/hardware/avr/1.8.6/variants/mega",
-   "/home/mmkumr/.arduino15/packages/arduino/hardware/avr/1.8.6/cores/arduino/HardwareSerial.cpp",
-   "-o",
-   "/run/media/mmkumr/MyWorkspace/Projects/xioty/CookingMachine/Arduino/laser_engraver/build/core/HardwareSerial.cpp.o"
-  ],
-  "file": "/home/mmkumr/.arduino15/packages/arduino/hardware/avr/1.8.6/cores/arduino/HardwareSerial.cpp"
- },
- {
-  "directory": "/run/media/mmkumr/MyWorkspace/Projects/xioty/CookingMachine/Arduino/laser_engraver",
+  "directory": "/home/mmkumr",
   "arguments": [
    "/home/mmkumr/.arduino15/packages/arduino/tools/avr-gcc/7.3.0-atmel3.6.1-arduino7/bin/avr-g++",
    "-c",
@@ -280,12 +190,102 @@
    "-I/home/mmkumr/.arduino15/packages/arduino/hardware/avr/1.8.6/variants/mega",
    "/home/mmkumr/.arduino15/packages/arduino/hardware/avr/1.8.6/cores/arduino/CDC.cpp",
    "-o",
-   "/run/media/mmkumr/MyWorkspace/Projects/xioty/CookingMachine/Arduino/laser_engraver/build/core/CDC.cpp.o"
+   "/mnt/MyWorkspace/Projects/xioty/CookingMachine/Arduino/laser_engraver/build/core/CDC.cpp.o"
   ],
   "file": "/home/mmkumr/.arduino15/packages/arduino/hardware/avr/1.8.6/cores/arduino/CDC.cpp"
  },
  {
-  "directory": "/run/media/mmkumr/MyWorkspace/Projects/xioty/CookingMachine/Arduino/laser_engraver",
+  "directory": "/home/mmkumr",
+  "arguments": [
+   "/home/mmkumr/.arduino15/packages/arduino/tools/avr-gcc/7.3.0-atmel3.6.1-arduino7/bin/avr-g++",
+   "-c",
+   "-g",
+   "-Os",
+   "-w",
+   "-std=gnu++11",
+   "-fpermissive",
+   "-fno-exceptions",
+   "-ffunction-sections",
+   "-fdata-sections",
+   "-fno-threadsafe-statics",
+   "-Wno-error=narrowing",
+   "-MMD",
+   "-flto",
+   "-mmcu=atmega2560",
+   "-DF_CPU=16000000L",
+   "-DARDUINO=10607",
+   "-DARDUINO_AVR_MEGA2560",
+   "-DARDUINO_ARCH_AVR",
+   "-I/home/mmkumr/.arduino15/packages/arduino/hardware/avr/1.8.6/cores/arduino",
+   "-I/home/mmkumr/.arduino15/packages/arduino/hardware/avr/1.8.6/variants/mega",
+   "/home/mmkumr/.arduino15/packages/arduino/hardware/avr/1.8.6/cores/arduino/HardwareSerial0.cpp",
+   "-o",
+   "/mnt/MyWorkspace/Projects/xioty/CookingMachine/Arduino/laser_engraver/build/core/HardwareSerial0.cpp.o"
+  ],
+  "file": "/home/mmkumr/.arduino15/packages/arduino/hardware/avr/1.8.6/cores/arduino/HardwareSerial0.cpp"
+ },
+ {
+  "directory": "/home/mmkumr",
+  "arguments": [
+   "/home/mmkumr/.arduino15/packages/arduino/tools/avr-gcc/7.3.0-atmel3.6.1-arduino7/bin/avr-g++",
+   "-c",
+   "-g",
+   "-Os",
+   "-w",
+   "-std=gnu++11",
+   "-fpermissive",
+   "-fno-exceptions",
+   "-ffunction-sections",
+   "-fdata-sections",
+   "-fno-threadsafe-statics",
+   "-Wno-error=narrowing",
+   "-MMD",
+   "-flto",
+   "-mmcu=atmega2560",
+   "-DF_CPU=16000000L",
+   "-DARDUINO=10607",
+   "-DARDUINO_AVR_MEGA2560",
+   "-DARDUINO_ARCH_AVR",
+   "-I/home/mmkumr/.arduino15/packages/arduino/hardware/avr/1.8.6/cores/arduino",
+   "-I/home/mmkumr/.arduino15/packages/arduino/hardware/avr/1.8.6/variants/mega",
+   "/home/mmkumr/.arduino15/packages/arduino/hardware/avr/1.8.6/cores/arduino/HardwareSerial1.cpp",
+   "-o",
+   "/mnt/MyWorkspace/Projects/xioty/CookingMachine/Arduino/laser_engraver/build/core/HardwareSerial1.cpp.o"
+  ],
+  "file": "/home/mmkumr/.arduino15/packages/arduino/hardware/avr/1.8.6/cores/arduino/HardwareSerial1.cpp"
+ },
+ {
+  "directory": "/home/mmkumr",
+  "arguments": [
+   "/home/mmkumr/.arduino15/packages/arduino/tools/avr-gcc/7.3.0-atmel3.6.1-arduino7/bin/avr-g++",
+   "-c",
+   "-g",
+   "-Os",
+   "-w",
+   "-std=gnu++11",
+   "-fpermissive",
+   "-fno-exceptions",
+   "-ffunction-sections",
+   "-fdata-sections",
+   "-fno-threadsafe-statics",
+   "-Wno-error=narrowing",
+   "-MMD",
+   "-flto",
+   "-mmcu=atmega2560",
+   "-DF_CPU=16000000L",
+   "-DARDUINO=10607",
+   "-DARDUINO_AVR_MEGA2560",
+   "-DARDUINO_ARCH_AVR",
+   "-I/home/mmkumr/.arduino15/packages/arduino/hardware/avr/1.8.6/cores/arduino",
+   "-I/home/mmkumr/.arduino15/packages/arduino/hardware/avr/1.8.6/variants/mega",
+   "/home/mmkumr/.arduino15/packages/arduino/hardware/avr/1.8.6/cores/arduino/HardwareSerial.cpp",
+   "-o",
+   "/mnt/MyWorkspace/Projects/xioty/CookingMachine/Arduino/laser_engraver/build/core/HardwareSerial.cpp.o"
+  ],
+  "file": "/home/mmkumr/.arduino15/packages/arduino/hardware/avr/1.8.6/cores/arduino/HardwareSerial.cpp"
+ },
+ {
+  "directory": "/home/mmkumr",
   "arguments": [
    "/home/mmkumr/.arduino15/packages/arduino/tools/avr-gcc/7.3.0-atmel3.6.1-arduino7/bin/avr-g++",
    "-c",
@@ -310,12 +310,12 @@
    "-I/home/mmkumr/.arduino15/packages/arduino/hardware/avr/1.8.6/variants/mega",
    "/home/mmkumr/.arduino15/packages/arduino/hardware/avr/1.8.6/cores/arduino/HardwareSerial2.cpp",
    "-o",
-   "/run/media/mmkumr/MyWorkspace/Projects/xioty/CookingMachine/Arduino/laser_engraver/build/core/HardwareSerial2.cpp.o"
+   "/mnt/MyWorkspace/Projects/xioty/CookingMachine/Arduino/laser_engraver/build/core/HardwareSerial2.cpp.o"
   ],
   "file": "/home/mmkumr/.arduino15/packages/arduino/hardware/avr/1.8.6/cores/arduino/HardwareSerial2.cpp"
  },
  {
-  "directory": "/run/media/mmkumr/MyWorkspace/Projects/xioty/CookingMachine/Arduino/laser_engraver",
+  "directory": "/home/mmkumr",
   "arguments": [
    "/home/mmkumr/.arduino15/packages/arduino/tools/avr-gcc/7.3.0-atmel3.6.1-arduino7/bin/avr-g++",
    "-c",
@@ -340,12 +340,12 @@
    "-I/home/mmkumr/.arduino15/packages/arduino/hardware/avr/1.8.6/variants/mega",
    "/home/mmkumr/.arduino15/packages/arduino/hardware/avr/1.8.6/cores/arduino/HardwareSerial3.cpp",
    "-o",
-   "/run/media/mmkumr/MyWorkspace/Projects/xioty/CookingMachine/Arduino/laser_engraver/build/core/HardwareSerial3.cpp.o"
+   "/mnt/MyWorkspace/Projects/xioty/CookingMachine/Arduino/laser_engraver/build/core/HardwareSerial3.cpp.o"
   ],
   "file": "/home/mmkumr/.arduino15/packages/arduino/hardware/avr/1.8.6/cores/arduino/HardwareSerial3.cpp"
  },
  {
-  "directory": "/run/media/mmkumr/MyWorkspace/Projects/xioty/CookingMachine/Arduino/laser_engraver",
+  "directory": "/home/mmkumr",
   "arguments": [
    "/home/mmkumr/.arduino15/packages/arduino/tools/avr-gcc/7.3.0-atmel3.6.1-arduino7/bin/avr-g++",
    "-c",
@@ -370,12 +370,12 @@
    "-I/home/mmkumr/.arduino15/packages/arduino/hardware/avr/1.8.6/variants/mega",
    "/home/mmkumr/.arduino15/packages/arduino/hardware/avr/1.8.6/cores/arduino/IPAddress.cpp",
    "-o",
-   "/run/media/mmkumr/MyWorkspace/Projects/xioty/CookingMachine/Arduino/laser_engraver/build/core/IPAddress.cpp.o"
+   "/mnt/MyWorkspace/Projects/xioty/CookingMachine/Arduino/laser_engraver/build/core/IPAddress.cpp.o"
   ],
   "file": "/home/mmkumr/.arduino15/packages/arduino/hardware/avr/1.8.6/cores/arduino/IPAddress.cpp"
  },
  {
-  "directory": "/run/media/mmkumr/MyWorkspace/Projects/xioty/CookingMachine/Arduino/laser_engraver",
+  "directory": "/home/mmkumr",
   "arguments": [
    "/home/mmkumr/.arduino15/packages/arduino/tools/avr-gcc/7.3.0-atmel3.6.1-arduino7/bin/avr-g++",
    "-c",
@@ -400,12 +400,12 @@
    "-I/home/mmkumr/.arduino15/packages/arduino/hardware/avr/1.8.6/variants/mega",
    "/home/mmkumr/.arduino15/packages/arduino/hardware/avr/1.8.6/cores/arduino/PluggableUSB.cpp",
    "-o",
-   "/run/media/mmkumr/MyWorkspace/Projects/xioty/CookingMachine/Arduino/laser_engraver/build/core/PluggableUSB.cpp.o"
+   "/mnt/MyWorkspace/Projects/xioty/CookingMachine/Arduino/laser_engraver/build/core/PluggableUSB.cpp.o"
   ],
   "file": "/home/mmkumr/.arduino15/packages/arduino/hardware/avr/1.8.6/cores/arduino/PluggableUSB.cpp"
  },
  {
-  "directory": "/run/media/mmkumr/MyWorkspace/Projects/xioty/CookingMachine/Arduino/laser_engraver",
+  "directory": "/home/mmkumr",
   "arguments": [
    "/home/mmkumr/.arduino15/packages/arduino/tools/avr-gcc/7.3.0-atmel3.6.1-arduino7/bin/avr-g++",
    "-c",
@@ -430,12 +430,12 @@
    "-I/home/mmkumr/.arduino15/packages/arduino/hardware/avr/1.8.6/variants/mega",
    "/home/mmkumr/.arduino15/packages/arduino/hardware/avr/1.8.6/cores/arduino/Print.cpp",
    "-o",
-   "/run/media/mmkumr/MyWorkspace/Projects/xioty/CookingMachine/Arduino/laser_engraver/build/core/Print.cpp.o"
+   "/mnt/MyWorkspace/Projects/xioty/CookingMachine/Arduino/laser_engraver/build/core/Print.cpp.o"
   ],
   "file": "/home/mmkumr/.arduino15/packages/arduino/hardware/avr/1.8.6/cores/arduino/Print.cpp"
  },
  {
-  "directory": "/run/media/mmkumr/MyWorkspace/Projects/xioty/CookingMachine/Arduino/laser_engraver",
+  "directory": "/home/mmkumr",
   "arguments": [
    "/home/mmkumr/.arduino15/packages/arduino/tools/avr-gcc/7.3.0-atmel3.6.1-arduino7/bin/avr-g++",
    "-c",
@@ -460,12 +460,12 @@
    "-I/home/mmkumr/.arduino15/packages/arduino/hardware/avr/1.8.6/variants/mega",
    "/home/mmkumr/.arduino15/packages/arduino/hardware/avr/1.8.6/cores/arduino/Stream.cpp",
    "-o",
-   "/run/media/mmkumr/MyWorkspace/Projects/xioty/CookingMachine/Arduino/laser_engraver/build/core/Stream.cpp.o"
+   "/mnt/MyWorkspace/Projects/xioty/CookingMachine/Arduino/laser_engraver/build/core/Stream.cpp.o"
   ],
   "file": "/home/mmkumr/.arduino15/packages/arduino/hardware/avr/1.8.6/cores/arduino/Stream.cpp"
  },
  {
-  "directory": "/run/media/mmkumr/MyWorkspace/Projects/xioty/CookingMachine/Arduino/laser_engraver",
+  "directory": "/home/mmkumr",
   "arguments": [
    "/home/mmkumr/.arduino15/packages/arduino/tools/avr-gcc/7.3.0-atmel3.6.1-arduino7/bin/avr-g++",
    "-c",
@@ -490,12 +490,12 @@
    "-I/home/mmkumr/.arduino15/packages/arduino/hardware/avr/1.8.6/variants/mega",
    "/home/mmkumr/.arduino15/packages/arduino/hardware/avr/1.8.6/cores/arduino/Tone.cpp",
    "-o",
-   "/run/media/mmkumr/MyWorkspace/Projects/xioty/CookingMachine/Arduino/laser_engraver/build/core/Tone.cpp.o"
+   "/mnt/MyWorkspace/Projects/xioty/CookingMachine/Arduino/laser_engraver/build/core/Tone.cpp.o"
   ],
   "file": "/home/mmkumr/.arduino15/packages/arduino/hardware/avr/1.8.6/cores/arduino/Tone.cpp"
  },
  {
-  "directory": "/run/media/mmkumr/MyWorkspace/Projects/xioty/CookingMachine/Arduino/laser_engraver",
+  "directory": "/home/mmkumr",
   "arguments": [
    "/home/mmkumr/.arduino15/packages/arduino/tools/avr-gcc/7.3.0-atmel3.6.1-arduino7/bin/avr-g++",
    "-c",
@@ -520,12 +520,12 @@
    "-I/home/mmkumr/.arduino15/packages/arduino/hardware/avr/1.8.6/variants/mega",
    "/home/mmkumr/.arduino15/packages/arduino/hardware/avr/1.8.6/cores/arduino/USBCore.cpp",
    "-o",
-   "/run/media/mmkumr/MyWorkspace/Projects/xioty/CookingMachine/Arduino/laser_engraver/build/core/USBCore.cpp.o"
+   "/mnt/MyWorkspace/Projects/xioty/CookingMachine/Arduino/laser_engraver/build/core/USBCore.cpp.o"
   ],
   "file": "/home/mmkumr/.arduino15/packages/arduino/hardware/avr/1.8.6/cores/arduino/USBCore.cpp"
  },
  {
-  "directory": "/run/media/mmkumr/MyWorkspace/Projects/xioty/CookingMachine/Arduino/laser_engraver",
+  "directory": "/home/mmkumr",
   "arguments": [
    "/home/mmkumr/.arduino15/packages/arduino/tools/avr-gcc/7.3.0-atmel3.6.1-arduino7/bin/avr-gcc",
    "-c",
@@ -547,12 +547,12 @@
    "-I/home/mmkumr/.arduino15/packages/arduino/hardware/avr/1.8.6/variants/mega",
    "/home/mmkumr/.arduino15/packages/arduino/hardware/avr/1.8.6/cores/arduino/WInterrupts.c",
    "-o",
-   "/run/media/mmkumr/MyWorkspace/Projects/xioty/CookingMachine/Arduino/laser_engraver/build/core/WInterrupts.c.o"
+   "/mnt/MyWorkspace/Projects/xioty/CookingMachine/Arduino/laser_engraver/build/core/WInterrupts.c.o"
   ],
   "file": "/home/mmkumr/.arduino15/packages/arduino/hardware/avr/1.8.6/cores/arduino/WInterrupts.c"
  },
  {
-  "directory": "/run/media/mmkumr/MyWorkspace/Projects/xioty/CookingMachine/Arduino/laser_engraver",
+  "directory": "/home/mmkumr",
   "arguments": [
    "/home/mmkumr/.arduino15/packages/arduino/tools/avr-gcc/7.3.0-atmel3.6.1-arduino7/bin/avr-g++",
    "-c",
@@ -577,12 +577,12 @@
    "-I/home/mmkumr/.arduino15/packages/arduino/hardware/avr/1.8.6/variants/mega",
    "/home/mmkumr/.arduino15/packages/arduino/hardware/avr/1.8.6/cores/arduino/WMath.cpp",
    "-o",
-   "/run/media/mmkumr/MyWorkspace/Projects/xioty/CookingMachine/Arduino/laser_engraver/build/core/WMath.cpp.o"
+   "/mnt/MyWorkspace/Projects/xioty/CookingMachine/Arduino/laser_engraver/build/core/WMath.cpp.o"
   ],
   "file": "/home/mmkumr/.arduino15/packages/arduino/hardware/avr/1.8.6/cores/arduino/WMath.cpp"
  },
  {
-  "directory": "/run/media/mmkumr/MyWorkspace/Projects/xioty/CookingMachine/Arduino/laser_engraver",
+  "directory": "/home/mmkumr",
   "arguments": [
    "/home/mmkumr/.arduino15/packages/arduino/tools/avr-gcc/7.3.0-atmel3.6.1-arduino7/bin/avr-g++",
    "-c",
@@ -607,12 +607,12 @@
    "-I/home/mmkumr/.arduino15/packages/arduino/hardware/avr/1.8.6/variants/mega",
    "/home/mmkumr/.arduino15/packages/arduino/hardware/avr/1.8.6/cores/arduino/WString.cpp",
    "-o",
-   "/run/media/mmkumr/MyWorkspace/Projects/xioty/CookingMachine/Arduino/laser_engraver/build/core/WString.cpp.o"
+   "/mnt/MyWorkspace/Projects/xioty/CookingMachine/Arduino/laser_engraver/build/core/WString.cpp.o"
   ],
   "file": "/home/mmkumr/.arduino15/packages/arduino/hardware/avr/1.8.6/cores/arduino/WString.cpp"
  },
  {
-  "directory": "/run/media/mmkumr/MyWorkspace/Projects/xioty/CookingMachine/Arduino/laser_engraver",
+  "directory": "/home/mmkumr",
   "arguments": [
    "/home/mmkumr/.arduino15/packages/arduino/tools/avr-gcc/7.3.0-atmel3.6.1-arduino7/bin/avr-g++",
    "-c",
@@ -637,12 +637,12 @@
    "-I/home/mmkumr/.arduino15/packages/arduino/hardware/avr/1.8.6/variants/mega",
    "/home/mmkumr/.arduino15/packages/arduino/hardware/avr/1.8.6/cores/arduino/abi.cpp",
    "-o",
-   "/run/media/mmkumr/MyWorkspace/Projects/xioty/CookingMachine/Arduino/laser_engraver/build/core/abi.cpp.o"
+   "/mnt/MyWorkspace/Projects/xioty/CookingMachine/Arduino/laser_engraver/build/core/abi.cpp.o"
   ],
   "file": "/home/mmkumr/.arduino15/packages/arduino/hardware/avr/1.8.6/cores/arduino/abi.cpp"
  },
  {
-  "directory": "/run/media/mmkumr/MyWorkspace/Projects/xioty/CookingMachine/Arduino/laser_engraver",
+  "directory": "/home/mmkumr",
   "arguments": [
    "/home/mmkumr/.arduino15/packages/arduino/tools/avr-gcc/7.3.0-atmel3.6.1-arduino7/bin/avr-gcc",
    "-c",
@@ -664,12 +664,12 @@
    "-I/home/mmkumr/.arduino15/packages/arduino/hardware/avr/1.8.6/variants/mega",
    "/home/mmkumr/.arduino15/packages/arduino/hardware/avr/1.8.6/cores/arduino/hooks.c",
    "-o",
-   "/run/media/mmkumr/MyWorkspace/Projects/xioty/CookingMachine/Arduino/laser_engraver/build/core/hooks.c.o"
+   "/mnt/MyWorkspace/Projects/xioty/CookingMachine/Arduino/laser_engraver/build/core/hooks.c.o"
   ],
   "file": "/home/mmkumr/.arduino15/packages/arduino/hardware/avr/1.8.6/cores/arduino/hooks.c"
  },
  {
-  "directory": "/run/media/mmkumr/MyWorkspace/Projects/xioty/CookingMachine/Arduino/laser_engraver",
+  "directory": "/home/mmkumr",
   "arguments": [
    "/home/mmkumr/.arduino15/packages/arduino/tools/avr-gcc/7.3.0-atmel3.6.1-arduino7/bin/avr-g++",
    "-c",
@@ -694,12 +694,12 @@
    "-I/home/mmkumr/.arduino15/packages/arduino/hardware/avr/1.8.6/variants/mega",
    "/home/mmkumr/.arduino15/packages/arduino/hardware/avr/1.8.6/cores/arduino/main.cpp",
    "-o",
-   "/run/media/mmkumr/MyWorkspace/Projects/xioty/CookingMachine/Arduino/laser_engraver/build/core/main.cpp.o"
+   "/mnt/MyWorkspace/Projects/xioty/CookingMachine/Arduino/laser_engraver/build/core/main.cpp.o"
   ],
   "file": "/home/mmkumr/.arduino15/packages/arduino/hardware/avr/1.8.6/cores/arduino/main.cpp"
  },
  {
-  "directory": "/run/media/mmkumr/MyWorkspace/Projects/xioty/CookingMachine/Arduino/laser_engraver",
+  "directory": "/home/mmkumr",
   "arguments": [
    "/home/mmkumr/.arduino15/packages/arduino/tools/avr-gcc/7.3.0-atmel3.6.1-arduino7/bin/avr-g++",
    "-c",
@@ -724,12 +724,12 @@
    "-I/home/mmkumr/.arduino15/packages/arduino/hardware/avr/1.8.6/variants/mega",
    "/home/mmkumr/.arduino15/packages/arduino/hardware/avr/1.8.6/cores/arduino/new.cpp",
    "-o",
-   "/run/media/mmkumr/MyWorkspace/Projects/xioty/CookingMachine/Arduino/laser_engraver/build/core/new.cpp.o"
+   "/mnt/MyWorkspace/Projects/xioty/CookingMachine/Arduino/laser_engraver/build/core/new.cpp.o"
   ],
   "file": "/home/mmkumr/.arduino15/packages/arduino/hardware/avr/1.8.6/cores/arduino/new.cpp"
  },
  {
-  "directory": "/run/media/mmkumr/MyWorkspace/Projects/xioty/CookingMachine/Arduino/laser_engraver",
+  "directory": "/home/mmkumr",
   "arguments": [
    "/home/mmkumr/.arduino15/packages/arduino/tools/avr-gcc/7.3.0-atmel3.6.1-arduino7/bin/avr-gcc",
    "-c",
@@ -751,12 +751,12 @@
    "-I/home/mmkumr/.arduino15/packages/arduino/hardware/avr/1.8.6/variants/mega",
    "/home/mmkumr/.arduino15/packages/arduino/hardware/avr/1.8.6/cores/arduino/wiring.c",
    "-o",
-   "/run/media/mmkumr/MyWorkspace/Projects/xioty/CookingMachine/Arduino/laser_engraver/build/core/wiring.c.o"
+   "/mnt/MyWorkspace/Projects/xioty/CookingMachine/Arduino/laser_engraver/build/core/wiring.c.o"
   ],
   "file": "/home/mmkumr/.arduino15/packages/arduino/hardware/avr/1.8.6/cores/arduino/wiring.c"
  },
  {
-  "directory": "/run/media/mmkumr/MyWorkspace/Projects/xioty/CookingMachine/Arduino/laser_engraver",
+  "directory": "/home/mmkumr",
   "arguments": [
    "/home/mmkumr/.arduino15/packages/arduino/tools/avr-gcc/7.3.0-atmel3.6.1-arduino7/bin/avr-gcc",
    "-c",
@@ -778,12 +778,12 @@
    "-I/home/mmkumr/.arduino15/packages/arduino/hardware/avr/1.8.6/variants/mega",
    "/home/mmkumr/.arduino15/packages/arduino/hardware/avr/1.8.6/cores/arduino/wiring_analog.c",
    "-o",
-   "/run/media/mmkumr/MyWorkspace/Projects/xioty/CookingMachine/Arduino/laser_engraver/build/core/wiring_analog.c.o"
+   "/mnt/MyWorkspace/Projects/xioty/CookingMachine/Arduino/laser_engraver/build/core/wiring_analog.c.o"
   ],
   "file": "/home/mmkumr/.arduino15/packages/arduino/hardware/avr/1.8.6/cores/arduino/wiring_analog.c"
  },
  {
-  "directory": "/run/media/mmkumr/MyWorkspace/Projects/xioty/CookingMachine/Arduino/laser_engraver",
+  "directory": "/home/mmkumr",
   "arguments": [
    "/home/mmkumr/.arduino15/packages/arduino/tools/avr-gcc/7.3.0-atmel3.6.1-arduino7/bin/avr-gcc",
    "-c",
@@ -805,12 +805,12 @@
    "-I/home/mmkumr/.arduino15/packages/arduino/hardware/avr/1.8.6/variants/mega",
    "/home/mmkumr/.arduino15/packages/arduino/hardware/avr/1.8.6/cores/arduino/wiring_digital.c",
    "-o",
-   "/run/media/mmkumr/MyWorkspace/Projects/xioty/CookingMachine/Arduino/laser_engraver/build/core/wiring_digital.c.o"
+   "/mnt/MyWorkspace/Projects/xioty/CookingMachine/Arduino/laser_engraver/build/core/wiring_digital.c.o"
   ],
   "file": "/home/mmkumr/.arduino15/packages/arduino/hardware/avr/1.8.6/cores/arduino/wiring_digital.c"
  },
  {
-  "directory": "/run/media/mmkumr/MyWorkspace/Projects/xioty/CookingMachine/Arduino/laser_engraver",
+  "directory": "/home/mmkumr",
   "arguments": [
    "/home/mmkumr/.arduino15/packages/arduino/tools/avr-gcc/7.3.0-atmel3.6.1-arduino7/bin/avr-gcc",
    "-c",
@@ -828,12 +828,12 @@
    "-I/home/mmkumr/.arduino15/packages/arduino/hardware/avr/1.8.6/variants/mega",
    "/home/mmkumr/.arduino15/packages/arduino/hardware/avr/1.8.6/cores/arduino/wiring_pulse.S",
    "-o",
-   "/run/media/mmkumr/MyWorkspace/Projects/xioty/CookingMachine/Arduino/laser_engraver/build/core/wiring_pulse.S.o"
+   "/mnt/MyWorkspace/Projects/xioty/CookingMachine/Arduino/laser_engraver/build/core/wiring_pulse.S.o"
   ],
   "file": "/home/mmkumr/.arduino15/packages/arduino/hardware/avr/1.8.6/cores/arduino/wiring_pulse.S"
  },
  {
-  "directory": "/run/media/mmkumr/MyWorkspace/Projects/xioty/CookingMachine/Arduino/laser_engraver",
+  "directory": "/home/mmkumr",
   "arguments": [
    "/home/mmkumr/.arduino15/packages/arduino/tools/avr-gcc/7.3.0-atmel3.6.1-arduino7/bin/avr-gcc",
    "-c",
@@ -855,12 +855,12 @@
    "-I/home/mmkumr/.arduino15/packages/arduino/hardware/avr/1.8.6/variants/mega",
    "/home/mmkumr/.arduino15/packages/arduino/hardware/avr/1.8.6/cores/arduino/wiring_pulse.c",
    "-o",
-   "/run/media/mmkumr/MyWorkspace/Projects/xioty/CookingMachine/Arduino/laser_engraver/build/core/wiring_pulse.c.o"
+   "/mnt/MyWorkspace/Projects/xioty/CookingMachine/Arduino/laser_engraver/build/core/wiring_pulse.c.o"
   ],
   "file": "/home/mmkumr/.arduino15/packages/arduino/hardware/avr/1.8.6/cores/arduino/wiring_pulse.c"
  },
  {
-  "directory": "/run/media/mmkumr/MyWorkspace/Projects/xioty/CookingMachine/Arduino/laser_engraver",
+  "directory": "/home/mmkumr",
   "arguments": [
    "/home/mmkumr/.arduino15/packages/arduino/tools/avr-gcc/7.3.0-atmel3.6.1-arduino7/bin/avr-gcc",
    "-c",
@@ -882,7 +882,7 @@
    "-I/home/mmkumr/.arduino15/packages/arduino/hardware/avr/1.8.6/variants/mega",
    "/home/mmkumr/.arduino15/packages/arduino/hardware/avr/1.8.6/cores/arduino/wiring_shift.c",
    "-o",
-   "/run/media/mmkumr/MyWorkspace/Projects/xioty/CookingMachine/Arduino/laser_engraver/build/core/wiring_shift.c.o"
+   "/mnt/MyWorkspace/Projects/xioty/CookingMachine/Arduino/laser_engraver/build/core/wiring_shift.c.o"
   ],
   "file": "/home/mmkumr/.arduino15/packages/arduino/hardware/avr/1.8.6/cores/arduino/wiring_shift.c"
  }

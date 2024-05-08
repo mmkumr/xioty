@@ -1,5 +1,5 @@
-/run/media/mmkumr/MyWorkspace/Projects/xioty/CookingMachine/Arduino/laser_engraver/build/sketch/laser_engraver.ino.cpp.o: \
- /run/media/mmkumr/MyWorkspace/Projects/xioty/CookingMachine/Arduino/laser_engraver/build/sketch/laser_engraver.ino.cpp \
+/mnt/MyWorkspace/Projects/xioty/CookingMachine/Arduino/laser_engraver/build/sketch/laser_engraver.ino.cpp.o: \
+ /mnt/MyWorkspace/Projects/xioty/CookingMachine/Arduino/laser_engraver/build/sketch/laser_engraver.ino.cpp \
  /home/mmkumr/.arduino15/packages/arduino/hardware/avr/1.8.6/cores/arduino/Arduino.h \
  /home/mmkumr/.arduino15/packages/arduino/hardware/avr/1.8.6/cores/arduino/binary.h \
  /home/mmkumr/.arduino15/packages/arduino/hardware/avr/1.8.6/cores/arduino/WCharacter.h \
@@ -15,4 +15,4 @@
  /home/mmkumr/Arduino/libraries/AccelStepper/src/MultiStepper.h \
  /home/mmkumr/Arduino/libraries/TimerThree/TimerThree.h \
  /home/mmkumr/Arduino/libraries/TimerThree/config/known_16bit_timers.h \
- /home/mmkumr/Arduino/libraries/G-Code-Arduino-Library/gcode.h
+ /home/mmkumr/Arduino/libraries/G-Code-Arduino-Library-master/gcode.h

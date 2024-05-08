@@ -30,7 +30,7 @@ class _ProcessPageState extends State<ProcessPage> {
   List<Operation> operations = [];
   GlobalKey<FormState> form = GlobalKey<FormState>();
   TextEditingController delay = TextEditingController();
-  List<String> heatLevels = ["100", "130", "160", "180", "200", "220", "240"];
+  List<String> heatLevels = ["0", "100", "130", "160", "180", "200", "220", "240"];
   String? heatLevel = "160";
   List<String> waterLevels = ["1cup", "1/4cup", "1/2cup", "3/4cup"];
   String? waterLevel = "1cup";
@@ -46,7 +46,6 @@ class _ProcessPageState extends State<ProcessPage> {
     "Preset",
     "Arm home",
     "Disable arm",
-    "indOff",
   ];
   bool loading = false;
   @override
@@ -346,7 +345,17 @@ class _ProcessPageState extends State<ProcessPage> {
         return AlertDialog(
           title: const Text("Update parameter"),
           content: content,
-          actions: const [],
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text(
+                "Close",
+                style: TextStyle(color: Colors.blue),
+              ),
+            )
+          ],
         );
       },
     );

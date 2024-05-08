@@ -6,5 +6,5 @@
   "fqbn": "arduino:avr:mega:cpu=atmega2560",
   "hardwareFolders": "/home/mmkumr/.arduino15/packages",
   "otherLibrariesFolders": "/home/mmkumr/Arduino/libraries",
-  "sketchLocation": "/run/media/mmkumr/MyWorkspace/Projects/xioty/CookingMachine/Arduino/laser_engraver"
+  "sketchLocation": "/mnt/MyWorkspace/Projects/xioty/CookingMachine/Arduino/laser_engraver"
 }

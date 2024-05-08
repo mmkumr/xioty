@@ -10,7 +10,6 @@ import 'package:flutter/services.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 import '../partials/menu.dart';
-import 'mima_description.dart';
 
 class ChefSolidMicro extends StatefulWidget {
   final VariantModel variant;
