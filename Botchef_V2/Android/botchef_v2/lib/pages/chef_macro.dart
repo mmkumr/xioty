@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:botchef_v2/commons.dart';
 import 'package:botchef_v2/db/variant.dart';
 import 'package:botchef_v2/models/recipe.dart';
@@ -5,6 +7,7 @@ import 'package:botchef_v2/models/variant.dart';
 import 'package:botchef_v2/pages/chef_solid_micros.dart';
 import 'package:botchef_v2/partials/appbar.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
@@ -23,9 +26,10 @@ class ChefMacroPage extends StatefulWidget {
 class _ChefMacroPageState extends State<ChefMacroPage> {
   List<TextEditingController> macros = [];
   GlobalKey<FormState> form = GlobalKey<FormState>();
-  TextEditingController description = TextEditingController();
+  List<TextEditingController> description = [];
   GlobalKey<FormState> popUpForm = GlobalKey<FormState>();
-  XFile? image;
+  List<XFile?> image = [];
+  List<String> photoUrl = [];
   List<String> quantities = [
     "1 cup",
     "1/2 cup",
@@ -40,12 +44,18 @@ class _ChefMacroPageState extends State<ChefMacroPage> {
     if (widget.variant.macros!.isEmpty) {
       macros = List.generate(nos, (index) => TextEditingController());
       quantity = List.generate(nos, (index) => quantities[0]);
+      photoUrl = List.generate(nos, (index) => "");
+      description = List.generate(nos, (index) => TextEditingController());
     } else {
+      debugPrint(widget.variant.vid);
       for (var e in widget.variant.macros!) {
         macros.add(TextEditingController(text: e["name"]));
         quantity.add(e["quantity"]);
+        photoUrl.add(e["photoUrl"]);
+        description.add(TextEditingController(text: e["description"]));
       }
     }
+    image = List.generate(nos, (index) => XFile(""));
     super.initState();
   }
 
@@ -153,8 +163,9 @@ class _ChefMacroPageState extends State<ChefMacroPage> {
                                     ),
                                   ),
                                   InkWell(
-                                    onTap: () {
-                                      mimaDescriptionPopup();
+                                    onTap: () async {
+                                      await mimaDescriptionPopup(i);
+                                      setState(() {});
                                     },
                                     child: const Icon(Icons.info_rounded),
                                   ),
@@ -183,6 +194,8 @@ class _ChefMacroPageState extends State<ChefMacroPage> {
                               {
                                 "name": macros[i].text,
                                 "quantity": quantity[i],
+                                "description": description[i].text,
+                                "photoUrl": photoUrl[i]
                               },
                             );
                           }
@@ -222,7 +235,7 @@ class _ChefMacroPageState extends State<ChefMacroPage> {
     );
   }
 
-  Future<dynamic> mimaDescriptionPopup() {
+  Future<dynamic> mimaDescriptionPopup(int index) {
     return showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -236,9 +249,45 @@ class _ChefMacroPageState extends State<ChefMacroPage> {
                 height: 500,
                 child: Column(
                   children: [
-                    const Icon(
-                      Icons.image_rounded,
-                      size: 200,
+                    InkWell(
+                      onTap: () async {
+                        image[index] = await ImagePicker()
+                            .pickImage(source: ImageSource.gallery);
+                        setState(() {
+                          image;
+                        });
+                        if (!context.mounted) return;
+                        Navigator.pop(context);
+                        mimaDescriptionPopup(index);
+                      },
+                      child: photoUrl[index].isNotEmpty &&
+                              image[index]!.name.isEmpty
+                          ? Container(
+                              height: 200,
+                              width: 200,
+                              decoration: BoxDecoration(
+                                image: DecorationImage(
+                                  image: CachedNetworkImageProvider(
+                                      photoUrl[index]),
+                                ),
+                              ),
+                            )
+                          : image[index]!.name.isNotEmpty
+                              ? Container(
+                                  height: 200,
+                                  width: 200,
+                                  decoration: BoxDecoration(
+                                    image: DecorationImage(
+                                      image:
+                                          Image.file(File(image[index]!.path))
+                                              .image,
+                                    ),
+                                  ),
+                                )
+                              : const Icon(
+                                  Icons.image_rounded,
+                                  size: 200,
+                                ),
                     ),
                     Form(
                       key: popUpForm,
@@ -246,7 +295,7 @@ class _ChefMacroPageState extends State<ChefMacroPage> {
                         padding: const EdgeInsets.all(20.0),
                         child: TextFormField(
                           maxLines: 5,
-                          controller: description,
+                          controller: description[index],
                           validator: (value) {
                             if (value!.isEmpty) {
                               return "Field can't be empty";
@@ -266,8 +315,36 @@ class _ChefMacroPageState extends State<ChefMacroPage> {
               ),
             ),
           ),
+          actions: [
+            TextButton(
+              onPressed: () async {
+                Navigator.pop(context);
+                if (image[index]!.name.isNotEmpty) {
+                  setState(() {
+                    loading = true;
+                  });
+                  photoUrl[index] = await uploadPic(index);
+                  setState(() {
+                    loading = false;
+                  });
+                }
+              },
+              child: const Text("Ok"),
+            )
+          ],
         );
       },
     );
+  }
+
+  Future<String> uploadPic(index) async {
+    FirebaseStorage storage = FirebaseStorage.instance;
+    //Create a reference to the location you want to upload to in firebase
+    Reference reference = storage.ref().child("Macros/${image[index]!.name}");
+
+    //Upload the file to firebase
+    await reference.putFile(File(image[index]!.path));
+    // Waits till the file is uploaded then stores the download url
+    return await reference.getDownloadURL();
   }
 }

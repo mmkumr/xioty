@@ -17,6 +17,10 @@ class HistoryPage extends StatefulWidget {
 
 class _HistoryPageState extends State<HistoryPage> {
   List<HistoryModel>? history = [];
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   void didChangeDependencies() async {
@@ -36,29 +40,27 @@ class _HistoryPageState extends State<HistoryPage> {
         elevation: 0,
       ),
       drawer: menu(context),
-      body: Flexible(
-        child: ListView.builder(
-          itemCount: history!.length,
-          itemBuilder: (context, index) {
-            return ListTile(
-              leading: CachedNetworkImage(
-                imageUrl: history![index].photoUrl!,
-                fit: BoxFit.fill,
-              ),
-              title: Text(
-                history![index].recipeName!,
-                overflow: TextOverflow.ellipsis,
-              ),
-              subtitle: Text("Chef name: ${history![index].chefName}"),
-              trailing: Text(
-                "${history![index].dateTime!.substring(0, 10)}\n${DateTime.now().toString().substring(11, 16)}",
-                softWrap: true,
-                textAlign: TextAlign.center,
-                overflow: TextOverflow.ellipsis,
-              ),
-            );
-          },
-        ),
+      body: ListView.builder(
+        itemCount: history!.length,
+        itemBuilder: (context, index) {
+          return ListTile(
+            leading: CachedNetworkImage(
+              imageUrl: history![index].photoUrl!,
+              fit: BoxFit.fill,
+            ),
+            title: Text(
+              history![index].recipeName!,
+              overflow: TextOverflow.ellipsis,
+            ),
+            subtitle: Text("Chef name: ${history![index].chefName}"),
+            trailing: Text(
+              "${history![index].dateTime!.substring(0, 10)}\n${DateTime.now().toString().substring(11, 16)}",
+              softWrap: true,
+              textAlign: TextAlign.center,
+              overflow: TextOverflow.ellipsis,
+            ),
+          );
+        },
       ),
     );
   }

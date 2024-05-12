@@ -1,3 +1,4 @@
+import 'package:botchef_v2/db/favorite.dart';
 import 'package:botchef_v2/db/history.dart';
 import 'package:botchef_v2/db/recipe.dart';
 import 'package:botchef_v2/db/variant.dart';
@@ -135,11 +136,11 @@ class _RatingPageState extends State<RatingPage> {
                     borderRadius: BorderRadius.circular(40),
                   ),
                   color: primaryC,
-                  onPressed: () {
-                    navigate(
-                        type: PageType.replace,
-                        context: context,
-                        page: const FavoritesPage());
+                  onPressed: () async {
+                    final user = Provider.of<UserProvider>(context);
+                    await FavoriteServices()
+                        .update(uid: user.user.uid, rid: widget.variant.rid!);
+                    Fluttertoast.showToast(msg: "Added recipe to favorites!");
                   },
                   child: Padding(
                     padding: const EdgeInsets.only(top: 10, bottom: 10),

@@ -8,9 +8,52 @@ class VariantServices {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   String collection = "variants";
   Algolia algoliaApp = const Algolia.init(
-    applicationId: 'KWPCAWUHDW', //ApplicationID,
-    apiKey: 'bf30ae35483ea194e02366cd3bf0737e', //Admin api key in flutter code
+    applicationId: 'BBEIAKOTBC', //ApplicationID,
+    apiKey: '0246a68e8bbbfa69cb719e672ff2cd84', //Admin api key in flutter code
   );
+
+  fill() async {
+    await _firestore.collection(collection).get().then((value) async {
+      for (var e in value.docs) {
+        DocumentReference ref = _firestore.collection(collection).doc(e.id);
+        List macros = [];
+        List liquidMicros = [];
+        List solidMicros = [];
+        await _firestore.collection(collection).doc(e.id).get().then((value) {
+          macros = value.data()!["macros"].map((e) {
+            return {
+              "name": e["name"],
+              "quantity": e["quantity"],
+              "photoUrl": "",
+              "description": "",
+            };
+          }).toList();
+          solidMicros = value.data()!["solidMicros"].map((e) {
+            return {
+              "name": e["name"],
+              "quantity": e["quantity"],
+              "photoUrl": "",
+              "description": "",
+            };
+          }).toList();
+          liquidMicros = value.data()!["liquidMicros"].map((e) {
+            return {
+              "name": e["name"],
+              "quantity": e["quantity"],
+              "photoUrl": "",
+              "description": "",
+            };
+          }).toList();
+          //end of macro, solid, liquid micro declaration.
+        });
+        ref.update({
+          "macros": macros,
+          "liquidMicros": liquidMicros,
+          "solidMicros": solidMicros
+        });
+      }
+    });
+  }
 
   create({
     required String rid,

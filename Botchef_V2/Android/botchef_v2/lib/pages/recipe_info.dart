@@ -27,6 +27,7 @@ class _RecipeInfoPageState extends State<RecipeInfoPage> {
   String selectedSpicy = "";
   String selectedPortionSize = "";
   List favorites = [];
+  VariantModel? variant;
   @override
   Widget build(BuildContext context) {
     final user = Provider.of<UserProvider>(context);
@@ -104,9 +105,14 @@ class _RecipeInfoPageState extends State<RecipeInfoPage> {
                             ),
                           ),
                         ),
-                        const TextSpan(
-                          text: "2 hours",
-                          style: TextStyle(
+                        TextSpan(
+                          text: variant!.cookingTime!.isEmpty
+                              ? "UA"
+                              : '${(Duration(seconds: int.parse(variant!.cookingTime!)))}'
+                                  .split('.')[0]
+                                  .padLeft(8, '0')
+                                  .toString(),
+                          style: const TextStyle(
                             color: Colors.black,
                             fontWeight: FontWeight.bold,
                           ),
@@ -170,6 +176,11 @@ class _RecipeInfoPageState extends State<RecipeInfoPage> {
                             selectedSpicy = variantButtons.keys.toList()[i];
                             selectedPortionSize =
                                 variantButtons[selectedSpicy][0];
+                            variant = variants
+                                .where((element) =>
+                                    element.spicy == selectedSpicy &&
+                                    element.portionSize == selectedPortionSize)
+                                .toList()[0];
                           });
                         },
                         child: Container(
@@ -217,6 +228,11 @@ class _RecipeInfoPageState extends State<RecipeInfoPage> {
                           setState(() {
                             selectedPortionSize =
                                 variantButtons[selectedSpicy][i];
+                            variant = variants
+                                .where((element) =>
+                                    element.spicy == selectedSpicy &&
+                                    element.portionSize == selectedPortionSize)
+                                .toList()[0];
                           });
                         },
                         child: Container(
@@ -308,6 +324,12 @@ class _RecipeInfoPageState extends State<RecipeInfoPage> {
     setState(() {
       selectedSpicy = variantButtons.keys.toList()[0];
       selectedPortionSize = variantButtons[selectedSpicy][0];
+      variant = variants
+          .where((element) =>
+              element.spicy == selectedSpicy &&
+              element.portionSize == selectedPortionSize)
+          .toList()[0];
+      setState(() {});
     });
   }
 

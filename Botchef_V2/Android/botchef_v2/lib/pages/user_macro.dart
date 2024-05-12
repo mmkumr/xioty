@@ -47,11 +47,14 @@ class _UserMacroPageState extends State<UserMacroPage> {
                                 Radius.circular(60),
                               ),
                             ),
-                            child: Text(
-                              "${macro["name"]} ${macro["quantity"]}",
-                              style: const TextStyle(fontSize: 20),
-                              softWrap: true,
-                              textAlign: TextAlign.center,
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text(
+                                "${macro["name"]} ${macro["quantity"]}",
+                                style: const TextStyle(fontSize: 15),
+                                softWrap: true,
+                                textAlign: TextAlign.left,
+                              ),
                             ),
                           ),
                           trailing: InkWell(

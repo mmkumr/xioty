@@ -80,55 +80,67 @@ class _UserMicroPageState extends State<UserMicroPage> {
                       ? Container()
                       : Padding(
                           padding: const EdgeInsets.all(10.0),
-                          child: ListTile(
-                            leading: Container(
-                              width: width(context) * 0.5,
-                              height: 40,
-                              decoration: BoxDecoration(
-                                color: primaryC,
-                                borderRadius: const BorderRadius.all(
-                                  Radius.circular(60),
-                                ),
+                          child: Row(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.only(left: 8.0),
+                                child: Text((index + 1).toString()),
                               ),
-                              child: Padding(
-                                padding:
-                                    const EdgeInsets.only(left: 20, right: 20),
-                                child: Center(
-                                  child: Text(
-                                    "${index + 1} ${liquidMicro['name']}",
-                                    overflow: TextOverflow.ellipsis,
-                                    style: const TextStyle(fontSize: 20),
-                                    softWrap: true,
-                                    textAlign: TextAlign.center,
+                              Expanded(
+                                child: ListTile(
+                                  leading: Container(
+                                    width: width(context) * 0.5,
+                                    decoration: BoxDecoration(
+                                      color: primaryC,
+                                      borderRadius: const BorderRadius.all(
+                                        Radius.circular(60),
+                                      ),
+                                    ),
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(
+                                          left: 20, right: 20),
+                                      child: Align(
+                                        alignment: Alignment.centerLeft,
+                                        child: Text(
+                                          maxLines: 3,
+                                          "${liquidMicro['name']}",
+                                          overflow: TextOverflow.ellipsis,
+                                          style: const TextStyle(fontSize: 15),
+                                          softWrap: true,
+                                          textAlign: TextAlign.left,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  title: TextFormField(
+                                    onTap: () {
+                                      if (!start) {
+                                        setState(() {
+                                          start = true;
+                                        });
+                                      }
+                                    },
+                                    controller: quantity![index],
+                                    decoration: InputDecoration(
+                                      hintText: "tsp",
+                                      label: const Text("tsp"),
+                                      filled: true,
+                                      border: OutlineInputBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(10.0),
+                                      ),
+                                      fillColor: primaryC,
+                                    ),
+                                  ),
+                                  trailing: InkWell(
+                                    onTap: () {
+                                      mimaDescriptionPopup(context);
+                                    },
+                                    child: const Icon(Icons.info),
                                   ),
                                 ),
                               ),
-                            ),
-                            title: TextFormField(
-                              onTap: () {
-                                if (!start) {
-                                  setState(() {
-                                    start = true;
-                                  });
-                                }
-                              },
-                              controller: quantity![index],
-                              decoration: InputDecoration(
-                                hintText: "tsp",
-                                label: const Text("tsp"),
-                                filled: true,
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(10.0),
-                                ),
-                                fillColor: primaryC,
-                              ),
-                            ),
-                            trailing: InkWell(
-                              onTap: () {
-                                mimaDescriptionPopup(context);
-                              },
-                              child: const Icon(Icons.info),
-                            ),
+                            ],
                           ),
                         );
                 },
@@ -147,55 +159,66 @@ class _UserMicroPageState extends State<UserMicroPage> {
                       ? Container()
                       : Padding(
                           padding: const EdgeInsets.all(10.0),
-                          child: ListTile(
-                            leading: Container(
-                              width: width(context) * 0.5,
-                              height: 40,
-                              decoration: BoxDecoration(
-                                color: primaryC,
-                                borderRadius: const BorderRadius.all(
-                                  Radius.circular(60),
-                                ),
+                          child: Row(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.only(left: 8.0),
+                                child: Text((index + 1).toString()),
                               ),
-                              child: Padding(
-                                padding:
-                                    const EdgeInsets.only(left: 20, right: 20),
-                                child: Center(
-                                  child: Text(
-                                    "${index + 1} ${solidMicro['name']}",
-                                    overflow: TextOverflow.ellipsis,
-                                    style: const TextStyle(fontSize: 20),
-                                    softWrap: true,
-                                    textAlign: TextAlign.center,
+                              Expanded(
+                                child: ListTile(
+                                  leading: Container(
+                                    width: width(context) * 0.5,
+                                    decoration: BoxDecoration(
+                                      color: primaryC,
+                                      borderRadius: const BorderRadius.all(
+                                        Radius.circular(60),
+                                      ),
+                                    ),
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(
+                                          left: 20, right: 20),
+                                      child: Align(
+                                        alignment: Alignment.centerLeft,
+                                        child: Text(
+                                          "${solidMicro['name']}",
+                                          overflow: TextOverflow.ellipsis,
+                                          style: const TextStyle(fontSize: 15),
+                                          softWrap: true,
+                                          textAlign: TextAlign.center,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  title: TextFormField(
+                                    onTap: () {
+                                      if (!start) {
+                                        setState(() {
+                                          start = true;
+                                        });
+                                      }
+                                    },
+                                    controller: quantity![index + 4],
+                                    decoration: InputDecoration(
+                                      hintText: "tsp",
+                                      label: const Text("tsp"),
+                                      filled: true,
+                                      border: OutlineInputBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(10.0),
+                                      ),
+                                      fillColor: primaryC,
+                                    ),
+                                  ),
+                                  trailing: InkWell(
+                                    onTap: () {
+                                      mimaDescriptionPopup(context);
+                                    },
+                                    child: const Icon(Icons.info),
                                   ),
                                 ),
                               ),
-                            ),
-                            title: TextFormField(
-                              onTap: () {
-                                if (!start) {
-                                  setState(() {
-                                    start = true;
-                                  });
-                                }
-                              },
-                              controller: quantity![index + 4],
-                              decoration: InputDecoration(
-                                hintText: "tsp",
-                                label: const Text("tsp"),
-                                filled: true,
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(10.0),
-                                ),
-                                fillColor: primaryC,
-                              ),
-                            ),
-                            trailing: InkWell(
-                              onTap: () {
-                                mimaDescriptionPopup(context);
-                              },
-                              child: const Icon(Icons.info),
-                            ),
+                            ],
                           ),
                         );
                 },

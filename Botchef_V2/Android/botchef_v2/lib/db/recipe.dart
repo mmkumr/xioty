@@ -9,8 +9,8 @@ class RecipeServices {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   String collection = "recipes";
   Algolia algoliaApp = const Algolia.init(
-    applicationId: 'KWPCAWUHDW', //ApplicationID,
-    apiKey: 'bf30ae35483ea194e02366cd3bf0737e', //Admin api key in flutter code
+    applicationId: 'BBEIAKOTBC', //ApplicationID,
+    apiKey: '0246a68e8bbbfa69cb719e672ff2cd84', //Admin api key in flutter code
   );
 
   create({
@@ -58,6 +58,24 @@ class RecipeServices {
         "calories": calories,
         "type": type,
       });
+      List algoMacros = [];
+      try {
+        algoMacros =
+            await algoliaApp.instance.index("xara").getObjectsByIds([id]);
+      } catch (e) {
+        algoMacros = [];
+      }
+      if (algoMacros.isNotEmpty) {
+        algoliaApp.instance.index("xara").addObject({
+          "objectID": id,
+          'macros': algoMacros[0]['macros'],
+          'recipeName': recipeName,
+          'chefName': chefName,
+          "photo": photoUrl,
+          "type": algoMacros[0]['type'],
+        });
+      }
+
       debugPrint("Recipe has Updated");
     } catch (e) {
       debugPrint('ERROR: ${e.toString()}');

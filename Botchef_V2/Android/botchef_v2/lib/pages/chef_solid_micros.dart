@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:botchef_v2/commons.dart';
 import 'package:botchef_v2/db/variant.dart';
 import 'package:botchef_v2/models/recipe.dart';
@@ -5,8 +7,10 @@ import 'package:botchef_v2/models/variant.dart';
 import 'package:botchef_v2/pages/chef_liquid_micros.dart';
 import 'package:botchef_v2/partials/appbar.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 import '../partials/menu.dart';
@@ -25,8 +29,10 @@ class _ChefSolidMicroState extends State<ChefSolidMicro> {
   GlobalKey<FormState> form = GlobalKey<FormState>();
   List<TextEditingController> solidMicros = [];
   List<TextEditingController> quantity = [];
-  TextEditingController description = TextEditingController();
+  List<TextEditingController> description = [];
   GlobalKey<FormState> popUpForm = GlobalKey<FormState>();
+  List<XFile?> image = [];
+  List<String> photoUrl = [];
   int nos = 8;
   ScrollController scrollController = ScrollController();
   bool loading = false;
@@ -44,12 +50,17 @@ class _ChefSolidMicroState extends State<ChefSolidMicro> {
       solidMicros = List.generate(nos, (index) => TextEditingController());
       quantity =
           List.generate(nos, (index) => TextEditingController(text: "0"));
+      photoUrl = List.generate(nos, (index) => "");
+      description = List.generate(nos, (index) => TextEditingController());
     } else {
       for (var e in widget.variant.solidMicros!) {
         solidMicros.add(TextEditingController(text: e["name"]));
         quantity.add(TextEditingController(text: e["quantity"]));
+        photoUrl.add(e["photoUrl"]);
+        description.add(TextEditingController(text: e["description"]));
       }
     }
+    image = List.generate(nos, (index) => XFile(""));
     super.initState();
   }
 
@@ -160,7 +171,7 @@ class _ChefSolidMicroState extends State<ChefSolidMicro> {
                                   ),
                                   InkWell(
                                     onTap: () {
-                                      mimaDescriptionPopup();
+                                      mimaDescriptionPopup(i);
                                     },
                                     child: const Icon(Icons.info_rounded),
                                   ),
@@ -189,6 +200,8 @@ class _ChefSolidMicroState extends State<ChefSolidMicro> {
                               {
                                 "name": solidMicros[i].text,
                                 "quantity": quantity[i].text,
+                                "description": description[i].text,
+                                "photoUrl": photoUrl[i]
                               },
                             );
                           }
@@ -228,7 +241,7 @@ class _ChefSolidMicroState extends State<ChefSolidMicro> {
     );
   }
 
-  Future<dynamic> mimaDescriptionPopup() {
+  Future<dynamic> mimaDescriptionPopup(int index) {
     return showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -242,9 +255,45 @@ class _ChefSolidMicroState extends State<ChefSolidMicro> {
                 height: 500,
                 child: Column(
                   children: [
-                    const Icon(
-                      Icons.image_rounded,
-                      size: 200,
+                    InkWell(
+                      onTap: () async {
+                        image[index] = await ImagePicker()
+                            .pickImage(source: ImageSource.gallery);
+                        setState(() {
+                          image;
+                        });
+                        if (!context.mounted) return;
+                        Navigator.pop(context);
+                        mimaDescriptionPopup(index);
+                      },
+                      child: photoUrl[index].isNotEmpty &&
+                              image[index]!.name.isEmpty
+                          ? Container(
+                              height: 200,
+                              width: 200,
+                              decoration: BoxDecoration(
+                                image: DecorationImage(
+                                  image: CachedNetworkImageProvider(
+                                      photoUrl[index]),
+                                ),
+                              ),
+                            )
+                          : image[index]!.name.isNotEmpty
+                              ? Container(
+                                  height: 200,
+                                  width: 200,
+                                  decoration: BoxDecoration(
+                                    image: DecorationImage(
+                                      image:
+                                          Image.file(File(image[index]!.path))
+                                              .image,
+                                    ),
+                                  ),
+                                )
+                              : const Icon(
+                                  Icons.image_rounded,
+                                  size: 200,
+                                ),
                     ),
                     Form(
                       key: popUpForm,
@@ -252,7 +301,7 @@ class _ChefSolidMicroState extends State<ChefSolidMicro> {
                         padding: const EdgeInsets.all(20.0),
                         child: TextFormField(
                           maxLines: 5,
-                          controller: description,
+                          controller: description[index],
                           validator: (value) {
                             if (value!.isEmpty) {
                               return "Field can't be empty";
@@ -272,8 +321,36 @@ class _ChefSolidMicroState extends State<ChefSolidMicro> {
               ),
             ),
           ),
+          actions: [
+            TextButton(
+              onPressed: () async {
+                Navigator.pop(context);
+                if (image[index]!.name.isNotEmpty) {
+                  setState(() {
+                    loading = true;
+                  });
+                  photoUrl[index] = await uploadPic(index);
+                  setState(() {
+                    loading = false;
+                  });
+                }
+              },
+              child: const Text("Ok"),
+            )
+          ],
         );
       },
     );
+  }
+
+  Future<String> uploadPic(index) async {
+    FirebaseStorage storage = FirebaseStorage.instance;
+    //Create a reference to the location you want to upload to in firebase
+    Reference reference = storage.ref().child("Macros/${image[index]!.name}");
+
+    //Upload the file to firebase
+    await reference.putFile(File(image[index]!.path));
+    // Waits till the file is uploaded then stores the download url
+    return await reference.getDownloadURL();
   }
 }
