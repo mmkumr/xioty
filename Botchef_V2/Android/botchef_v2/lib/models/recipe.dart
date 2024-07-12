@@ -13,6 +13,8 @@ class RecipeModel {
   static const PUBLISHED = "published";
   static const NO_OF_TIMES = "no_of_times";
   static const EARNINGS = "earnings";
+  static const PRICE = "price";
+  static const RATING = "rating";
 
   String? _photoUrl;
   String? _rid;
@@ -25,6 +27,8 @@ class RecipeModel {
   bool? _published;
   int? _noOfTimes;
   int? _earings;
+  int? _price;
+  double? _rating;
 
   //  getters
   String? get photoUrl => _photoUrl;
@@ -38,6 +42,8 @@ class RecipeModel {
   bool? get published => _published;
   int? get noOfTimes => _noOfTimes;
   int? get earnings => _earings;
+  int? get price => _price;
+  double? get rating => _rating;
 
   // public variables
   RecipeModel.fromSnapshot(DocumentSnapshot snapshot) {
@@ -52,5 +58,7 @@ class RecipeModel {
     _published = snapshot[PUBLISHED];
     _noOfTimes = snapshot[NO_OF_TIMES];
     _earings = snapshot[EARNINGS];
+    _price = snapshot[PRICE];
+    _rating = snapshot[RATING].toDouble();
   }
 }

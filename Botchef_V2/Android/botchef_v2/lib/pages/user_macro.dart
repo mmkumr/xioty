@@ -11,7 +11,15 @@ import 'user_micro.dart';
 class UserMacroPage extends StatefulWidget {
   final VariantModel variant;
   final RecipeModel recipe;
-  const UserMacroPage({super.key, required this.recipe, required this.variant});
+  final List? solidMicros;
+  final List? liquidMicros;
+  const UserMacroPage({
+    super.key,
+    required this.recipe,
+    required this.variant,
+    this.solidMicros,
+    this.liquidMicros,
+  });
 
   @override
   State<UserMacroPage> createState() => _UserMacroPageState();
@@ -78,13 +86,25 @@ class _UserMacroPageState extends State<UserMacroPage> {
               ),
               color: elementsC,
               onPressed: () {
-                navigate(
-                    type: PageType.replace,
-                    context: context,
-                    page: UserMicroPage(
-                      recipe: widget.recipe,
-                      variant: widget.variant,
-                    ));
+                if (widget.solidMicros == null) {
+                  navigate(
+                      type: PageType.replace,
+                      context: context,
+                      page: UserMicroPage(
+                        recipe: widget.recipe,
+                        variant: widget.variant,
+                      ));
+                } else {
+                  navigate(
+                      type: PageType.replace,
+                      context: context,
+                      page: UserMicroPage(
+                        recipe: widget.recipe,
+                        variant: widget.variant,
+                        solidMicros: widget.solidMicros,
+                        liquidMicros: widget.liquidMicros,
+                      ));
+                }
               },
               child: Padding(
                 padding: const EdgeInsets.only(top: 10, bottom: 10),

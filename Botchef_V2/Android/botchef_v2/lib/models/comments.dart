@@ -10,19 +10,19 @@ class CommentModel {
   String? _rid;
   String? _name;
   String? _comment;
-  String? _rating;
+  double? _rating;
 
   //  getters
   String? get rid => _rid;
   String? get name => _name;
   String? get comment => _comment;
-  String? get rating => _rating;
+  double? get rating => _rating;
 
   // public variables
   CommentModel.fromSnapshot(DocumentSnapshot snapshot) {
     _name = snapshot[NAME];
     _rid = snapshot[RID];
     _comment = snapshot[COMMENT];
-    _rating = snapshot[RATING];
+    _rating = snapshot[RATING].toDouble();
   }
 }

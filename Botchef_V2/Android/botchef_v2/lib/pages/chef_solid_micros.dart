@@ -52,6 +52,12 @@ class _ChefSolidMicroState extends State<ChefSolidMicro> {
           List.generate(nos, (index) => TextEditingController(text: "0"));
       photoUrl = List.generate(nos, (index) => "");
       description = List.generate(nos, (index) => TextEditingController());
+      //Jeera, Salt, turmeric powder, chilli powder, garam masala powder
+      solidMicros[0] = TextEditingController(text: "Jeera");
+      solidMicros[1] = TextEditingController(text: "Salt");
+      solidMicros[2] = TextEditingController(text: "Turmeric Powder");
+      solidMicros[3] = TextEditingController(text: "Chilli Powder");
+      solidMicros[4] = TextEditingController(text: "Garam Masala Powder");
     } else {
       for (var e in widget.variant.solidMicros!) {
         solidMicros.add(TextEditingController(text: e["name"]));

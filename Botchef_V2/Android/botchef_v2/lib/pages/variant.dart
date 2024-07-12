@@ -209,8 +209,9 @@ class _VariantPageState extends State<VariantPage> {
                               loading = true;
                             });
                             VariantServices variantServices = VariantServices();
+                            String vid = "";
                             if (widget.variant == null) {
-                              variantServices.create(
+                              vid = await variantServices.create(
                                   rid: widget.recipe.rid!,
                                   description: description.text,
                                   spicy: spicy!,
@@ -226,6 +227,7 @@ class _VariantPageState extends State<VariantPage> {
                               loading = false;
                             });
                             if (widget.variant != null) {
+                              if (!context.mounted) return;
                               navigate(
                                 type: PageType.replace,
                                 context: context,
@@ -235,13 +237,18 @@ class _VariantPageState extends State<VariantPage> {
                                 ),
                               );
                             } else {
-                              var recipe = await RecipeServices()
+                              RecipeModel recipe = await RecipeServices()
                                   .getById(widget.recipe.rid!);
+                              VariantModel variant =
+                                  await VariantServices().getById(vid);
                               if (!context.mounted) return;
                               navigate(
                                 type: PageType.replace,
                                 context: context,
-                                page: VariantsPage(recipe: recipe),
+                                page: ChefMacroPage(
+                                  variant: variant,
+                                  recipe: recipe,
+                                ),
                               );
                             }
                           }

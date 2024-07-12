@@ -9,8 +9,8 @@ class RecipeServices {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   String collection = "recipes";
   Algolia algoliaApp = const Algolia.init(
-    applicationId: 'BBEIAKOTBC', //ApplicationID,
-    apiKey: '0246a68e8bbbfa69cb719e672ff2cd84', //Admin api key in flutter code
+    applicationId: 'KWPCAWUHDW', //ApplicationID,
+    apiKey: 'bf30ae35483ea194e02366cd3bf0737e', //Admin api key in flutter code
   );
 
   create({
@@ -33,7 +33,9 @@ class RecipeServices {
         "type": type,
         "published": false,
         "no_of_times": 0,
+        "price": 0,
         "earnings": 0,
+        "rating": 0.0,
       });
     } catch (e) {
       debugPrint('ERROR: ${e.toString()}');
@@ -82,6 +84,16 @@ class RecipeServices {
     }
   }
 
+  updateEarnings({
+    required String rid,
+    required int earnings,
+  }) async {
+    _firestore.collection(collection).doc(rid).update({
+      "earnings": FieldValue.increment(earnings),
+      "no_of_times": FieldValue.increment(1),
+    });
+  }
+
   Future<List<RecipeModel>> myRecipes(String uid) {
     return _firestore
         .collection(collection)
@@ -102,6 +114,7 @@ class RecipeServices {
 
   Future<RecipeModel> getById(String id) =>
       _firestore.collection(collection).doc(id).get().then((doc) {
+        debugPrint(doc.data().toString());
         return RecipeModel.fromSnapshot(doc);
       });
 }

@@ -1,20 +1,35 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:botchef_v2/db/recipe.dart';
+import 'package:botchef_v2/models/recipe.dart';
+import 'package:botchef_v2/models/user.dart';
 import 'package:botchef_v2/models/variant.dart';
 import 'package:botchef_v2/pages/home.dart';
+import 'package:botchef_v2/pages/machine_connect.dart';
 import 'package:botchef_v2/pages/rating.dart';
+import 'package:botchef_v2/providers/user_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:mqtt_client/mqtt_client.dart';
 import 'package:mqtt_client/mqtt_server_client.dart';
+import 'package:provider/provider.dart';
 
 import '../commons.dart';
 
 class CookingPage extends StatefulWidget {
   final VariantModel variant;
-  const CookingPage({super.key, required this.variant});
+  final RecipeModel recipe;
+  final List solidMicros;
+  final List liquidMicros;
+  const CookingPage({
+    super.key,
+    required this.variant,
+    required this.recipe,
+    required this.solidMicros,
+    required this.liquidMicros,
+  });
 
   @override
   State<CookingPage> createState() => _CookingPageState();
@@ -26,6 +41,7 @@ class _CookingPageState extends State<CookingPage> {
   bool start = false, pause = false;
   List instructions = [];
   String receivedMessage = '';
+  String sendingTopic = "/xara/cmds/";
   bool sending = false;
   final MqttServerClient client = MqttServerClient.withPort(
       '6b3b54fa5f4a464fa80e2e0410aec35e.s2.eu.hivemq.cloud', '', 8883);
@@ -53,19 +69,25 @@ class _CookingPageState extends State<CookingPage> {
 
   @override
   Widget build(BuildContext context) {
-    if (!start && client.connectionState == MqttConnectionState.disconnected) {
+    if (!start && client.connectionState == MqttConnectionState.connected) {
       if (receivedMessage == "Done") {
         Fluttertoast.showToast(msg: "Previous Recipe have been cooked");
         receivedMessage = "";
         sendData('', 'response', true);
       }
+      debugPrint("Waiting for machine response");
       Future.delayed(const Duration(seconds: 5), () {
         if (receivedMessage == "Received") {
+          RecipeServices().updateEarnings(
+            rid: widget.variant.rid!,
+            earnings: widget.recipe.price!,
+          );
           startCountdown();
           Fluttertoast.showToast(msg: "Started Cooking");
           receivedMessage = "";
           sendData('', 'response', true);
         } else {
+          setState(() {});
           Future.delayed(Duration.zero, () {
             Fluttertoast.showToast(
               msg: "Please turn on you machine",
@@ -126,10 +148,10 @@ class _CookingPageState extends State<CookingPage> {
                         ),
                       ),
                       Text(
-                          '${(Duration(seconds: time))}'
+                          Duration(seconds: time)
+                              .toString()
                               .split('.')[0]
-                              .padLeft(8, '0')
-                              .toString(),
+                              .padLeft(8, '0'),
                           style: const TextStyle(fontSize: 30)),
                     ],
                   ),
@@ -147,12 +169,12 @@ class _CookingPageState extends State<CookingPage> {
                     setState(() {
                       pause = false;
                     });
-                    sendData("Resume", "xara/cmds", false);
+                    sendData("Resume", sendingTopic, false);
                   } else {
                     setState(() {
                       pause = true;
                     });
-                    sendData("Pause", "xara/cmds", false);
+                    sendData("Pause", sendingTopic, false);
                   }
                 },
                 child: Padding(
@@ -219,7 +241,9 @@ class _CookingPageState extends State<CookingPage> {
         }
         instructions.add("smu$num");
         for (int i = 0;
-            i < int.parse(operation["param"].toString().replaceAll(" tsp", ""));
+            i <
+                int.parse(
+                    widget.solidMicros[int.parse(num)].replaceAll(" tsp", ""));
             i++) {
           instructions.add("tilt");
         }
@@ -232,7 +256,9 @@ class _CookingPageState extends State<CookingPage> {
         }
         instructions.add("lmu$num");
         for (int i = 0;
-            i < int.parse(operation["param"].replaceAll(" tsp", ""));
+            i <
+                int.parse(
+                    widget.liquidMicros[int.parse(num)].replaceAll(" tsp", ""));
             i++) {
           instructions.add("squeeze");
         }
@@ -283,6 +309,17 @@ class _CookingPageState extends State<CookingPage> {
   }
 
   mqttinit() async {
+    final user = Provider.of<UserProvider>(context);
+    sendingTopic += user.userModel.machineId!;
+    debugPrint(sendingTopic);
+    if (sendingTopic.isEmpty) {
+      Future(() {
+        navigate(
+            type: PageType.replace,
+            context: context,
+            page: const MachineConnectPage());
+      });
+    }
     client.logging(on: true);
     client.onDisconnected = onDisconnected;
     client.autoReconnect = true;
@@ -343,7 +380,8 @@ class _CookingPageState extends State<CookingPage> {
   void onConnected() {
     debugPrint('Client connection was successful');
     subscribe();
-    sendData(instructions.join("\n"), "xara/cmds", false);
+    sendData(instructions.join("\n"), sendingTopic, false);
+    setState(() {});
   }
 
   void onReconnect() {

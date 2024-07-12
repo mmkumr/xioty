@@ -1,7 +1,11 @@
+import 'package:botchef_v2/db/edited_recipes.dart';
+import 'package:botchef_v2/db/recipe.dart';
 import 'package:botchef_v2/models/recipe.dart';
 import 'package:botchef_v2/models/variant.dart';
 import 'package:botchef_v2/pages/cooking.dart';
+import 'package:botchef_v2/providers/user_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../commons.dart';
 import '../partials/description_popup.dart';
@@ -10,7 +14,15 @@ import '../partials/menu.dart';
 class UserMicroPage extends StatefulWidget {
   final VariantModel variant;
   final RecipeModel recipe;
-  const UserMicroPage({super.key, required this.variant, required this.recipe});
+  final List? solidMicros;
+  final List? liquidMicros;
+  const UserMicroPage({
+    super.key,
+    required this.variant,
+    required this.recipe,
+    this.solidMicros,
+    this.liquidMicros,
+  });
 
   @override
   State<UserMicroPage> createState() => _UserMicroPageState();
@@ -19,15 +31,25 @@ class UserMicroPage extends StatefulWidget {
 class _UserMicroPageState extends State<UserMicroPage> {
   @override
   void initState() {
-    quantity = List.generate(
-        4,
-        (index) => TextEditingController(
-            text: widget.variant.liquidMicros![index]["quantity"]));
-    quantity = quantity! +
-        List.generate(
-            8,
-            (index) => TextEditingController(
-                text: widget.variant.solidMicros![index]["quantity"]));
+    if (widget.solidMicros != null) {
+      quantity = List.generate(4,
+          (index) => TextEditingController(text: widget.liquidMicros![index]));
+      quantity = quantity! +
+          List.generate(
+              8,
+              (index) =>
+                  TextEditingController(text: widget.solidMicros![index]));
+    } else {
+      quantity = List.generate(
+          4,
+          (index) => TextEditingController(
+              text: widget.variant.liquidMicros![index]["quantity"]));
+      quantity = quantity! +
+          List.generate(
+              8,
+              (index) => TextEditingController(
+                  text: widget.variant.solidMicros![index]["quantity"]));
+    }
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       scrollController.animateTo(
@@ -44,12 +66,30 @@ class _UserMicroPageState extends State<UserMicroPage> {
   List<TextEditingController>? quantity;
   @override
   Widget build(BuildContext context) {
+    final user = Provider.of<UserProvider>(context);
     return Scaffold(
       appBar: AppBar(
         backgroundColor: bgC,
         actions: [
           InkWell(
-            onTap: () {},
+            onTap: () async {
+              List liquidMicro = [];
+              List solidMicros = [];
+              for (int i = 0; i < 4; i++) {
+                liquidMicro.add(quantity![i].text);
+              }
+              for (int i = 4; i < 12; i++) {
+                solidMicros.add(quantity![i].text);
+              }
+              EditedRecipeServices editedRecipeServices =
+                  EditedRecipeServices();
+              editedRecipeServices.update(
+                  uid: user.user.uid,
+                  rid: widget.variant.rid!,
+                  vid: widget.variant.vid!,
+                  solidMicro: solidMicros,
+                  liquidMicro: liquidMicro);
+            },
             child: const Padding(
               padding: EdgeInsets.all(15.0),
               child: Icon(Icons.save, size: 40),
@@ -233,10 +273,24 @@ class _UserMicroPageState extends State<UserMicroPage> {
                   ),
                   color: elementsC,
                   onPressed: () {
+                    List liquidMicros = [];
+                    List solidMicros = [];
+                    for (var i = 0; i < 4; i++) {
+                      liquidMicros.add(quantity![i].text);
+                    }
+                    for (var i = 4; i < 12; i++) {
+                      solidMicros.add(quantity![i].text);
+                    }
                     navigate(
-                        type: PageType.replace,
-                        context: context,
-                        page: CookingPage(variant: widget.variant));
+                      type: PageType.replace,
+                      context: context,
+                      page: CookingPage(
+                        variant: widget.variant,
+                        recipe: widget.recipe,
+                        solidMicros: solidMicros,
+                        liquidMicros: liquidMicros,
+                      ),
+                    );
                   },
                   child: Padding(
                     padding: const EdgeInsets.only(top: 10, bottom: 10),

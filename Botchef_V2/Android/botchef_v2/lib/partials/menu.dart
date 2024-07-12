@@ -3,6 +3,7 @@ import 'package:botchef_v2/pages/contact_us.dart';
 import 'package:botchef_v2/pages/edited_recipes.dart';
 import 'package:botchef_v2/pages/history.dart';
 import 'package:botchef_v2/pages/home.dart';
+import 'package:botchef_v2/pages/mqtt.dart';
 import 'package:botchef_v2/pages/your_recipes.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
@@ -77,6 +78,14 @@ Widget menu(BuildContext context) {
                 page: const EditedRecipesPage());
           },
           leading: const Icon(FontAwesomeIcons.spoon),
+        ),
+        ListTile(
+          title: const Text('Manual Mode'),
+          onTap: () {
+            navigate(
+                type: PageType.push, context: context, page: const MQTTPage());
+          },
+          leading: const Icon(Icons.home),
         ),
         ListTile(
           title: const Text('Home'),

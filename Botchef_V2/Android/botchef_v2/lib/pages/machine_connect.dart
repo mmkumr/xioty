@@ -1,7 +1,10 @@
 import 'package:botchef_v2/commons.dart';
+import 'package:botchef_v2/db/user.dart';
+import 'package:botchef_v2/providers/user_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:provider/provider.dart';
 
 import 'home.dart';
 
@@ -13,6 +16,13 @@ class MachineConnectPage extends StatefulWidget {
 }
 
 class _MachineConnectPageState extends State<MachineConnectPage> {
+  @override
+  void didChangeDependencies() {
+    final user = Provider.of<UserProvider>(context);
+    macCode.text = user.userModel.machineId!;
+    super.didChangeDependencies();
+  }
+
   TextEditingController macCode = TextEditingController();
   GlobalKey<FormState> form = GlobalKey<FormState>();
   @override
@@ -55,6 +65,21 @@ class _MachineConnectPageState extends State<MachineConnectPage> {
                     }
                     return null;
                   },
+                  onEditingComplete: () {
+                    final user =
+                        Provider.of<UserProvider>(context, listen: false);
+                    if (form.currentState!.validate()) {
+                      UserServices().updateMachineId(
+                        uid: user.user.uid,
+                        machineId: macCode.text,
+                      );
+                      navigate(
+                        type: PageType.push,
+                        context: context,
+                        page: const HomePage(),
+                      );
+                    }
+                  },
                   decoration: InputDecoration(
                     hintText: "Enter the scratch code",
                     icon: const Icon(FontAwesomeIcons.robot),
@@ -80,7 +105,13 @@ class _MachineConnectPageState extends State<MachineConnectPage> {
                 ),
                 color: elementsC,
                 onPressed: () {
+                  final user =
+                      Provider.of<UserProvider>(context, listen: false);
                   if (form.currentState!.validate()) {
+                    UserServices().updateMachineId(
+                      uid: user.user.uid,
+                      machineId: macCode.text,
+                    );
                     navigate(
                       type: PageType.push,
                       context: context,

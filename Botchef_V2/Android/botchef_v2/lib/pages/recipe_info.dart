@@ -1,10 +1,13 @@
 import 'package:botchef_v2/db/favorite.dart';
 import 'package:botchef_v2/db/variant.dart';
+import 'package:botchef_v2/models/comments.dart';
 import 'package:botchef_v2/models/recipe.dart';
 import 'package:botchef_v2/models/variant.dart';
 import 'package:botchef_v2/pages/user_macro.dart';
 import 'package:botchef_v2/providers/user_provider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_pagination/firebase_pagination.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
@@ -126,9 +129,9 @@ class _RecipeInfoPageState extends State<RecipeInfoPage> {
                             ),
                           ),
                         ),
-                        const TextSpan(
-                          text: "4.8",
-                          style: TextStyle(
+                        TextSpan(
+                          text: widget.recipe.rating!.toString(),
+                          style: const TextStyle(
                             color: Colors.black,
                             fontWeight: FontWeight.bold,
                           ),
@@ -297,6 +300,51 @@ class _RecipeInfoPageState extends State<RecipeInfoPage> {
                   ),
                 ),
               ),
+              const Align(
+                alignment: Alignment.centerLeft,
+                child: Padding(
+                  padding: EdgeInsets.all(20.0),
+                  child: Text(
+                    "Comments",
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ),
+              FirestorePagination(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  query: FirebaseFirestore.instance
+                      .collection("comments")
+                      .where("rid", isEqualTo: widget.recipe.rid!),
+                  itemBuilder: (context, documentSnapshot, index) {
+                    CommentModel comment =
+                        CommentModel.fromSnapshot(documentSnapshot);
+                    return Padding(
+                      padding: const EdgeInsets.all(10.0),
+                      child: Container(
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          color: primaryC,
+                          border: Border.all(),
+                          borderRadius:
+                              const BorderRadius.all(Radius.circular(40)),
+                        ),
+                        child: ListTile(
+                          leading: Text(
+                            "Rating:\n${comment.rating.toString()}",
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(
+                                fontWeight: FontWeight.bold, fontSize: 15),
+                          ),
+                          title: Text(comment.comment!),
+                          subtitle: Text(
+                            "Name: ${comment.name!}",
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ),
+                    );
+                  })
             ],
           ),
         ),

@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 import '../models/user.dart';
 
@@ -21,9 +22,15 @@ class UserServices {
         'created_on': DateTime.now(),
         "machineId": "",
       });
-      debugPrint("USER has CREATED");
+      debugPrint("Machine id updated successfully!");
+      Fluttertoast.showToast(
+          msg: "Machine id updated successfully.",
+          backgroundColor: Colors.green);
     } catch (e) {
       debugPrint('ERROR: ${e.toString()}');
+
+      Fluttertoast.showToast(
+          msg: "Failed to update Machine id!", backgroundColor: Colors.red);
     }
   }
 

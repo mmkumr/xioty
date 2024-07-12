@@ -1,8 +1,10 @@
 import 'package:botchef_v2/firebase_options.dart';
+import 'package:botchef_v2/pages/machine_connect.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'pages/home.dart';
 import 'pages/login.dart';
@@ -48,6 +50,19 @@ class ScreensController extends StatefulWidget {
 }
 
 class _ScreensControllerState extends State<ScreensController> {
+  StatefulWidget? page;
+  @override
+  void didChangeDependencies() async {
+    final user = Provider.of<UserProvider>(context);
+    if (user.userModel.machineId!.isEmpty) {
+      page = const MachineConnectPage();
+    } else {
+      page = await firstTime();
+    }
+    setState(() {});
+    super.didChangeDependencies();
+  }
+
   @override
   Widget build(BuildContext context) {
     final user = Provider.of<UserProvider>(context);
@@ -66,7 +81,19 @@ class _ScreensControllerState extends State<ScreensController> {
           ),
         );
       case Status.authenticated:
-        return const HomePage();
+        return page!;
+    }
+  }
+
+  Future<StatefulWidget> firstTime() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    bool first = preferences.getBool('first_time') ?? true;
+    debugPrint(first.toString());
+    if (first) {
+      preferences.setBool('first_time', false);
+      return const MachineConnectPage();
+    } else {
+      return const HomePage();
     }
   }
 }

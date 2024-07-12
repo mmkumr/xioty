@@ -1,4 +1,8 @@
+import 'package:botchef_v2/db/recipe.dart';
+import 'package:botchef_v2/db/variant.dart';
 import 'package:botchef_v2/models/edited_recipes.dart';
+import 'package:botchef_v2/models/recipe.dart';
+import 'package:botchef_v2/models/variant.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
@@ -8,50 +12,58 @@ class EditedRecipeServices {
 
   Future update({
     required String uid,
-    required EditedRecipeModel editRecipe,
+    required String rid,
+    required String vid,
+    required List solidMicro,
+    required List liquidMicro,
   }) async {
     try {
       await _firestore.collection(collection).doc(uid).update({
-        editRecipe.vid!: {
-          "rid": editRecipe.rid!,
-          "solidMicro": editRecipe.solidMicro!,
-          "liquidMicro": editRecipe.liquidMicro!,
+        vid: {
+          "rid": rid,
+          "solidMicro": solidMicro,
+          "liquidMicro": liquidMicro,
         },
       });
     } catch (e) {
       debugPrint('ERROR: ${e.toString()}');
+      await _firestore.collection(collection).doc(uid).set({
+        vid: {
+          "rid": rid,
+          "solidMicro": solidMicro,
+          "liquidMicro": liquidMicro,
+        },
+      });
     }
   }
 
-  Future<List> getById({
+  Future<EditedRecipeModel> getById({
     required String uid,
     required String vid,
   }) async {
-    try {
-      return _firestore.collection(collection).doc(uid).get().then((value) {
-        if (value.data() != null) {
-          return value.data()![vid];
-        } else {
-          return [];
-        }
+    return _firestore.collection(collection).doc(uid).get().then((value) async {
+      Map data = value.data()![vid];
+      VariantModel variant = await VariantServices().getById(vid);
+      RecipeModel recipe = await RecipeServices().getById(data["rid"]);
+      return EditedRecipeModel.fromMap({
+        "uid": uid,
+        "vModel": variant,
+        "rModel": recipe,
+        "solidMicro": data["solidMicro"],
+        "liquidMicro": data["liquidMicro"],
       });
-    } catch (e) {
-      debugPrint('ERROR: ${e.toString()}');
-      return [];
-    }
+    });
   }
 
   Future<List<EditedRecipeModel>> myEditedRecipes(String uid) {
-    return _firestore.collection(collection).doc(uid).get().then((value) {
-      return value.data()!.keys.map((e) {
-        return EditedRecipeModel.fromMap({
-          "uid": uid,
-          "vid": e,
-          "rid": value.data()![e]["rid"],
-          "solidMicro": value.data()![e]["solidMicro"],
-          "liquidMicro": value.data()![e]["liquidMicro"],
-        });
-      }).toList();
+    return _firestore.collection(collection).doc(uid).get().then((value) async {
+      List<EditedRecipeModel> data = [];
+      for (var element in value.data()!.keys) {
+        EditedRecipeModel editedRecipe = await getById(uid: uid, vid: element);
+        debugPrint(editedRecipe.rModel!.photoUrl);
+        data.add(editedRecipe);
+      }
+      return data;
     });
   }
 }

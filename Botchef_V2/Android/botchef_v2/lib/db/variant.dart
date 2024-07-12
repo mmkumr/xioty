@@ -8,8 +8,8 @@ class VariantServices {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   String collection = "variants";
   Algolia algoliaApp = const Algolia.init(
-    applicationId: 'BBEIAKOTBC', //ApplicationID,
-    apiKey: '0246a68e8bbbfa69cb719e672ff2cd84', //Admin api key in flutter code
+    applicationId: 'KWPCAWUHDW', //ApplicationID,
+    apiKey: 'bf30ae35483ea194e02366cd3bf0737e', //Admin api key in flutter code
   );
 
   fill() async {
@@ -55,14 +55,14 @@ class VariantServices {
     });
   }
 
-  create({
+  Future<String> create({
     required String rid,
     required String description,
     required String spicy,
     required String portionSize,
   }) async {
     try {
-      await _firestore.collection(collection).add({
+      DocumentReference data = await _firestore.collection(collection).add({
         "rid": rid,
         "description": description,
         "spicy": spicy,
@@ -74,8 +74,10 @@ class VariantServices {
         "cookingTime": "",
       });
       debugPrint("Variant has CREATED");
+      return data.id;
     } catch (e) {
       debugPrint('ERROR: ${e.toString()}');
+      return "";
     }
   }
 
