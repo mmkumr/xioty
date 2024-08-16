@@ -397,7 +397,8 @@ class _ProcessPageState extends State<ProcessPage> {
                       ),
                       children: [
                         for (int i = 0; i < widget.variant.macros!.length; i++)
-                          widget.variant.macros![i]["name"].isEmpty
+                          widget.variant.macros![i]["name"].isEmpty ||
+                                  widget.variant.macros![i]["param"] == "0"
                               ? Container()
                               : Padding(
                                   padding: const EdgeInsets.all(8.0),
@@ -456,7 +457,8 @@ class _ProcessPageState extends State<ProcessPage> {
                         for (int i = 0;
                             i < widget.variant.solidMicros!.length;
                             i++)
-                          widget.variant.solidMicros![i]["name"].isEmpty
+                          widget.variant.solidMicros![i]["name"].isEmpty ||
+                                  widget.variant.solidMicros![i]["param"] == "0"
                               ? Container()
                               : Padding(
                                   padding: const EdgeInsets.all(8.0),
@@ -516,7 +518,9 @@ class _ProcessPageState extends State<ProcessPage> {
                         for (int i = 0;
                             i < widget.variant.liquidMicros!.length;
                             i++)
-                          widget.variant.liquidMicros![i]["name"].isEmpty
+                          widget.variant.liquidMicros![i]["name"].isEmpty ||
+                                  widget.variant.liquidMicros![i]["param"] ==
+                                      "0"
                               ? Container()
                               : Padding(
                                   padding: const EdgeInsets.all(8.0),

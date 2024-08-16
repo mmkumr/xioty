@@ -5,6 +5,7 @@ import 'package:botchef_v2/models/recipe.dart';
 import 'package:botchef_v2/models/variant.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class EditedRecipeServices {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -25,6 +26,9 @@ class EditedRecipeServices {
           "liquidMicro": liquidMicro,
         },
       });
+      Fluttertoast.showToast(
+          msg: "Your changes have been save in editedRecipes.",
+          backgroundColor: Colors.green);
     } catch (e) {
       debugPrint('ERROR: ${e.toString()}');
       await _firestore.collection(collection).doc(uid).set({
@@ -34,6 +38,9 @@ class EditedRecipeServices {
           "liquidMicro": liquidMicro,
         },
       });
+      Fluttertoast.showToast(
+          msg: "Your changes have been save in editedRecipes.",
+          backgroundColor: Colors.green);
     }
   }
 

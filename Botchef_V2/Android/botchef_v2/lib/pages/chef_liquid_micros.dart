@@ -43,7 +43,7 @@ class _ChefLiquidMicroState extends State<ChefLiquidMicro> {
           List.generate(nos, (index) => TextEditingController(text: "0"));
       photoUrl = List.generate(nos, (index) => "");
       description = List.generate(nos, (index) => TextEditingController());
-      liquidMicros[0] = TextEditingController(text: "Refined Oiled");
+      liquidMicros[0] = TextEditingController(text: "Refined Oil");
       liquidMicros[1] = TextEditingController(text: "Tomato Sauce");
       liquidMicros[2] = TextEditingController(text: "Chilli Sauce");
     } else {
