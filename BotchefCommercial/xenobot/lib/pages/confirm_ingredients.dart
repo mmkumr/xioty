@@ -1,7 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:xenobot/pages/chef_my_recipes.dart';
 import 'package:xenobot/partials/appbar.dart';
 import 'package:xenobot/partials/menu.dart';
@@ -26,11 +25,12 @@ class _ConfirmIngredientsPageState extends State<ConfirmIngredientsPage> {
 
   List<TextEditingController> quantities = [];
   GlobalKey<FormState> formKey = GlobalKey<FormState>();
-  List<String> cupSizes = ["150 ml"];
+  List<String> cupSizes = ["150 ml", "250 ml", "350 ml"];
   List<String> bases = ["Milk", "Evaporated Milk", "Black Tea", "Green Tea"];
   List sweetners = ["Sugar", "Honey", "Jagery"];
   List flavours = ["Chocolate", "Masala", "Rose"];
   int ingredientsTotalQuantity = 0;
+  String cupSize = "150 ml";
   @override
   Widget build(BuildContext context) {
     ingredientsTotalQuantity = 0;
@@ -48,6 +48,11 @@ class _ConfirmIngredientsPageState extends State<ConfirmIngredientsPage> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
+                  const Text(
+                    "Verify Ingredients quantity & Price",
+                    softWrap: true,
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
                   Padding(
                     padding: const EdgeInsets.all(10.0),
                     child: Container(
@@ -69,28 +74,38 @@ class _ConfirmIngredientsPageState extends State<ConfirmIngredientsPage> {
                   Padding(
                     padding: const EdgeInsets.only(left: 30.0),
                     child: ListTile(
-                      trailing: Text(
-                        "$ingredientsTotalQuantity ml",
+                      leading: const Text(
+                        "Cup Size",
                         softWrap: true,
                         style: TextStyle(
                           fontSize: 20,
-                          color: ingredientsTotalQuantity > 140
-                              ? Colors.red
-                              : Colors.green,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                       title: Row(
                         children: [
                           Expanded(
-                            child: Text(
-                              "Cup Size ${cupSizes[0]}",
-                              style:
-                                  const TextStyle(fontWeight: FontWeight.bold),
+                            child: DropdownButtonFormField(
+                              value: cupSize,
+                              items: cupSizes.map((String items) {
+                                return DropdownMenuItem(
+                                  value: items,
+                                  child: Text(items),
+                                );
+                              }).toList(),
+                              onChanged: (String? value) {
+                                setState(() {
+                                  cupSize = value!;
+                                });
+                              },
+                              decoration: const InputDecoration(
+                                hintText: "Cup Size",
+                              ),
                             ),
                           ),
                           Expanded(
                             child: TextFormField(
+                              readOnly: true,
                               controller: quantities[0],
                               style: const TextStyle(color: Colors.black),
                               decoration: InputDecoration(
@@ -156,7 +171,7 @@ class _ConfirmIngredientsPageState extends State<ConfirmIngredientsPage> {
                             Expanded(
                               child: TextFormField(
                                 readOnly: true,
-                                controller: quantities[index + cupSizes.length],
+                                controller: quantities[index + 1],
                                 style: const TextStyle(color: Colors.black),
                                 onChanged: (val) {
                                   if (val.isNotEmpty) {
@@ -231,8 +246,8 @@ class _ConfirmIngredientsPageState extends State<ConfirmIngredientsPage> {
                                     setState(() {});
                                   }
                                 },
-                                controller: quantities[
-                                    index + cupSizes.length + bases.length],
+                                controller:
+                                    quantities[index + 1 + bases.length],
                                 style: const TextStyle(color: Colors.black),
                                 decoration: InputDecoration(
                                   filled: true,
@@ -303,7 +318,7 @@ class _ConfirmIngredientsPageState extends State<ConfirmIngredientsPage> {
                                   }
                                 },
                                 controller: quantities[index +
-                                    cupSizes.length +
+                                    1 +
                                     bases.length +
                                     sweetners.length],
                                 style: const TextStyle(color: Colors.black),

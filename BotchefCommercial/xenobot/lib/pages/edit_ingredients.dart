@@ -90,35 +90,6 @@ class _EditIngredientsPageState extends State<EditIngredientsPage> {
                                   const TextStyle(fontWeight: FontWeight.bold),
                             ),
                           ),
-                          Expanded(
-                            child: TextFormField(
-                              controller: quantities[0],
-                              style: const TextStyle(color: Colors.black),
-                              decoration: InputDecoration(
-                                filled: true,
-                                fillColor: const Color(0xfff6f2f2),
-                                label: const Text(
-                                  "Price",
-                                  style: TextStyle(
-                                      color: Colors.black,
-                                      fontWeight: FontWeight.bold),
-                                ),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(10.0),
-                                ),
-                              ),
-                              keyboardType: TextInputType.number,
-                              inputFormatters: <TextInputFormatter>[
-                                FilteringTextInputFormatter.digitsOnly,
-                              ],
-                              validator: (value) {
-                                if (value!.isEmpty) {
-                                  return "Enter valid Price";
-                                }
-                                return null;
-                              },
-                            ),
-                          ),
                         ],
                       ),
                     ),
