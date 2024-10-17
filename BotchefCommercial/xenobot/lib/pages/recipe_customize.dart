@@ -5,6 +5,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:number_inc_dec/number_inc_dec.dart';
 import 'package:xenobot/pages/order_preparing.dart';
 import 'package:xenobot/partials/appbar.dart';
 import 'package:xenobot/partials/menu.dart';
@@ -23,7 +24,8 @@ class _CustomizeRecipePageState extends State<CustomizeRecipePage> {
   @override
   void initState() {
     super.initState();
-    quantity = List.generate(nos, (index) => TextEditingController(text: "0"));
+    quantities =
+        List.generate(nos, (index) => TextEditingController(text: "0"));
     cupSize = cupSizes[0];
   }
 
@@ -33,11 +35,21 @@ class _CustomizeRecipePageState extends State<CustomizeRecipePage> {
     "250 ml",
     "350 ml",
   ];
-  List<TextEditingController> quantity = [];
+
+  GlobalKey<FormState> formKey = GlobalKey<FormState>();
+  List<TextEditingController> quantities = [];
   List sweetners = ["Sugar", "Honey", "Jagery"];
   List flavours = ["Chocolate", "Masala", "Rose"];
+  int ingredientsTotalQuantity = 0, remainingQuantity = 0;
+
   @override
   Widget build(BuildContext context) {
+    ingredientsTotalQuantity = 0;
+    for (var quantity in quantities) {
+      ingredientsTotalQuantity += int.parse(quantity.text);
+    }
+    remainingQuantity = 130 - ingredientsTotalQuantity;
+
     return Scaffold(
       appBar: appbar,
       drawer: menu(context),
@@ -153,31 +165,22 @@ class _CustomizeRecipePageState extends State<CustomizeRecipePage> {
                               ),
                             ),
                             Expanded(
-                              child: TextFormField(
-                                controller: quantity[index],
-                                style: const TextStyle(color: Colors.white),
-                                decoration: InputDecoration(
-                                  filled: true,
-                                  fillColor: Colors.black,
-                                  label: const Text(
-                                    "ml",
-                                    style: TextStyle(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10.0),
-                                  ),
-                                ),
-                                keyboardType: TextInputType.number,
-                                inputFormatters: <TextInputFormatter>[
-                                  FilteringTextInputFormatter.digitsOnly,
-                                ],
-                                validator: (value) {
-                                  if (value!.isEmpty) {
-                                    return "Enter valid quantity";
-                                  }
-                                  return null;
+                              child: NumberInputWithIncrementDecrement(
+                                controller: quantities[index],
+                                min: 0,
+                                max: int.parse(quantities[index].text) +
+                                    remainingQuantity,
+                                onIncrement: (newValue) {
+                                  updateSweetnersText(newValue, index);
+                                },
+                                onDecrement: (newValue) {
+                                  updateSweetnersText(newValue, index);
+                                },
+                                onSubmitted: (newValue) {
+                                  updateSweetnersText(newValue, index);
+                                },
+                                onChanged: (newValue) {
+                                  updateSweetnersText(newValue, index);
                                 },
                               ),
                             ),
@@ -217,31 +220,25 @@ class _CustomizeRecipePageState extends State<CustomizeRecipePage> {
                               ),
                             ),
                             Expanded(
-                              child: TextFormField(
-                                controller: quantity[index + 3],
-                                style: const TextStyle(color: Colors.white),
-                                decoration: InputDecoration(
-                                  filled: true,
-                                  fillColor: Colors.black,
-                                  label: const Text(
-                                    "ml",
-                                    style: TextStyle(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10.0),
-                                  ),
-                                ),
-                                keyboardType: TextInputType.number,
-                                inputFormatters: <TextInputFormatter>[
-                                  FilteringTextInputFormatter.digitsOnly,
-                                ],
-                                validator: (value) {
-                                  if (value!.isEmpty) {
-                                    return "Enter valid quantity";
-                                  }
-                                  return null;
+                              child: NumberInputWithIncrementDecrement(
+                                controller:
+                                    quantities[index + sweetners.length],
+                                min: 0,
+                                max: int.parse(
+                                        quantities[index + sweetners.length]
+                                            .text) +
+                                    remainingQuantity,
+                                onIncrement: (newValue) {
+                                  updateFlavoursText(newValue, index);
+                                },
+                                onDecrement: (newValue) {
+                                  updateFlavoursText(newValue, index);
+                                },
+                                onSubmitted: (newValue) {
+                                  updateFlavoursText(newValue, index);
+                                },
+                                onChanged: (newValue) {
+                                  updateFlavoursText(newValue, index);
                                 },
                               ),
                             ),
@@ -288,6 +285,20 @@ class _CustomizeRecipePageState extends State<CustomizeRecipePage> {
         ),
       ),
     );
+  }
+
+  // Function for updating the state after any event of the number_inc_dec widget in Sweetners values section to update the ingredientsTotalQuantity variable.
+  updateSweetnersText(num newValue, int index) {
+    setState(() {
+      quantities[index].text = newValue.toString();
+    });
+  }
+
+  // Function for updating the state after any event of the number_inc_dec widget in Sweetners values section to update the ingredientsTotalQuantity variable.
+  updateFlavoursText(num newValue, int index) {
+    setState(() {
+      quantities[index + sweetners.length].text = newValue.toString();
+    });
   }
 
   savePreference() async {

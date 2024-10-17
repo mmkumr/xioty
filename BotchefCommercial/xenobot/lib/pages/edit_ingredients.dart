@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:number_inc_dec/number_inc_dec.dart';
 import 'package:xenobot/pages/chef_my_recipes.dart';
 import 'package:xenobot/pages/confirm_ingredients.dart';
 import 'package:xenobot/partials/appbar.dart';
@@ -31,53 +32,119 @@ class _EditIngredientsPageState extends State<EditIngredientsPage> {
   List<String> bases = ["Milk", "Evaporated Milk", "Black Tea", "Green Tea"];
   List sweetners = ["Sugar", "Honey", "Jagery"];
   List flavours = ["Chocolate", "Masala", "Rose"];
-  int ingredientsTotalQuantity = 0;
+  int ingredientsTotalQuantity = 0, remainingQuantity = 0;
+  bool readOnly = false;
   @override
   Widget build(BuildContext context) {
     ingredientsTotalQuantity = 0;
     for (var quantity in quantities) {
       ingredientsTotalQuantity += int.parse(quantity.text);
     }
+    remainingQuantity = 130 - ingredientsTotalQuantity;
+
     return Scaffold(
       appBar: appbar,
       drawer: menu(context),
-      body: Flexible(
-        child: SingleChildScrollView(
-          child: Form(
-            key: formKey,
-            child: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(10.0),
-                    child: Container(
-                      decoration: const BoxDecoration(
-                        shape: BoxShape.circle,
-                      ),
-                      child: const CircleAvatar(
-                        radius: 80,
-                        backgroundImage: CachedNetworkImageProvider(
-                            "https://c8.alamy.com/comp/2F1KG86/cup-of-healthy-garlic-tea-on-white-background-2F1KG86.jpg"),
-                      ),
+      body: SingleChildScrollView(
+        child: Form(
+          key: formKey,
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: Container(
+                    decoration: const BoxDecoration(
+                      shape: BoxShape.circle,
+                    ),
+                    child: const CircleAvatar(
+                      radius: 80,
+                      backgroundImage: CachedNetworkImageProvider(
+                          "https://c8.alamy.com/comp/2F1KG86/cup-of-healthy-garlic-tea-on-white-background-2F1KG86.jpg"),
                     ),
                   ),
-                  const Text(
-                    "Irani Tea",
-                    softWrap: true,
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+                ),
+                const Text(
+                  "Irani Tea",
+                  softWrap: true,
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(left: 30.0),
+                  child: ListTile(
+                    trailing: Text(
+                      "$ingredientsTotalQuantity ml",
+                      softWrap: true,
+                      style: TextStyle(
+                        fontSize: 20,
+                        color: ingredientsTotalQuantity > 130
+                            ? Colors.red
+                            : Colors.green,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    title: Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            "Cup Size ${cupSizes[0]}",
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                        Expanded(
+                          child: TextFormField(
+                            readOnly: true,
+                            controller: quantities[0],
+                            style: const TextStyle(color: Colors.black),
+                            decoration: InputDecoration(
+                              filled: true,
+                              fillColor: const Color(0xfff6f2f2),
+                              label: const Text(
+                                "Price",
+                                style: TextStyle(
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10.0),
+                              ),
+                            ),
+                            keyboardType: TextInputType.number,
+                            inputFormatters: <TextInputFormatter>[
+                              FilteringTextInputFormatter.digitsOnly,
+                            ],
+                            validator: (value) {
+                              if (value!.isEmpty) {
+                                return "Enter valid Price";
+                              }
+                              return null;
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
+                ),
+                const Padding(
+                  padding: EdgeInsets.only(left: 30.0),
+                  child: Align(
+                    alignment: Alignment.topLeft,
+                    child: Text(
+                      "Base",
+                      style:
+                          TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+                    ),
+                  ),
+                ),
+                for (int index = 0; index < bases.length; index++)
                   Padding(
                     padding: const EdgeInsets.only(left: 30.0),
                     child: ListTile(
-                      trailing: Text(
-                        "$ingredientsTotalQuantity ml",
-                        softWrap: true,
+                      trailing: const Text(
+                        "ml",
                         style: TextStyle(
                           fontSize: 20,
-                          color: ingredientsTotalQuantity > 140
-                              ? Colors.red
-                              : Colors.green,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -85,268 +152,214 @@ class _EditIngredientsPageState extends State<EditIngredientsPage> {
                         children: [
                           Expanded(
                             child: Text(
-                              "Cup Size ${cupSizes[0]}",
+                              bases[index],
                               style:
                                   const TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                          Expanded(
+                            child: NumberInputWithIncrementDecrement(
+                              controller: quantities[index + cupSizes.length],
+                              min: 0,
+                              max: int.parse(quantities[index + cupSizes.length]
+                                      .text) +
+                                  remainingQuantity,
+                              onIncrement: (newValue) {
+                                updateBaseText(newValue, index);
+                              },
+                              onDecrement: (newValue) {
+                                updateBaseText(newValue, index);
+                              },
+                              onSubmitted: (newValue) {
+                                updateBaseText(newValue, index);
+                              },
+                              onChanged: (newValue) {
+                                updateBaseText(newValue, index);
+                              },
                             ),
                           ),
                         ],
                       ),
                     ),
                   ),
-                  const Padding(
-                    padding: EdgeInsets.only(left: 30.0),
-                    child: Align(
-                      alignment: Alignment.topLeft,
-                      child: Text(
-                        "Base",
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 20),
-                      ),
+                const Padding(
+                  padding: EdgeInsets.only(left: 30.0),
+                  child: Align(
+                    alignment: Alignment.topLeft,
+                    child: Text(
+                      "Sweetners",
+                      style:
+                          TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
                     ),
                   ),
-                  for (int index = 0; index < bases.length; index++)
-                    Padding(
-                      padding: const EdgeInsets.only(left: 30.0),
-                      child: ListTile(
-                        trailing: const Text(
-                          "ml",
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        title: Row(
-                          children: [
-                            Expanded(
-                              child: Text(
-                                bases[index],
-                                style: const TextStyle(
-                                    fontWeight: FontWeight.bold),
-                              ),
-                            ),
-                            Expanded(
-                              child: TextFormField(
-                                controller: quantities[index + cupSizes.length],
-                                style: const TextStyle(color: Colors.black),
-                                onChanged: (val) {
-                                  if (val.isNotEmpty) {
-                                    setState(() {});
-                                  }
-                                },
-                                decoration: InputDecoration(
-                                  filled: true,
-                                  fillColor: const Color(0xfff6f2f2),
-                                  label: const Text(
-                                    "ml",
-                                    style: TextStyle(
-                                        color: Colors.black,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10.0),
-                                  ),
-                                ),
-                                keyboardType: TextInputType.number,
-                                inputFormatters: <TextInputFormatter>[
-                                  FilteringTextInputFormatter.digitsOnly,
-                                ],
-                                validator: (value) {
-                                  if (value!.isEmpty) {
-                                    return "Enter valid quantity";
-                                  }
-                                  return null;
-                                },
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  const Padding(
-                    padding: EdgeInsets.only(left: 30.0),
-                    child: Align(
-                      alignment: Alignment.topLeft,
-                      child: Text(
-                        "Sweetners",
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 20),
-                      ),
-                    ),
-                  ),
-                  for (int index = 0; index < sweetners.length; index++)
-                    Padding(
-                      padding: const EdgeInsets.only(left: 30.0),
-                      child: ListTile(
-                        trailing: const Text(
-                          "ml",
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        title: Row(
-                          children: [
-                            Expanded(
-                              child: Text(
-                                sweetners[index],
-                                style: const TextStyle(
-                                    fontWeight: FontWeight.bold),
-                              ),
-                            ),
-                            Expanded(
-                              child: TextFormField(
-                                onChanged: (val) {
-                                  if (val.isNotEmpty) {
-                                    setState(() {});
-                                  }
-                                },
-                                controller: quantities[
-                                    index + cupSizes.length + bases.length],
-                                style: const TextStyle(color: Colors.black),
-                                decoration: InputDecoration(
-                                  filled: true,
-                                  fillColor: const Color(0xfff6f2f2),
-                                  label: const Text(
-                                    "ml",
-                                    style: TextStyle(
-                                        color: Colors.black,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10.0),
-                                  ),
-                                ),
-                                keyboardType: TextInputType.number,
-                                inputFormatters: <TextInputFormatter>[
-                                  FilteringTextInputFormatter.digitsOnly,
-                                ],
-                                validator: (value) {
-                                  if (value!.isEmpty) {
-                                    return "Enter valid quantity";
-                                  }
-                                  return null;
-                                },
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  const Padding(
-                    padding: EdgeInsets.only(left: 30.0),
-                    child: Align(
-                      alignment: Alignment.topLeft,
-                      child: Text(
-                        "Flavours",
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 20),
-                      ),
-                    ),
-                  ),
-                  for (int index = 0; index < flavours.length; index++)
-                    Padding(
-                      padding: const EdgeInsets.only(left: 30.0),
-                      child: ListTile(
-                        trailing: const Text(
-                          "ml",
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        title: Row(
-                          children: [
-                            Expanded(
-                              child: Text(
-                                flavours[index],
-                                style: const TextStyle(
-                                    fontWeight: FontWeight.bold),
-                              ),
-                            ),
-                            Expanded(
-                              child: TextFormField(
-                                onChanged: (val) {
-                                  if (val.isNotEmpty) {
-                                    setState(() {});
-                                  }
-                                },
-                                controller: quantities[index +
-                                    cupSizes.length +
-                                    bases.length +
-                                    sweetners.length],
-                                style: const TextStyle(color: Colors.black),
-                                decoration: InputDecoration(
-                                  filled: true,
-                                  fillColor: const Color(0xfff6f2f2),
-                                  label: const Text(
-                                    "ml",
-                                    style: TextStyle(
-                                        color: Colors.black,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10.0),
-                                  ),
-                                ),
-                                keyboardType: TextInputType.number,
-                                inputFormatters: <TextInputFormatter>[
-                                  FilteringTextInputFormatter.digitsOnly,
-                                ],
-                                validator: (value) {
-                                  if (value!.isEmpty) {
-                                    return "Enter valid quantity";
-                                  }
-                                  return null;
-                                },
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
+                ),
+                for (int index = 0; index < sweetners.length; index++)
                   Padding(
-                    padding: const EdgeInsets.all(15.0),
-                    child: MaterialButton(
-                      elevation: 10,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(40),
+                    padding: const EdgeInsets.only(left: 30.0),
+                    child: ListTile(
+                      trailing: const Text(
+                        "ml",
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                      color: elementsC,
-                      onPressed: () {
-                        if (ingredientsTotalQuantity > 140) {
-                          Fluttertoast.showToast(
-                              msg:
-                                  "Total quantity should not be more than 140ml",
-                              backgroundColor: Colors.red);
-                        } else {
-                          navigate(
-                              type: PageType.replace,
-                              context: context,
-                              page: const ConfirmIngredientsPage());
-                        }
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.only(
-                            left: 15.0, right: 15.0, top: 10, bottom: 10),
-                        child: Text(
-                          "Next",
-                          style: TextStyle(
-                            fontSize: 20,
-                            color: elementsC.computeLuminance() > 0.5
-                                ? Colors.black
-                                : Colors.white,
+                      title: Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              sweetners[index],
+                              style:
+                                  const TextStyle(fontWeight: FontWeight.bold),
+                            ),
                           ),
+                          Expanded(
+                            child: NumberInputWithIncrementDecrement(
+                              controller: quantities[
+                                  index + cupSizes.length + bases.length],
+                              min: 0,
+                              max: int.parse(quantities[index +
+                                          cupSizes.length +
+                                          bases.length]
+                                      .text) +
+                                  remainingQuantity,
+                              onIncrement: (newValue) {
+                                updateSweetnersText(newValue, index);
+                              },
+                              onDecrement: (newValue) {
+                                updateSweetnersText(newValue, index);
+                              },
+                              onSubmitted: (newValue) {
+                                updateSweetnersText(newValue, index);
+                              },
+                              onChanged: (newValue) {
+                                updateSweetnersText(newValue, index);
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                const Padding(
+                  padding: EdgeInsets.only(left: 30.0),
+                  child: Align(
+                    alignment: Alignment.topLeft,
+                    child: Text(
+                      "Flavours",
+                      style:
+                          TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+                    ),
+                  ),
+                ),
+                for (int index = 0; index < flavours.length; index++)
+                  Padding(
+                    padding: const EdgeInsets.only(left: 30.0),
+                    child: ListTile(
+                      trailing: const Text(
+                        "ml",
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      title: Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              flavours[index],
+                              style:
+                                  const TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                          Expanded(
+                            child: NumberInputWithIncrementDecrement(
+                              controller: quantities[index +
+                                  cupSizes.length +
+                                  bases.length +
+                                  sweetners.length],
+                              min: 0,
+                              max: int.parse(quantities[index +
+                                          cupSizes.length +
+                                          bases.length +
+                                          sweetners.length]
+                                      .text) +
+                                  remainingQuantity,
+                              onIncrement: (newValue) {
+                                updateFlavoursText(newValue, index);
+                              },
+                              onDecrement: (newValue) {
+                                updateFlavoursText(newValue, index);
+                              },
+                              onSubmitted: (newValue) {
+                                updateFlavoursText(newValue, index);
+                              },
+                              onChanged: (newValue) {
+                                updateFlavoursText(newValue, index);
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                Padding(
+                  padding: const EdgeInsets.all(15.0),
+                  child: MaterialButton(
+                    elevation: 10,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(40),
+                    ),
+                    color: elementsC,
+                    onPressed: () {
+                      navigate(
+                          type: PageType.replace,
+                          context: context,
+                          page: const ChefMyRecipe());
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.only(
+                          left: 15.0, right: 15.0, top: 10, bottom: 10),
+                      child: Text(
+                        "Next",
+                        style: TextStyle(
+                          fontSize: 20,
+                          color: elementsC.computeLuminance() > 0.5
+                              ? Colors.black
+                              : Colors.white,
                         ),
                       ),
                     ),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ),
       ),
     );
+  }
+
+  // Function for updating the state after any event of the number_inc_dec widget in Base values section to update the ingredientsTotalQuantity variable.
+  updateBaseText(num newValue, int index) {
+    setState(() {
+      quantities[index + cupSizes.length].text = newValue.toString();
+    });
+  }
+
+  // Function for updating the state after any event of the number_inc_dec widget in Sweetners values section to update the ingredientsTotalQuantity variable.
+  updateSweetnersText(num newValue, int index) {
+    setState(() {
+      quantities[index + cupSizes.length + bases.length].text =
+          newValue.toString();
+    });
+  }
+
+  // Function for updating the state after any event of the number_inc_dec widget in Sweetners values section to update the ingredientsTotalQuantity variable.
+  updateFlavoursText(num newValue, int index) {
+    setState(() {
+      quantities[index + cupSizes.length + bases.length + sweetners.length]
+          .text = newValue.toString();
+    });
   }
 }

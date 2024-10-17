@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:xenobot/pages/scan_kiosk.dart';
 
 import '../commons.dart';
+import 'admin_login.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -19,11 +20,19 @@ class _LoginPageState extends State<LoginPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Padding(
-              padding: const EdgeInsets.all(15.0),
-              child: Image.asset(
-                "assets/imgs/logo.png",
-                height: 100,
+            InkWell(
+              onLongPress: () {
+                navigate(
+                    type: PageType.replace,
+                    context: context,
+                    page: const AdminLoginPage());
+              },
+              child: Padding(
+                padding: const EdgeInsets.all(15.0),
+                child: Image.asset(
+                  "assets/imgs/logo.png",
+                  height: 100,
+                ),
               ),
             ),
             const Padding(
