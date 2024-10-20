@@ -68,7 +68,7 @@ class _ContactUsPageState extends State<ContactUsPage> {
                   tileColor: Colors.white,
                   onTap: () {
                     launchUrl(
-                      Uri.parse("https://xara.com"),
+                      Uri.parse("https://xenobot.in"),
                     );
                   },
                   leading: const Icon(
@@ -84,7 +84,7 @@ class _ContactUsPageState extends State<ContactUsPage> {
                         style: TextStyle(
                             color: Colors.black, fontWeight: FontWeight.bold),
                       ),
-                      Text("xara.com"),
+                      Text("xenobot.in"),
                     ],
                   ),
                 ),

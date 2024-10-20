@@ -63,21 +63,6 @@ class _NewRecipePageState extends State<NewRecipePage> {
                     ),
                   ),
                   Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: TextFormField(
-                      readOnly: true,
-                      decoration: InputDecoration(
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10.0),
-                        ),
-                        filled: true,
-                        hintText: "Chef Name",
-                        labelText: "Chef Name",
-                        fillColor: const Color(0xfff6f2f2),
-                      ),
-                    ),
-                  ),
-                  Padding(
                     padding: const EdgeInsets.only(
                       top: 8.0,
                       bottom: 8,

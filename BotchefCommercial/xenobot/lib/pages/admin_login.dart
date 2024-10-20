@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:xenobot/commons.dart';
-import 'package:xenobot/pages/home.dart';
+import 'package:xenobot/pages/kiosks.dart';
 
 class AdminLoginPage extends StatefulWidget {
   const AdminLoginPage({super.key});
@@ -96,7 +96,7 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
                     navigate(
                         type: PageType.replace,
                         context: context,
-                        page: const HomePage());
+                        page: const KiosksPage());
                   },
                   child: Text(
                     "Admin Login",

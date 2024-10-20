@@ -1,10 +1,15 @@
+// ignore_for_file: unused_element
+
 /*
 [12:43 pm, 16/09/2024] Eswar Dora(Xioty Solution): 150, 250, 350
 [12:43 pm, 16/09/2024] Eswar Dora(Xioty Solution): ml
 */
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:number_inc_dec/number_inc_dec.dart';
+import 'package:razorpay_flutter/razorpay_flutter.dart';
+import 'package:xenobot/pages/home.dart';
 import 'package:xenobot/pages/order_preparing.dart';
 import 'package:xenobot/partials/appbar.dart';
 import 'package:xenobot/partials/menu.dart';
@@ -26,6 +31,15 @@ class _RecipeInfoPageState extends State<RecipeInfoPage> {
     quantities =
         List.generate(nos, (index) => TextEditingController(text: "0"));
     cupSize = cupSizes[0];
+    razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS, handlePaymentSuccess);
+    razorpay.on(Razorpay.EVENT_PAYMENT_ERROR, handlePaymentError);
+    razorpay.on(Razorpay.EVENT_EXTERNAL_WALLET, handleExternalWallet);
+  }
+
+  @override
+  void dispose() {
+    razorpay.clear(); // Removes all listeners
+    super.dispose();
   }
 
   String cupSize = "";
@@ -40,6 +54,7 @@ class _RecipeInfoPageState extends State<RecipeInfoPage> {
   List sweetners = ["Sugar", "Honey", "Jagery"];
   List flavours = ["Chocolate", "Masala", "Rose"];
   int ingredientsTotalQuantity = 0, remainingQuantity = 0;
+  Razorpay razorpay = Razorpay();
 
   @override
   Widget build(BuildContext context) {
@@ -123,10 +138,17 @@ class _RecipeInfoPageState extends State<RecipeInfoPage> {
                       ),
                       color: elementsC,
                       onPressed: () {
-                        navigate(
-                            type: PageType.replace,
-                            context: context,
-                            page: const OrderPreparingPage());
+                        var options = {
+                          'key': 'rzp_test_2Eh5LSk1v3ujdn',
+                          'amount': 10000,
+                          'name': 'Mukesh Kumar',
+                          'description': 'Irani Tea',
+                          'prefill': {
+                            'contact': '8337908779',
+                            'email': 'mmkumr.ping@gmail.com'
+                          }
+                        };
+                        razorpay.open(options);
                       },
                       child: Padding(
                         padding: const EdgeInsets.only(
@@ -285,10 +307,17 @@ class _RecipeInfoPageState extends State<RecipeInfoPage> {
                       onPressed: () async {
                         await savePreference();
                         if (context.mounted) {
-                          navigate(
-                              type: PageType.replace,
-                              context: context,
-                              page: const OrderPreparingPage());
+                          var options = {
+                            'key': 'rzp_test_2Eh5LSk1v3ujdn',
+                            'amount': 10000,
+                            'name': 'Mukesh Kumar',
+                            'description': 'Irani Tea',
+                            'prefill': {
+                              'contact': '8337908779',
+                              'email': 'mmkumr.ping@gmail.com'
+                            }
+                          };
+                          razorpay.open(options);
                         }
                       },
                       child: Padding(
@@ -312,9 +341,39 @@ class _RecipeInfoPageState extends State<RecipeInfoPage> {
           ),
         ),
       ),
+      bottomNavigationBar: Container(
+        color: primaryC,
+        child: const Row(
+          children: [
+            Expanded(
+              child: Text(
+                "Total Price: ₹128",
+                textAlign: TextAlign.center,
+                style: TextStyle(color: Colors.green, fontSize: 20),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
+  void handlePaymentSuccess(PaymentSuccessResponse response) {
+    navigate(
+        type: PageType.replace,
+        context: context,
+        page: const OrderPreparingPage());
+  }
+
+  void handlePaymentError(PaymentFailureResponse response) {
+    navigate(type: PageType.replace, context: context, page: const HomePage());
+    Fluttertoast.showToast(
+        msg: "Paymtment Failed", backgroundColor: Colors.red);
+  }
+
+  void handleExternalWallet(ExternalWalletResponse response) {
+    // Do something when an external wallet was selected
+  }
   savePreference() async {
     await showDialog(
       context: context,

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 Color elementsC = const Color(0xfff0ca91);
-Color primaryC = Colors.black12;
+Color primaryC = const Color(0xfff6f2f2);
 Color bgC = Colors.white;
 
 enum PageType { push, replace }
