@@ -1,25 +1,26 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:xenobot/pages/coupons.dart';
 import 'package:xenobot/pages/kiosks.dart';
 
 import '../commons.dart';
 
-class NewKioskPage extends StatefulWidget {
-  const NewKioskPage({super.key});
+class NewCouponsPage extends StatefulWidget {
+  const NewCouponsPage({super.key});
 
   @override
-  State<NewKioskPage> createState() => _NewKioskPageState();
+  State<NewCouponsPage> createState() => _NewCouponsPageState();
 }
 
-class _NewKioskPageState extends State<NewKioskPage> {
-  TextEditingController kioskId = TextEditingController(text: "6");
-  TextEditingController ownerName = TextEditingController();
-  TextEditingController address = TextEditingController();
+class _NewCouponsPageState extends State<NewCouponsPage> {
+  TextEditingController couponName = TextEditingController();
+  TextEditingController couponValue = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: bgC,
       appBar: AppBar(
-        title: const Text("New Kiosk"),
+        title: const Text("New Coupons"),
         centerTitle: true,
         backgroundColor: bgC,
         elevation: 0,
@@ -30,13 +31,13 @@ class _NewKioskPageState extends State<NewKioskPage> {
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: TextFormField(
-                controller: ownerName,
+                controller: couponName,
                 style: const TextStyle(color: Colors.black),
                 decoration: InputDecoration(
                   filled: true,
                   fillColor: const Color(0xfff6f2f2),
                   label: const Text(
-                    "Owner Name",
+                    "Coupon Text",
                     style: TextStyle(
                         color: Colors.black, fontWeight: FontWeight.bold),
                   ),
@@ -55,13 +56,13 @@ class _NewKioskPageState extends State<NewKioskPage> {
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: TextFormField(
-                controller: address,
+                controller: couponValue,
                 style: const TextStyle(color: Colors.black),
                 decoration: InputDecoration(
                   filled: true,
                   fillColor: const Color(0xfff6f2f2),
                   label: const Text(
-                    "Kiosk Address",
+                    "value in ₹",
                     style: TextStyle(
                         color: Colors.black, fontWeight: FontWeight.bold),
                   ),
@@ -69,6 +70,10 @@ class _NewKioskPageState extends State<NewKioskPage> {
                     borderRadius: BorderRadius.circular(10.0),
                   ),
                 ),
+                keyboardType: TextInputType.number,
+                inputFormatters: <TextInputFormatter>[
+                  FilteringTextInputFormatter.digitsOnly,
+                ],
                 validator: (value) {
                   if (value!.isEmpty) {
                     return "This field is required";
@@ -89,7 +94,7 @@ class _NewKioskPageState extends State<NewKioskPage> {
                   navigate(
                       type: PageType.replace,
                       context: context,
-                      page: const KiosksPage());
+                      page: const CouponsPage());
                 },
                 child: Padding(
                   padding: const EdgeInsets.only(

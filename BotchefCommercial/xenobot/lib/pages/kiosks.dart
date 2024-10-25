@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+import 'package:xenobot/pages/coupons.dart';
 import 'package:xenobot/pages/ingredients_level.dart';
 import 'package:xenobot/pages/new_kiosk.dart';
 import 'package:xenobot/pages/users.dart';
@@ -39,6 +41,19 @@ class _KiosksPageState extends State<KiosksPage> {
               child: const Text("Users"),
             ),
           ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: IconButton(
+              onPressed: () {
+                navigate(
+                    type: PageType.push,
+                    context: context,
+                    page: const CouponsPage());
+              },
+              color: elementsC,
+              icon: const Icon(FontAwesomeIcons.tag),
+            ),
+          ),
         ],
       ),
       body: Column(
@@ -55,7 +70,7 @@ class _KiosksPageState extends State<KiosksPage> {
                 color: elementsC,
                 onPressed: () {
                   navigate(
-                      type: PageType.push,
+                      type: PageType.replace,
                       context: context,
                       page: const NewKioskPage());
                 },
@@ -92,7 +107,7 @@ class _KiosksPageState extends State<KiosksPage> {
                             ListTile(
                               onTap: () {
                                 navigate(
-                                    type: PageType.push,
+                                    type: PageType.replace,
                                     context: context,
                                     page: const NewKioskPage());
                               },

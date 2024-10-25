@@ -1,8 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:qr_flutter/qr_flutter.dart';
 import 'package:xenobot/pages/ingredients_level.dart';
-import 'package:xenobot/pages/new_kiosk.dart';
 
 import '../commons.dart';
 
