@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:xenobot/pages/new_coupons.dart';
-import 'package:xenobot/pages/new_kiosk.dart';
 
 import '../commons.dart';
 

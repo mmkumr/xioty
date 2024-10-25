@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:number_inc_dec/number_inc_dec.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
+import 'package:xenobot/pages/checkout.dart';
 import 'package:xenobot/pages/home.dart';
 import 'package:xenobot/pages/order_preparing.dart';
 import 'package:xenobot/partials/appbar.dart';
@@ -31,9 +32,6 @@ class _RecipeInfoPageState extends State<RecipeInfoPage> {
     quantities =
         List.generate(nos, (index) => TextEditingController(text: "0"));
     cupSize = cupSizes[0];
-    razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS, handlePaymentSuccess);
-    razorpay.on(Razorpay.EVENT_PAYMENT_ERROR, handlePaymentError);
-    razorpay.on(Razorpay.EVENT_EXTERNAL_WALLET, handleExternalWallet);
   }
 
   @override
@@ -138,17 +136,10 @@ class _RecipeInfoPageState extends State<RecipeInfoPage> {
                       ),
                       color: elementsC,
                       onPressed: () {
-                        var options = {
-                          'key': 'rzp_test_2Eh5LSk1v3ujdn',
-                          'amount': 10000,
-                          'name': 'Mukesh Kumar',
-                          'description': 'Irani Tea',
-                          'prefill': {
-                            'contact': '8337908779',
-                            'email': 'mmkumr.ping@gmail.com'
-                          }
-                        };
-                        razorpay.open(options);
+                        navigate(
+                            type: PageType.replace,
+                            context: context,
+                            page: const CheckoutPage());
                       },
                       child: Padding(
                         padding: const EdgeInsets.only(
@@ -307,17 +298,10 @@ class _RecipeInfoPageState extends State<RecipeInfoPage> {
                       onPressed: () async {
                         await savePreference();
                         if (context.mounted) {
-                          var options = {
-                            'key': 'rzp_test_2Eh5LSk1v3ujdn',
-                            'amount': 10000,
-                            'name': 'Mukesh Kumar',
-                            'description': 'Irani Tea',
-                            'prefill': {
-                              'contact': '8337908779',
-                              'email': 'mmkumr.ping@gmail.com'
-                            }
-                          };
-                          razorpay.open(options);
+                          navigate(
+                              type: PageType.replace,
+                              context: context,
+                              page: const CheckoutPage());
                         }
                       },
                       child: Padding(
@@ -358,22 +342,6 @@ class _RecipeInfoPageState extends State<RecipeInfoPage> {
     );
   }
 
-  void handlePaymentSuccess(PaymentSuccessResponse response) {
-    navigate(
-        type: PageType.replace,
-        context: context,
-        page: const OrderPreparingPage());
-  }
-
-  void handlePaymentError(PaymentFailureResponse response) {
-    navigate(type: PageType.replace, context: context, page: const HomePage());
-    Fluttertoast.showToast(
-        msg: "Paymtment Failed", backgroundColor: Colors.red);
-  }
-
-  void handleExternalWallet(ExternalWalletResponse response) {
-    // Do something when an external wallet was selected
-  }
   savePreference() async {
     await showDialog(
       context: context,

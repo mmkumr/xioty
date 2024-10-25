@@ -3,8 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:xenobot/commons.dart';
 import 'package:xenobot/pages/home.dart';
-import 'package:xenobot/partials/appbar.dart';
-import 'package:xenobot/partials/menu.dart';
 
 class Rating extends StatefulWidget {
   const Rating({super.key});
@@ -19,8 +17,11 @@ class _RatingState extends State<Rating> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: bgC,
-      appBar: appbar,
-      drawer: menu(context),
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        backgroundColor: bgC,
+        elevation: 0,
+      ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -52,11 +53,14 @@ class _RatingState extends State<Rating> {
                 softWrap: true,
               ),
             ),
-            const Text(
-              "How would you like to rate the experience",
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              textAlign: TextAlign.center,
-              softWrap: true,
+            const Padding(
+              padding: EdgeInsets.all(8.0),
+              child: Text(
+                "How would you like to rate the experience",
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                textAlign: TextAlign.center,
+                softWrap: true,
+              ),
             ),
             Padding(
               padding: const EdgeInsets.all(10.0),
