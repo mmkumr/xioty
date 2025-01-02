@@ -22,7 +22,6 @@ class _IngredientsLevelPageState extends State<IngredientsLevelPage> {
         backgroundColor: bgC,
         elevation: 0,
       ),
-      drawer: menu(context),
       body: SingleChildScrollView(
         child: Center(
           child: Column(

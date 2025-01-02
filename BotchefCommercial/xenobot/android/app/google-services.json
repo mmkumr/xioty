@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "716203647813",
+    "project_id": "xenobot-8ac35",
+    "storage_bucket": "xenobot-8ac35.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:716203647813:android:e74564bd1a22ad25ebd42c",
+        "android_client_info": {
+          "package_name": "com.example.xenobot"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "716203647813-1e2dnfubhkim5cmv6siu5m88be8bla9r.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.xenobot",
+            "certificate_hash": "18753377eef59787641cedb028299e2585f28366"
+          }
+        },
+        {
+          "client_id": "716203647813-20hn3542eork4lp5ur6qibner3mgcd7m.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDxizuOCe5ehk972OKO6uFj1X7oKvvFkak"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "716203647813-20hn3542eork4lp5ur6qibner3mgcd7m.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

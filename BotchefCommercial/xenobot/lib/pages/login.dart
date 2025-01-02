@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:xenobot/pages/scan_kiosk.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:provider/provider.dart';
 
 import '../commons.dart';
+import '../providers/user_provider.dart';
 import 'admin_login.dart';
 
 class LoginPage extends StatefulWidget {
@@ -14,6 +16,7 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
+    final userProvider = Provider.of<UserProvider>(context);
     return Scaffold(
       backgroundColor: bgC,
       body: Center(
@@ -56,10 +59,20 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 color: elementsC,
                 onPressed: () {
-                  navigate(
-                      type: PageType.replace,
-                      context: context,
-                      page: const ScanKiosk());
+                  userProvider.signInWithGoogle().then(
+                    (value) {
+                      if (value == "new") {
+                        Fluttertoast.showToast(msg: "Welcome to Xara.");
+                      }
+                      if (value == "old") {
+                        Fluttertoast.showToast(msg: "Welcome back....");
+                      } else {
+                        Fluttertoast.showToast(
+                            msg:
+                                "Error while login, please try after some time.");
+                      }
+                    },
+                  );
                 },
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,

@@ -1,15 +1,20 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:provider/provider.dart';
 import 'package:xenobot/commons.dart';
 import 'package:xenobot/pages/chef_my_recipes.dart';
 import 'package:xenobot/pages/contact_us.dart';
 import 'package:xenobot/pages/history.dart';
 import 'package:xenobot/pages/home.dart';
+import 'package:xenobot/pages/login.dart';
 import 'package:xenobot/pages/payment_options.dart';
 import 'package:xenobot/pages/refer.dart';
 
+import '../providers/user_provider.dart';
+
 Widget menu(BuildContext context) {
+  final user = Provider.of<UserProvider>(context);
   return Drawer(
     child: ListView(
       padding: const EdgeInsets.all(10.0),
@@ -35,7 +40,7 @@ Widget menu(BuildContext context) {
           ),
         ),
         ListTile(
-          leading: const Icon(FontAwesomeIcons.home),
+          leading: const Icon(FontAwesomeIcons.house),
           title: const Text('Home'),
           onTap: () {
             navigate(
@@ -92,7 +97,13 @@ Widget menu(BuildContext context) {
         ),
         ListTile(
           title: const Text('Log Out'),
-          onTap: () {},
+          onTap: () {
+            user.signOut();
+            navigate(
+                type: PageType.replace,
+                context: context,
+                page: const LoginPage());
+          },
           leading: const Icon(FontAwesomeIcons.rightFromBracket),
         ),
       ],

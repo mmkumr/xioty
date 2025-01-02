@@ -135,7 +135,7 @@ class _KiosksPageState extends State<KiosksPage> {
                                           width: width(context) * 0.7,
                                           child: QrImageView(
                                             data:
-                                                "Kiosk ID: ${index + 1}\nName: Mukesh Kumar\nAddress:Baada Baazar, Berhampur, Odisha",
+                                                '{"Kiosk ID": "${index + 1}", "Name": "Mukesh Kumar", "Address": "Baada Baazar, Berhampur, Odisha"}',
                                             version: QrVersions.auto,
                                             embeddedImage: Image.asset(
                                               "assets/imgs/logo.png",

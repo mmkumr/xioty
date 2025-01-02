@@ -6,12 +6,9 @@
 */
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:number_inc_dec/number_inc_dec.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
 import 'package:xenobot/pages/checkout.dart';
-import 'package:xenobot/pages/home.dart';
-import 'package:xenobot/pages/order_preparing.dart';
 import 'package:xenobot/partials/appbar.dart';
 import 'package:xenobot/partials/menu.dart';
 
