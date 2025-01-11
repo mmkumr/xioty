@@ -1,20 +1,31 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:xenobot/pages/new_recipe.dart';
+import 'package:provider/provider.dart';
+import 'package:xenobot/db/recipes.dart';
+import 'package:xenobot/models/recipe.dart';
+import 'package:xenobot/pages/recipe.dart';
 import 'package:xenobot/pages/recipe_customize.dart';
 import 'package:xenobot/partials/appbar.dart';
 
 import '../commons.dart';
 import '../partials/menu.dart';
+import '../providers/user_provider.dart';
 
-class ChefMyRecipe extends StatefulWidget {
-  const ChefMyRecipe({super.key});
+class MyRecipes extends StatefulWidget {
+  const MyRecipes({super.key});
 
   @override
-  State<ChefMyRecipe> createState() => _ChefMyRecipeState();
+  State<MyRecipes> createState() => _MyRecipesState();
 }
 
-class _ChefMyRecipeState extends State<ChefMyRecipe> {
+class _MyRecipesState extends State<MyRecipes> {
+  List<RecipeModel> myRecipes = [];
+  @override
+  void didChangeDependencies() {
+    getMyRecipes();
+    super.didChangeDependencies();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -36,7 +47,7 @@ class _ChefMyRecipeState extends State<ChefMyRecipe> {
                 navigate(
                     type: PageType.push,
                     context: context,
-                    page: const NewRecipePage());
+                    page: const RecipePage());
               },
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
@@ -115,7 +126,7 @@ class _ChefMyRecipeState extends State<ChefMyRecipe> {
                   ListView.builder(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
-                    itemCount: 4,
+                    itemCount: myRecipes.length,
                     itemBuilder: (BuildContext context, int index) {
                       return Padding(
                         padding: const EdgeInsets.only(
@@ -125,7 +136,9 @@ class _ChefMyRecipeState extends State<ChefMyRecipe> {
                             navigate(
                                 type: PageType.push,
                                 context: context,
-                                page: const NewRecipePage());
+                                page: RecipePage(
+                                  recipe: myRecipes[index],
+                                ));
                           },
                           tileColor: Colors.black12,
                           shape: const RoundedRectangleBorder(
@@ -143,9 +156,9 @@ class _ChefMyRecipeState extends State<ChefMyRecipe> {
                                   "https://sinfullyspicy.com/wp-content/uploads/2024/04/1200-by-1200-images.jpg"),
                             ),
                           ),
-                          title: const Text(
-                            "Milk Tea",
-                            style: TextStyle(fontWeight: FontWeight.bold),
+                          title: Text(
+                            myRecipes[index].name,
+                            style: const TextStyle(fontWeight: FontWeight.bold),
                           ),
                         ),
                       );
@@ -158,5 +171,11 @@ class _ChefMyRecipeState extends State<ChefMyRecipe> {
         ],
       ),
     );
+  }
+
+  getMyRecipes() async {
+    final user = Provider.of<UserProvider>(context);
+    myRecipes = await RecipeServices().getMyRecipes(uid: user.userModel.id);
+    setState(() {});
   }
 }

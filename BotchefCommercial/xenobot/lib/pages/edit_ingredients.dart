@@ -1,45 +1,82 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:number_inc_dec/number_inc_dec.dart';
-import 'package:xenobot/pages/chef_my_recipes.dart';
+import 'package:xenobot/pages/my_recipes.dart';
 import 'package:xenobot/partials/appbar.dart';
 import 'package:xenobot/partials/menu.dart';
 
 import '../commons.dart';
+import '../db/recipes.dart';
+import '../models/recipe.dart';
 
 class EditIngredientsPage extends StatefulWidget {
-  const EditIngredientsPage({super.key});
+  final RecipeModel recipe;
+  const EditIngredientsPage({super.key, required this.recipe});
 
   @override
   State<EditIngredientsPage> createState() => _EditIngredientsPageState();
 }
 
 class _EditIngredientsPageState extends State<EditIngredientsPage> {
-  int nos = 11;
+  int nos = 0;
   @override
   void initState() {
     super.initState();
-    quantities =
-        List.generate(nos, (index) => TextEditingController(text: "0"));
+    bases = widget.recipe.base;
+    sweetners = widget.recipe.sweetners;
+    flavours = widget.recipe.flavors;
+    nos = bases.length + sweetners.length + flavours.length;
+  }
+
+  @override
+  void didChangeDependencies() async {
+    await getIngredientsPrice();
+    super.didChangeDependencies();
   }
 
   List<TextEditingController> quantities = [];
+  TextEditingController priceController = TextEditingController();
   GlobalKey<FormState> formKey = GlobalKey<FormState>();
   List<String> cupSizes = ["150 ml"];
-  List<String> bases = ["Milk", "Evaporated Milk", "Black Tea", "Green Tea"];
-  List sweetners = ["Sugar", "Honey", "Jagery"];
-  List flavours = ["Chocolate", "Masala", "Rose"];
-  int ingredientsTotalQuantity = 0, remainingQuantity = 0;
+  List bases = [];
+  List sweetners = [];
+  List flavours = [];
+  int ingredientsTotalQuantity = 0,
+      remainingQuantity = 0,
+      desiredQuantity = 130;
   bool readOnly = false;
+  Map? ingredientsPrices;
+  int price = 0;
+  bool start = false;
   @override
   Widget build(BuildContext context) {
     ingredientsTotalQuantity = 0;
+    price = 0;
     for (var quantity in quantities) {
       ingredientsTotalQuantity += int.parse(quantity.text);
     }
-    remainingQuantity = 130 - ingredientsTotalQuantity;
-
+    remainingQuantity = desiredQuantity - ingredientsTotalQuantity;
+    int i = 0;
+    for (var base in ingredientsPrices!["bases"]) {
+      price += int.parse(base[base.keys.toList()[0]].toString()) *
+          int.parse(quantities[i].text);
+      i++;
+    }
+    for (var flavour in ingredientsPrices!["flavours"]) {
+      price += int.parse(flavour[flavour.keys.toList()[0]].toString()) *
+          int.parse(quantities[i].text);
+      i++;
+    }
+    for (var sweetners in ingredientsPrices!["sweetners"]) {
+      price += int.parse(sweetners[sweetners.keys.toList()[0]].toString()) *
+          int.parse(quantities[i].text);
+      i++;
+    }
+    setState(() {
+      priceController.text = price.toString();
+    });
     return Scaffold(
       appBar: appbar,
       drawer: menu(context),
@@ -63,10 +100,11 @@ class _EditIngredientsPageState extends State<EditIngredientsPage> {
                     ),
                   ),
                 ),
-                const Text(
-                  "Irani Tea",
+                Text(
+                  widget.recipe.name,
                   softWrap: true,
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+                  style: const TextStyle(
+                      fontWeight: FontWeight.bold, fontSize: 20),
                 ),
                 Padding(
                   padding: const EdgeInsets.only(left: 30.0),
@@ -93,7 +131,7 @@ class _EditIngredientsPageState extends State<EditIngredientsPage> {
                         Expanded(
                           child: TextFormField(
                             readOnly: true,
-                            controller: quantities[0],
+                            controller: priceController,
                             style: const TextStyle(color: Colors.black),
                             decoration: InputDecoration(
                               filled: true,
@@ -135,7 +173,9 @@ class _EditIngredientsPageState extends State<EditIngredientsPage> {
                     ),
                   ),
                 ),
-                for (int index = 0; index < bases.length; index++)
+                for (int index = 0;
+                    index < ingredientsPrices!["bases"].length;
+                    index++)
                   Padding(
                     padding: const EdgeInsets.only(left: 30.0),
                     child: ListTile(
@@ -150,18 +190,22 @@ class _EditIngredientsPageState extends State<EditIngredientsPage> {
                         children: [
                           Expanded(
                             child: Text(
-                              bases[index],
+                              ingredientsPrices!["bases"][index]
+                                  .keys
+                                  .toList()[0],
                               style:
                                   const TextStyle(fontWeight: FontWeight.bold),
                             ),
                           ),
                           Expanded(
                             child: NumberInputWithIncrementDecrement(
-                              controller: quantities[index + cupSizes.length],
+                              initialValue: bases[index],
+                              controller: quantities[index],
                               min: 0,
-                              max: int.parse(quantities[index + cupSizes.length]
-                                      .text) +
-                                  remainingQuantity,
+                              max: start
+                                  ? int.parse(quantities[index].text) +
+                                      remainingQuantity
+                                  : desiredQuantity,
                               onIncrement: (newValue) {
                                 updateBaseText(newValue, index);
                               },
@@ -191,7 +235,9 @@ class _EditIngredientsPageState extends State<EditIngredientsPage> {
                     ),
                   ),
                 ),
-                for (int index = 0; index < sweetners.length; index++)
+                for (int index = 0;
+                    index < ingredientsPrices!["sweetners"].length;
+                    index++)
                   Padding(
                     padding: const EdgeInsets.only(left: 30.0),
                     child: ListTile(
@@ -206,21 +252,23 @@ class _EditIngredientsPageState extends State<EditIngredientsPage> {
                         children: [
                           Expanded(
                             child: Text(
-                              sweetners[index],
+                              ingredientsPrices!["sweetners"][index]
+                                  .keys
+                                  .toList()[0],
                               style:
                                   const TextStyle(fontWeight: FontWeight.bold),
                             ),
                           ),
                           Expanded(
                             child: NumberInputWithIncrementDecrement(
-                              controller: quantities[
-                                  index + cupSizes.length + bases.length],
+                              initialValue: sweetners[index],
+                              controller: quantities[index + bases.length],
                               min: 0,
-                              max: int.parse(quantities[index +
-                                          cupSizes.length +
-                                          bases.length]
-                                      .text) +
-                                  remainingQuantity,
+                              max: start
+                                  ? int.parse(quantities[index + bases.length]
+                                          .text) +
+                                      remainingQuantity
+                                  : desiredQuantity,
                               onIncrement: (newValue) {
                                 updateSweetnersText(newValue, index);
                               },
@@ -250,7 +298,9 @@ class _EditIngredientsPageState extends State<EditIngredientsPage> {
                     ),
                   ),
                 ),
-                for (int index = 0; index < flavours.length; index++)
+                for (int index = 0;
+                    index < ingredientsPrices!["flavours"].length;
+                    index++)
                   Padding(
                     padding: const EdgeInsets.only(left: 30.0),
                     child: ListTile(
@@ -265,24 +315,26 @@ class _EditIngredientsPageState extends State<EditIngredientsPage> {
                         children: [
                           Expanded(
                             child: Text(
-                              flavours[index],
+                              ingredientsPrices!["flavours"][index]
+                                  .keys
+                                  .toList()[0],
                               style:
                                   const TextStyle(fontWeight: FontWeight.bold),
                             ),
                           ),
                           Expanded(
                             child: NumberInputWithIncrementDecrement(
-                              controller: quantities[index +
-                                  cupSizes.length +
-                                  bases.length +
-                                  sweetners.length],
+                              initialValue: flavours[index],
+                              controller: quantities[
+                                  index + bases.length + sweetners.length],
                               min: 0,
-                              max: int.parse(quantities[index +
-                                          cupSizes.length +
-                                          bases.length +
-                                          sweetners.length]
-                                      .text) +
-                                  remainingQuantity,
+                              max: start
+                                  ? int.parse(quantities[index +
+                                              bases.length +
+                                              sweetners.length]
+                                          .text) +
+                                      remainingQuantity
+                                  : desiredQuantity,
                               onIncrement: (newValue) {
                                 updateFlavoursText(newValue, index);
                               },
@@ -309,11 +361,39 @@ class _EditIngredientsPageState extends State<EditIngredientsPage> {
                       borderRadius: BorderRadius.circular(40),
                     ),
                     color: elementsC,
-                    onPressed: () {
+                    onPressed: () async {
+                      int i = 0;
+                      List basesList = [],
+                          flavoursList = [],
+                          sweetnersList = [];
+                      for (var base in ingredientsPrices!["bases"]) {
+                        basesList.add(int.parse(quantities[i].text));
+                        i++;
+                      }
+                      for (var flavour in ingredientsPrices!["flavours"]) {
+                        flavoursList.add(int.parse(quantities[i].text));
+                        i++;
+                      }
+                      for (var sweetner in ingredientsPrices!["sweetners"]) {
+                        sweetnersList.add(int.parse(quantities[i].text));
+                        i++;
+                      }
+                      RecipeServices recipeServices = RecipeServices();
+                      await recipeServices.update(
+                        rid: widget.recipe.rid,
+                        name: widget.recipe.name,
+                        description: widget.recipe.description,
+                        base: basesList,
+                        flavors: flavoursList,
+                        sweetners: sweetnersList,
+                        imageUrl: "",
+                        price: price,
+                      );
+                      if (!context.mounted) return;
                       navigate(
                           type: PageType.replace,
                           context: context,
-                          page: const ChefMyRecipe());
+                          page: const MyRecipes());
                     },
                     child: Padding(
                       padding: const EdgeInsets.only(
@@ -341,23 +421,48 @@ class _EditIngredientsPageState extends State<EditIngredientsPage> {
   // Function for updating the state after any event of the number_inc_dec widget in Base values section to update the ingredientsTotalQuantity variable.
   updateBaseText(num newValue, int index) {
     setState(() {
-      quantities[index + cupSizes.length].text = newValue.toString();
+      quantities[index].text = newValue.toString();
     });
   }
 
   // Function for updating the state after any event of the number_inc_dec widget in Sweetners values section to update the ingredientsTotalQuantity variable.
   updateSweetnersText(num newValue, int index) {
     setState(() {
-      quantities[index + cupSizes.length + bases.length].text =
-          newValue.toString();
+      quantities[index + bases.length].text = newValue.toString();
     });
   }
 
   // Function for updating the state after any event of the number_inc_dec widget in Sweetners values section to update the ingredientsTotalQuantity variable.
   updateFlavoursText(num newValue, int index) {
     setState(() {
-      quantities[index + cupSizes.length + bases.length + sweetners.length]
-          .text = newValue.toString();
+      quantities[index + bases.length + sweetners.length].text =
+          newValue.toString();
+    });
+  }
+
+  getIngredientsPrice() async {
+    await FirebaseFirestore.instance
+        .collection("ingredientsPrice")
+        .doc("0")
+        .get()
+        .then((value) {
+      setState(() {
+        ingredientsPrices = value.data();
+        priceController.text = widget.recipe.price.toString();
+
+        for (var base in bases) {
+          quantities.add(TextEditingController(text: base.toString()));
+        }
+        debugPrint(
+            (int.parse(quantities[0].text) + remainingQuantity).toString());
+        for (var sweetner in sweetners) {
+          quantities.add(TextEditingController(text: sweetner.toString()));
+        }
+        for (var flavour in flavours) {
+          quantities.add(TextEditingController(text: flavour.toString()));
+        }
+        start = true;
+      });
     });
   }
 }

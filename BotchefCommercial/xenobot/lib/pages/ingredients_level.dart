@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:xenobot/partials/menu.dart';
 
 import '../commons.dart';
 

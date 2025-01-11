@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
 import 'package:xenobot/commons.dart';
-import 'package:xenobot/pages/home.dart';
 import 'package:xenobot/partials/appbar.dart';
 
 import 'order_preparing.dart';

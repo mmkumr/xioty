@@ -18,6 +18,7 @@ class _OrderPreparingPageState extends State<OrderPreparingPage> {
   @override
   void initState() {
     Future.delayed(const Duration(seconds: 5), () {
+      if (!mounted) return;
       navigate(type: PageType.replace, context: context, page: const Rating());
     });
     super.initState();

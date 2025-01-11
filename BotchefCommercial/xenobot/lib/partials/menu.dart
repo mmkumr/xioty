@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:xenobot/commons.dart';
-import 'package:xenobot/pages/chef_my_recipes.dart';
+import 'package:xenobot/pages/my_recipes.dart';
 import 'package:xenobot/pages/contact_us.dart';
 import 'package:xenobot/pages/history.dart';
 import 'package:xenobot/pages/home.dart';
@@ -79,9 +79,7 @@ Widget menu(BuildContext context) {
           title: const Text('Your Recipes'),
           onTap: () {
             navigate(
-                type: PageType.push,
-                context: context,
-                page: const ChefMyRecipe());
+                type: PageType.push, context: context, page: const MyRecipes());
           },
           leading: const Icon(FontAwesomeIcons.utensils),
         ),

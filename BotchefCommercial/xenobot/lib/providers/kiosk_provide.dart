@@ -17,7 +17,7 @@ class KioskProvider with ChangeNotifier {
   KioskModel get kioskModel => _kioskModel;
   Future<String> getKiosk(String id) async {
     try {
-      _kioskModel = await _kioskServices.getKioskById(id);
+      _kioskModel = await _kioskServices.getById(id);
       _status = ScannedStatus.scanned;
       Fluttertoast.showToast(
           msg: "Happy Ordering", backgroundColor: Colors.green);

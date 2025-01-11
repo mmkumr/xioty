@@ -8,6 +8,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:number_inc_dec/number_inc_dec.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
+import 'package:xenobot/models/recipe.dart';
 import 'package:xenobot/pages/checkout.dart';
 import 'package:xenobot/partials/appbar.dart';
 import 'package:xenobot/partials/menu.dart';
@@ -15,7 +16,8 @@ import 'package:xenobot/partials/menu.dart';
 import '../commons.dart';
 
 class RecipeInfoPage extends StatefulWidget {
-  const RecipeInfoPage({super.key});
+  final RecipeModel recipe;
+  const RecipeInfoPage({super.key, required this.recipe});
 
   @override
   State<RecipeInfoPage> createState() => _RecipeInfoPageState();
@@ -46,8 +48,9 @@ class _RecipeInfoPageState extends State<RecipeInfoPage> {
 
   GlobalKey<FormState> formKey = GlobalKey<FormState>();
   List<TextEditingController> quantities = [];
-  List sweetners = ["Sugar", "Honey", "Jagery"];
-  List flavours = ["Chocolate", "Masala", "Rose"];
+  List bases = [];
+  List sweetners = [];
+  List flavours = [];
   int ingredientsTotalQuantity = 0, remainingQuantity = 0;
   Razorpay razorpay = Razorpay();
 

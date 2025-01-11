@@ -7,7 +7,7 @@ class KioskServices {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   String collection = "kiosks";
 
-  createUser({
+  create({
     required String id,
     required String name,
     required String address,
@@ -16,7 +16,7 @@ class KioskServices {
       await _firestore.collection(collection).doc(id).set({
         "kid": id,
         "name": name,
-        "email": address,
+        "address": address,
         'created_on': FieldValue.serverTimestamp(),
       });
       Fluttertoast.showToast(
@@ -29,7 +29,29 @@ class KioskServices {
     }
   }
 
-  Future<KioskModel> getKioskById(String id) =>
+  update({
+    required String id,
+    required String name,
+    required String address,
+  }) async {
+    try {
+      await _firestore.collection(collection).doc(id).update({
+        "kid": id,
+        "name": name,
+        "address": address,
+        'created_on': FieldValue.serverTimestamp(),
+      });
+      Fluttertoast.showToast(
+          msg: "Kiosk creation successfully.", backgroundColor: Colors.green);
+    } catch (e) {
+      debugPrint('ERROR: ${e.toString()}');
+
+      Fluttertoast.showToast(
+          msg: "Kiosk creation Failed!", backgroundColor: Colors.red);
+    }
+  }
+
+  Future<KioskModel> getById(String id) =>
       _firestore.collection(collection).doc(id).get().then((doc) {
         return KioskModel.fromSnapshot(doc);
       });

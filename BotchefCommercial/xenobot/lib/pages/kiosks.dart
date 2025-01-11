@@ -3,7 +3,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:xenobot/pages/coupons.dart';
 import 'package:xenobot/pages/ingredients_level.dart';
-import 'package:xenobot/pages/new_kiosk.dart';
+import 'package:xenobot/pages/kiosk.dart';
 import 'package:xenobot/pages/users.dart';
 
 import '../commons.dart';
