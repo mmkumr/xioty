@@ -46,7 +46,9 @@ class _HomePageState extends State<HomePage> {
                       navigate(
                           type: PageType.push,
                           context: context,
-                          page: const RecipeInfoPage());
+                          page: RecipeInfoPage(
+                            recipe: kioskRecipes[index],
+                          ));
                     },
                     tileColor: Colors.black12,
                     shape: const RoundedRectangleBorder(

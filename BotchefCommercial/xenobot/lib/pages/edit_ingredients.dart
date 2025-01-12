@@ -1,8 +1,9 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:number_inc_dec/number_inc_dec.dart';
+import 'package:xenobot/db/ingredients_prices.dart';
+import 'package:xenobot/models/ingredients_price.dart';
 import 'package:xenobot/pages/my_recipes.dart';
 import 'package:xenobot/partials/appbar.dart';
 import 'package:xenobot/partials/menu.dart';
@@ -43,12 +44,12 @@ class _EditIngredientsPageState extends State<EditIngredientsPage> {
   List bases = [];
   List sweetners = [];
   List flavours = [];
+  IngredientsPriceModel? ingredientsPrices;
+  int price = 0;
   int ingredientsTotalQuantity = 0,
       remainingQuantity = 0,
       desiredQuantity = 130;
   bool readOnly = false;
-  Map? ingredientsPrices;
-  int price = 0;
   bool start = false;
   @override
   Widget build(BuildContext context) {
@@ -59,21 +60,19 @@ class _EditIngredientsPageState extends State<EditIngredientsPage> {
     }
     remainingQuantity = desiredQuantity - ingredientsTotalQuantity;
     int i = 0;
-    for (var base in ingredientsPrices!["bases"]) {
-      price += int.parse(base[base.keys.toList()[0]].toString()) *
-          int.parse(quantities[i].text);
+    for (var base in ingredientsPrices!.bases) {
+      price += base.value * int.parse(quantities[i].text);
       i++;
     }
-    for (var flavour in ingredientsPrices!["flavours"]) {
-      price += int.parse(flavour[flavour.keys.toList()[0]].toString()) *
-          int.parse(quantities[i].text);
+    for (var sweetners in ingredientsPrices!.sweetners) {
+      price += sweetners.value * int.parse(quantities[i].text);
       i++;
     }
-    for (var sweetners in ingredientsPrices!["sweetners"]) {
-      price += int.parse(sweetners[sweetners.keys.toList()[0]].toString()) *
-          int.parse(quantities[i].text);
+    for (var flavour in ingredientsPrices!.flavours) {
+      price += flavour.value * int.parse(quantities[i].text);
       i++;
     }
+
     setState(() {
       priceController.text = price.toString();
     });
@@ -173,9 +172,7 @@ class _EditIngredientsPageState extends State<EditIngredientsPage> {
                     ),
                   ),
                 ),
-                for (int index = 0;
-                    index < ingredientsPrices!["bases"].length;
-                    index++)
+                for (int index = 0; index < bases.length; index++)
                   Padding(
                     padding: const EdgeInsets.only(left: 30.0),
                     child: ListTile(
@@ -190,9 +187,7 @@ class _EditIngredientsPageState extends State<EditIngredientsPage> {
                         children: [
                           Expanded(
                             child: Text(
-                              ingredientsPrices!["bases"][index]
-                                  .keys
-                                  .toList()[0],
+                              ingredientsPrices!.bases[index].key,
                               style:
                                   const TextStyle(fontWeight: FontWeight.bold),
                             ),
@@ -235,9 +230,7 @@ class _EditIngredientsPageState extends State<EditIngredientsPage> {
                     ),
                   ),
                 ),
-                for (int index = 0;
-                    index < ingredientsPrices!["sweetners"].length;
-                    index++)
+                for (int index = 0; index < sweetners.length; index++)
                   Padding(
                     padding: const EdgeInsets.only(left: 30.0),
                     child: ListTile(
@@ -252,9 +245,7 @@ class _EditIngredientsPageState extends State<EditIngredientsPage> {
                         children: [
                           Expanded(
                             child: Text(
-                              ingredientsPrices!["sweetners"][index]
-                                  .keys
-                                  .toList()[0],
+                              ingredientsPrices!.sweetners[index].key,
                               style:
                                   const TextStyle(fontWeight: FontWeight.bold),
                             ),
@@ -298,9 +289,7 @@ class _EditIngredientsPageState extends State<EditIngredientsPage> {
                     ),
                   ),
                 ),
-                for (int index = 0;
-                    index < ingredientsPrices!["flavours"].length;
-                    index++)
+                for (int index = 0; index < flavours.length; index++)
                   Padding(
                     padding: const EdgeInsets.only(left: 30.0),
                     child: ListTile(
@@ -315,9 +304,7 @@ class _EditIngredientsPageState extends State<EditIngredientsPage> {
                         children: [
                           Expanded(
                             child: Text(
-                              ingredientsPrices!["flavours"][index]
-                                  .keys
-                                  .toList()[0],
+                              ingredientsPrices!.flavours[index].key,
                               style:
                                   const TextStyle(fontWeight: FontWeight.bold),
                             ),
@@ -366,15 +353,15 @@ class _EditIngredientsPageState extends State<EditIngredientsPage> {
                       List basesList = [],
                           flavoursList = [],
                           sweetnersList = [];
-                      for (var base in ingredientsPrices!["bases"]) {
+                      for (var base in ingredientsPrices!.bases) {
                         basesList.add(int.parse(quantities[i].text));
                         i++;
                       }
-                      for (var flavour in ingredientsPrices!["flavours"]) {
+                      for (var flavour in ingredientsPrices!.flavours) {
                         flavoursList.add(int.parse(quantities[i].text));
                         i++;
                       }
-                      for (var sweetner in ingredientsPrices!["sweetners"]) {
+                      for (var sweetner in ingredientsPrices!.sweetners) {
                         sweetnersList.add(int.parse(quantities[i].text));
                         i++;
                       }
@@ -441,20 +428,14 @@ class _EditIngredientsPageState extends State<EditIngredientsPage> {
   }
 
   getIngredientsPrice() async {
-    await FirebaseFirestore.instance
-        .collection("ingredientsPrice")
-        .doc("0")
-        .get()
-        .then((value) {
+    await IngredientsPricesServices().get().then((value) {
       setState(() {
-        ingredientsPrices = value.data();
+        ingredientsPrices = value;
         priceController.text = widget.recipe.price.toString();
 
         for (var base in bases) {
           quantities.add(TextEditingController(text: base.toString()));
         }
-        debugPrint(
-            (int.parse(quantities[0].text) + remainingQuantity).toString());
         for (var sweetner in sweetners) {
           quantities.add(TextEditingController(text: sweetner.toString()));
         }
