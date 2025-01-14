@@ -1,13 +1,34 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:provider/provider.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
 import 'package:xenobot/commons.dart';
+import 'package:xenobot/db/orders.dart';
+import 'package:xenobot/db/users.dart';
+import 'package:xenobot/models/recipe.dart';
 import 'package:xenobot/partials/appbar.dart';
+import 'package:xenobot/providers/user_provider.dart';
 
 import 'order_preparing.dart';
 
 class CheckoutPage extends StatefulWidget {
-  const CheckoutPage({super.key});
+  final int price;
+  final String name;
+  final String image;
+  final List bases;
+  final List flavours;
+  final List sweetners;
+  final RecipeModel recipe;
+  const CheckoutPage({
+    super.key,
+    required this.price,
+    required this.name,
+    required this.image,
+    required this.sweetners,
+    required this.flavours,
+    required this.bases,
+    required this.recipe,
+  });
 
   @override
   State<CheckoutPage> createState() => _CheckoutPageState();
@@ -19,11 +40,16 @@ class _CheckoutPageState extends State<CheckoutPage> {
     super.initState();
     razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS, handlePaymentSuccess);
     razorpay.on(Razorpay.EVENT_PAYMENT_ERROR, handlePaymentError);
+    tax = widget.price * (5 / 100);
+    total = (widget.price + tax) - discount;
   }
 
   TextEditingController couponName = TextEditingController();
   GlobalKey<FormState> formKey = GlobalKey<FormState>();
   Razorpay razorpay = Razorpay();
+  double discount = 0;
+  double tax = 0.0;
+  double total = 0.0;
 
   @override
   Widget build(BuildContext context) {
@@ -92,9 +118,9 @@ class _CheckoutPageState extends State<CheckoutPage> {
                   padding: const EdgeInsets.all(20.0),
                   child: RichText(
                     textAlign: TextAlign.center,
-                    text: const TextSpan(
+                    text: TextSpan(
                       children: [
-                        TextSpan(
+                        const TextSpan(
                           text: "Payment Details\n\n",
                           style: TextStyle(
                             color: Colors.black,
@@ -102,7 +128,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                             fontSize: 20,
                           ),
                         ),
-                        TextSpan(
+                        const TextSpan(
                           text: "Subtotal: ",
                           style: TextStyle(
                             color: Colors.black,
@@ -111,13 +137,13 @@ class _CheckoutPageState extends State<CheckoutPage> {
                           ),
                         ),
                         TextSpan(
-                          text: "₹200/-\n",
-                          style: TextStyle(
+                          text: "₹${widget.price}/-\n",
+                          style: const TextStyle(
                             color: Colors.black,
                             fontSize: 15,
                           ),
                         ),
-                        TextSpan(
+                        const TextSpan(
                           text: "Tax(5%): ",
                           style: TextStyle(
                             color: Colors.black,
@@ -126,13 +152,13 @@ class _CheckoutPageState extends State<CheckoutPage> {
                           ),
                         ),
                         TextSpan(
-                          text: "₹10/-\n",
-                          style: TextStyle(
+                          text: "₹$tax/-\n",
+                          style: const TextStyle(
                             color: Colors.black,
                             fontSize: 15,
                           ),
                         ),
-                        TextSpan(
+                        const TextSpan(
                           text: "Discount: ",
                           style: TextStyle(
                             color: Colors.black,
@@ -141,13 +167,13 @@ class _CheckoutPageState extends State<CheckoutPage> {
                           ),
                         ),
                         TextSpan(
-                          text: "₹5/-\n",
-                          style: TextStyle(
+                          text: "₹$discount/-\n",
+                          style: const TextStyle(
                             color: Colors.black,
                             fontSize: 15,
                           ),
                         ),
-                        TextSpan(
+                        const TextSpan(
                           text: "---------------------------\n",
                           style: TextStyle(
                             color: Colors.black,
@@ -155,7 +181,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                             fontSize: 15,
                           ),
                         ),
-                        TextSpan(
+                        const TextSpan(
                           text: "Total: ",
                           style: TextStyle(
                             color: Colors.black,
@@ -164,8 +190,8 @@ class _CheckoutPageState extends State<CheckoutPage> {
                           ),
                         ),
                         TextSpan(
-                          text: "₹125/-\n",
-                          style: TextStyle(
+                          text: "₹$total/-\n",
+                          style: const TextStyle(
                             color: Colors.black,
                             fontSize: 15,
                           ),
@@ -185,17 +211,60 @@ class _CheckoutPageState extends State<CheckoutPage> {
                 ),
                 color: elementsC,
                 onPressed: () {
-                  var options = {
-                    'key': 'rzp_test_2Eh5LSk1v3ujdn',
-                    'amount': 10000,
-                    'name': 'Mukesh Kumar',
-                    'description': 'Irani Tea',
-                    'prefill': {
-                      'contact': '8337908779',
-                      'email': 'mmkumr.ping@gmail.com'
+                  var user = Provider.of<UserProvider>(context, listen: false);
+                  if (user.userModel.paymentMethod == PaymentMethod.online) {
+                    var options = {
+                      'key': 'rzp_test_2Eh5LSk1v3ujdn',
+                      'amount': "${total.toString()}00",
+                      'name': user.userModel.name,
+                      'description': widget.name,
+                      'prefill': {
+                        'email': user.userModel.email,
+                      }
+                    };
+                    razorpay.open(options);
+                  } else if (user.userModel.paymentMethod ==
+                          PaymentMethod.wallet &&
+                      user.userModel.wallet > total) {
+                    try {
+                      OrderServices().create(
+                        uid: user.userModel.id,
+                        itemImage: widget.image,
+                        itemName: widget.name,
+                        total: total,
+                        tax: tax,
+                        discount: discount.toDouble(),
+                        subtotal: widget.price.toDouble(),
+                        status: OrderStatus.success.name,
+                        paymentMethod: PaymentMethod.wallet,
+                        context: context,
+                      );
+                      navigate(
+                          type: PageType.replace,
+                          context: context,
+                          page: OrderPreparingPage(
+                            recipe: widget.recipe,
+                          ));
+                    } catch (e) {
+                      debugPrint(e.toString());
                     }
-                  };
-                  razorpay.open(options);
+                  } else {
+                    debugPrint(total.toStringAsFixed(2).replaceAll(".", ""));
+                    var options = {
+                      'key': 'rzp_test_2Eh5LSk1v3ujdn',
+                      'amount': total.toStringAsFixed(2).replaceAll(".", ""),
+                      'name': user.userModel.name,
+                      'description': widget.name,
+                      'prefill': {
+                        'email': user.userModel.email,
+                      }
+                    };
+                    Fluttertoast.showToast(
+                        msg:
+                            "Insufficient wallet balance. Switching to online payment method.",
+                        backgroundColor: Colors.red);
+                    razorpay.open(options);
+                  }
                 },
                 child: Padding(
                   padding: const EdgeInsets.only(
@@ -219,13 +288,44 @@ class _CheckoutPageState extends State<CheckoutPage> {
   }
 
   void handlePaymentSuccess(PaymentSuccessResponse response) {
+    var user = Provider.of<UserProvider>(context, listen: false);
+    OrderServices().create(
+      uid: user.userModel.id,
+      itemImage: widget.image,
+      itemName: widget.name,
+      total: total,
+      tax: tax,
+      discount: discount.toDouble(),
+      subtotal: widget.price.toDouble(),
+      status: OrderStatus.success.name,
+      paymentMethod: PaymentMethod.online,
+      context: context,
+    );
     navigate(
         type: PageType.replace,
         context: context,
-        page: const OrderPreparingPage());
+        page: OrderPreparingPage(
+          recipe: widget.recipe,
+        ));
   }
 
   void handlePaymentError(PaymentFailureResponse response) {
+    var user = Provider.of<UserProvider>(context);
+    OrderServices().create(
+        uid: user.userModel.id,
+        itemImage: widget.image,
+        itemName: widget.name,
+        total: total,
+        tax: tax,
+        discount: discount.toDouble(),
+        subtotal: widget.price.toDouble(),
+        status: OrderStatus.success.name,
+        paymentMethod: PaymentMethod.online,
+        context: context);
+    navigate(
+        type: PageType.replace,
+        context: context,
+        page: OrderPreparingPage(recipe: widget.recipe));
     Fluttertoast.showToast(
         msg: "Paymtment Failed", backgroundColor: Colors.red);
   }

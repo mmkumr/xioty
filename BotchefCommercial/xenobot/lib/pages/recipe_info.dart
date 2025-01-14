@@ -5,7 +5,6 @@
 [12:43 pm, 16/09/2024] Eswar Dora(Xioty Solution): ml
 */
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:number_inc_dec/number_inc_dec.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
@@ -200,7 +199,15 @@ class _RecipeInfoPageState extends State<RecipeInfoPage> {
                         navigate(
                             type: PageType.replace,
                             context: context,
-                            page: const CheckoutPage());
+                            page: CheckoutPage(
+                              image: widget.recipe.imageUrl,
+                              name: widget.recipe.name,
+                              price: price,
+                              bases: bases,
+                              sweetners: sweetners,
+                              flavours: flavours,
+                              recipe: widget.recipe,
+                            ));
                       },
                       child: Padding(
                         padding: const EdgeInsets.only(
@@ -366,7 +373,15 @@ class _RecipeInfoPageState extends State<RecipeInfoPage> {
                           navigate(
                               type: PageType.replace,
                               context: context,
-                              page: const CheckoutPage());
+                              page: CheckoutPage(
+                                image: widget.recipe.imageUrl,
+                                name: widget.recipe.name,
+                                price: price,
+                                bases: bases,
+                                sweetners: sweetners,
+                                flavours: flavours,
+                                recipe: widget.recipe,
+                              ));
                         }
                       },
                       child: Padding(

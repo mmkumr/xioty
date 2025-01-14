@@ -89,6 +89,11 @@ class UserProvider with ChangeNotifier {
     }
   }
 
+  updateUserData() async {
+    _userModel = await _userServices.getUserById(user.uid);
+    notifyListeners();
+  }
+
   signOut() async {
     _auth.signOut();
     _status = Status.unauthenticated;

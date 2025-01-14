@@ -2,13 +2,15 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:xenobot/commons.dart';
+import 'package:xenobot/models/recipe.dart';
 import 'package:xenobot/pages/rating.dart';
 
 import '../partials/appbar.dart';
 import '../partials/menu.dart';
 
 class OrderPreparingPage extends StatefulWidget {
-  const OrderPreparingPage({super.key});
+  final RecipeModel recipe;
+  const OrderPreparingPage({super.key, required this.recipe});
 
   @override
   State<OrderPreparingPage> createState() => _OrderPreparingPageState();
@@ -19,7 +21,12 @@ class _OrderPreparingPageState extends State<OrderPreparingPage> {
   void initState() {
     Future.delayed(const Duration(seconds: 5), () {
       if (!mounted) return;
-      navigate(type: PageType.replace, context: context, page: const Rating());
+      navigate(
+          type: PageType.replace,
+          context: context,
+          page: Rating(
+            recipe: widget.recipe,
+          ));
     });
     super.initState();
   }

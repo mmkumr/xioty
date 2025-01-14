@@ -1,6 +1,8 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:xenobot/commons.dart';
+import 'package:xenobot/db/orders.dart';
+import 'package:xenobot/models/order.dart';
 import 'package:xenobot/partials/menu.dart';
 
 class HistoryPage extends StatefulWidget {
@@ -11,6 +13,7 @@ class HistoryPage extends StatefulWidget {
 }
 
 class _HistoryPageState extends State<HistoryPage> {
+  List<OrderModel> orders = [];
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -58,16 +61,10 @@ class _HistoryPageState extends State<HistoryPage> {
           );
         },
       ),
-      bottomNavigationBar: Container(
-        color: Colors.white70,
-        height: 100,
-        alignment: Alignment.center,
-        child: const Text(
-          "Total Consumption: Rs.115",
-          softWrap: true,
-          style: TextStyle(color: Colors.red, fontSize: 20),
-        ),
-      ),
     );
+  }
+
+  getHistory() async {
+    orders = await OrderServices().getAll();
   }
 }

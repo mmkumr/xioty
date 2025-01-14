@@ -114,7 +114,8 @@ class RecipeServices {
   }) async {
     try {
       await _firestore.collection(collection).doc(rid).update({
-        "rating": ((oldRating * noOfRatings) + newRating) / noOfRatings + 1,
+        "rating": (((oldRating * noOfRatings) + newRating) / (noOfRatings + 1))
+            .round(),
         "noOfRatings": noOfRatings + 1
       });
       Fluttertoast.showToast(

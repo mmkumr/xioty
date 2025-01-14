@@ -5,7 +5,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:number_inc_dec/number_inc_dec.dart';
-import 'package:xenobot/pages/order_preparing.dart';
 import 'package:xenobot/partials/appbar.dart';
 import 'package:xenobot/partials/menu.dart';
 
@@ -256,10 +255,10 @@ class _CustomizeRecipePageState extends State<CustomizeRecipePage> {
                       onPressed: () async {
                         await savePreference();
                         if (context.mounted) {
-                          navigate(
-                              type: PageType.replace,
-                              context: context,
-                              page: const OrderPreparingPage());
+                          // navigate(
+                          //     type: PageType.replace,
+                          //     context: context,
+                          //     page: const OrderPreparingPage());
                         }
                       },
                       child: Padding(

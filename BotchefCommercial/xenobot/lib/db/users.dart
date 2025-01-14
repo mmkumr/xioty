@@ -1,10 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:provider/provider.dart';
+import 'package:xenobot/providers/user_provider.dart';
 
 import '../models/user.dart';
 
 enum UserType { normal, chef, admin }
+
+enum PaymentMethod { wallet, online }
 
 class UserServices {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -24,6 +28,7 @@ class UserServices {
         "wallet": 0,
         "type": 0,
         'created_on': DateTime.now(),
+        "paymentMethod": 0,
       });
       Fluttertoast.showToast(
           msg: "User creation successfully.", backgroundColor: Colors.green);
@@ -38,6 +43,7 @@ class UserServices {
   updateType({
     required String id,
     required UserType type,
+    required BuildContext context,
   }) async {
     try {
       await _firestore.collection(collection).doc(id).update({
@@ -46,11 +52,57 @@ class UserServices {
       Fluttertoast.showToast(
           msg: "User type updated successfully.",
           backgroundColor: Colors.green);
+      if (!context.mounted) return;
+      var user = Provider.of<UserProvider>(context);
+      user.updateUserData();
     } catch (e) {
       debugPrint('ERROR: ${e.toString()}');
 
       Fluttertoast.showToast(
           msg: "User type updating Failed!", backgroundColor: Colors.red);
+    }
+  }
+
+  updatePaymentMethod({
+    required String id,
+    required PaymentMethod paymentMethod,
+    required BuildContext context,
+  }) async {
+    try {
+      await _firestore.collection(collection).doc(id).update({
+        "paymentMethod": paymentMethod.index,
+      });
+      Fluttertoast.showToast(
+          msg: "Payment method updated successfully.",
+          backgroundColor: Colors.green);
+      if (!context.mounted) return;
+      var user = Provider.of<UserProvider>(context);
+      user.updateUserData();
+    } catch (e) {
+      debugPrint('ERROR: ${e.toString()}');
+
+      Fluttertoast.showToast(
+          msg: "Payment method updating Failed!", backgroundColor: Colors.red);
+    }
+  }
+
+  updateWallet({
+    required String id,
+    required double price,
+    required BuildContext context,
+  }) async {
+    try {
+      await _firestore.collection(collection).doc(id).update({
+        "wallet": FieldValue.increment(-price),
+      });
+      if (!context.mounted) return;
+      var user = Provider.of<UserProvider>(context);
+      user.updateUserData();
+    } catch (e) {
+      debugPrint('ERROR: ${e.toString()}');
+
+      Fluttertoast.showToast(
+          msg: "Please try after sometime!", backgroundColor: Colors.red);
     }
   }
 

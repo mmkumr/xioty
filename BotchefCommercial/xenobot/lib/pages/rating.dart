@@ -2,10 +2,13 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:xenobot/commons.dart';
+import 'package:xenobot/db/recipes.dart';
+import 'package:xenobot/models/recipe.dart';
 import 'package:xenobot/pages/home.dart';
 
 class Rating extends StatefulWidget {
-  const Rating({super.key});
+  final RecipeModel recipe;
+  const Rating({super.key, required this.recipe});
 
   @override
   State<Rating> createState() => _RatingState();
@@ -113,6 +116,12 @@ class _RatingState extends State<Rating> {
                 ),
                 color: elementsC,
                 onPressed: () {
+                  RecipeServices().updateRating(
+                    rid: widget.recipe.rid,
+                    noOfRatings: widget.recipe.noOfRatings,
+                    newRating: rating.round(),
+                    oldRating: widget.recipe.rating,
+                  );
                   navigate(
                       type: PageType.replace,
                       context: context,
