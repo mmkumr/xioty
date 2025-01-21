@@ -428,7 +428,7 @@ class _EditIngredientsPageState extends State<EditIngredientsPage> {
   }
 
   getIngredientsPrice() async {
-    await IngredientsPricesServices().get().then((value) {
+    await IngredientPriceServices().get().then((value) {
       setState(() {
         ingredientsPrices = value;
         priceController.text = widget.recipe.price.toString();

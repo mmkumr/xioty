@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:xenobot/db/coupons.dart';
+import 'package:xenobot/models/coupon.dart';
 
 import '../commons.dart';
 import 'coupon.dart';
@@ -11,6 +13,13 @@ class CouponsPage extends StatefulWidget {
 }
 
 class _CouponsPageState extends State<CouponsPage> {
+  @override
+  void didChangeDependencies() {
+    getCoupon();
+    super.didChangeDependencies();
+  }
+
+  List<CouponModel> coupons = [];
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -61,7 +70,7 @@ class _CouponsPageState extends State<CouponsPage> {
                   ListView.builder(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
-                    itemCount: 4,
+                    itemCount: coupons.length,
                     itemBuilder: (BuildContext context, int index) {
                       return Padding(
                         padding: const EdgeInsets.only(
@@ -71,21 +80,27 @@ class _CouponsPageState extends State<CouponsPage> {
                             navigate(
                                 type: PageType.replace,
                                 context: context,
-                                page: const NewCouponsPage());
+                                page: NewCouponsPage(
+                                  coupon: coupons[index],
+                                ));
                           },
                           tileColor: Colors.black12,
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(40)),
-                          leading: const Text(
-                            "₹20",
+                          leading: Text(
+                            "₹${coupons[index].value}",
                             softWrap: true,
                           ),
-                          title: const Text(
-                            "OFF20",
+                          title: Text(
+                            coupons[index].name,
                             softWrap: true,
                           ),
                           trailing: IconButton(
-                            onPressed: () {},
+                            onPressed: () {
+                              CouponServices().delete(id: coupons[index].id);
+                              coupons.removeAt(index);
+                              setState(() {});
+                            },
                             icon: const Icon(Icons.delete),
                           ),
                         ),
@@ -99,5 +114,11 @@ class _CouponsPageState extends State<CouponsPage> {
         ],
       ),
     );
+  }
+
+  getCoupon() async {
+    coupons = await CouponServices().getAll();
+    debugPrint(coupons[0].id);
+    setState(() {});
   }
 }

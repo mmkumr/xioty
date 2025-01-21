@@ -1,8 +1,12 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_pagination/firebase_pagination.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+import 'package:xenobot/models/kiosk.dart';
 import 'package:xenobot/pages/coupons.dart';
 import 'package:xenobot/pages/ingredients_level.dart';
+import 'package:xenobot/pages/ingredients_price.dart';
 import 'package:xenobot/pages/kiosk.dart';
 import 'package:xenobot/pages/users.dart';
 
@@ -16,6 +20,13 @@ class KiosksPage extends StatefulWidget {
 }
 
 class _KiosksPageState extends State<KiosksPage> {
+  int noOfKiosks = 0;
+  @override
+  void didChangeDependencies() {
+    countKiosks();
+    super.didChangeDependencies();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -54,6 +65,16 @@ class _KiosksPageState extends State<KiosksPage> {
               icon: const Icon(FontAwesomeIcons.tag),
             ),
           ),
+          IconButton(
+            onPressed: () {
+              navigate(
+                  type: PageType.push,
+                  context: context,
+                  page: const IngredientsPricePage());
+            },
+            color: elementsC,
+            icon: const Icon(FontAwesomeIcons.indianRupeeSign),
+          ),
         ],
       ),
       body: Column(
@@ -69,10 +90,13 @@ class _KiosksPageState extends State<KiosksPage> {
                 ),
                 color: elementsC,
                 onPressed: () {
+                  debugPrint((noOfKiosks + 1).toString());
                   navigate(
                       type: PageType.replace,
                       context: context,
-                      page: const NewKioskPage());
+                      page: NewKioskPage(
+                        id: (noOfKiosks + 1).toString(),
+                      ));
                 },
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
@@ -94,11 +118,15 @@ class _KiosksPageState extends State<KiosksPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  ListView.builder(
+                  FirestorePagination(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
-                    itemCount: 4,
-                    itemBuilder: (BuildContext context, int index) {
+                    query: FirebaseFirestore.instance
+                        .collection("kiosks")
+                        .orderBy("created_on", descending: true),
+                    itemBuilder: (context, documentSnapshot, index) {
+                      KioskModel kiosk =
+                          KioskModel.fromSnapshot(documentSnapshot);
                       return Padding(
                         padding: const EdgeInsets.only(
                             top: 8.0, bottom: 8.0, left: 20.0, right: 20.0),
@@ -109,7 +137,10 @@ class _KiosksPageState extends State<KiosksPage> {
                                 navigate(
                                     type: PageType.replace,
                                     context: context,
-                                    page: const NewKioskPage());
+                                    page: NewKioskPage(
+                                      id: kiosk.id,
+                                      kiosk: kiosk,
+                                    ));
                               },
                               tileColor: Colors.black12,
                               shape: const RoundedRectangleBorder(
@@ -119,11 +150,11 @@ class _KiosksPageState extends State<KiosksPage> {
                                 ),
                               ),
                               leading: Text(
-                                "Kiosk ID: ${index + 1}",
+                                "Kiosk ID: ${kiosk.id}",
                                 softWrap: true,
                               ),
-                              title: const Text(
-                                "Mukesh Kumar, Baad Baazar, Berhampur, Odisha",
+                              title: Text(
+                                "${kiosk.name},\n${kiosk.address}",
                                 softWrap: true,
                               ),
                               trailing: IconButton(
@@ -135,7 +166,7 @@ class _KiosksPageState extends State<KiosksPage> {
                                           width: width(context) * 0.7,
                                           child: QrImageView(
                                             data:
-                                                '{"Kiosk ID": "${index + 1}", "Name": "Mukesh Kumar", "Address": "Baada Baazar, Berhampur, Odisha"}',
+                                                '{"Kiosk ID": "${kiosk.id}", "Name": "${kiosk.name}", "Address": "${kiosk.address}"}',
                                             version: QrVersions.auto,
                                             embeddedImage: Image.asset(
                                               "assets/imgs/logo.png",
@@ -147,7 +178,8 @@ class _KiosksPageState extends State<KiosksPage> {
                                     );
                                   },
                                   icon: const Icon(Icons.qr_code)),
-                              subtitle: const Text("22/12/2022 24:30"),
+                              subtitle:
+                                  Text((kiosk.createdOn.toDate()).toString()),
                             ),
                             Row(
                               children: [
@@ -157,7 +189,9 @@ class _KiosksPageState extends State<KiosksPage> {
                                       navigate(
                                           type: PageType.push,
                                           context: context,
-                                          page: const IngredientsLevelPage());
+                                          page: IngredientsLevelPage(
+                                            kiosk: kiosk,
+                                          ));
                                     },
                                     color: elementsC,
                                     shape: const RoundedRectangleBorder(
@@ -183,5 +217,13 @@ class _KiosksPageState extends State<KiosksPage> {
         ],
       ),
     );
+  }
+
+  countKiosks() async {
+    AggregateQuerySnapshot query =
+        await FirebaseFirestore.instance.collection('kiosks').count().get();
+    setState(() {
+      noOfKiosks = query.count!;
+    });
   }
 }

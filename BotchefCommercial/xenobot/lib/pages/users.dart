@@ -1,6 +1,11 @@
+import 'dart:math';
+
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_pagination/firebase_pagination.dart';
 import 'package:flutter/material.dart';
-import 'package:xenobot/pages/ingredients_level.dart';
+import 'package:xenobot/db/users.dart';
+import 'package:xenobot/models/user.dart';
 
 import '../commons.dart';
 
@@ -12,6 +17,8 @@ class UsersPage extends StatefulWidget {
 }
 
 class _UsersPageState extends State<UsersPage> {
+  List<UserModel> users = [];
+  String updated = "";
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -28,18 +35,21 @@ class _UsersPageState extends State<UsersPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  ListView.builder(
+                  FirestorePagination(
+                    key: Key(updated),
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
-                    itemCount: 4,
-                    itemBuilder: (BuildContext context, int index) {
+                    query: FirebaseFirestore.instance
+                        .collection("users")
+                        .orderBy("created_on", descending: true),
+                    itemBuilder: (context, documentSnapshot, index) {
+                      UserModel user = UserModel.fromSnapshot(documentSnapshot);
                       return Padding(
                         padding: const EdgeInsets.only(
                             top: 8.0, bottom: 8.0, left: 20.0, right: 20.0),
                         child: Column(
                           children: [
                             ListTile(
-                              onTap: () {},
                               tileColor: Colors.black12,
                               shape: const RoundedRectangleBorder(
                                 borderRadius: BorderRadius.only(
@@ -51,31 +61,34 @@ class _UsersPageState extends State<UsersPage> {
                                 decoration: const BoxDecoration(
                                   shape: BoxShape.circle,
                                 ),
-                                child: const CircleAvatar(
+                                child: CircleAvatar(
                                   backgroundImage: CachedNetworkImageProvider(
-                                      "https://lh3.googleusercontent.com/a/ACg8ocJ4IhUP1z32yYbb2A2CL3WW_kkISolKvWSge0E4RiVQ3Db-6c4u=s288-c-no"),
+                                      user.profileUrl),
                                 ),
                               ),
-                              title: const Text(
-                                "mmkumr.ping@gmail.com",
+                              title: Text(
+                                user.email,
                                 textAlign: TextAlign.center,
                                 softWrap: true,
                               ),
-                              subtitle: const Text(
-                                "22/12/2022 24:30",
+                              subtitle: Text(
+                                user.createdOn.toDate().toString(),
                                 textAlign: TextAlign.center,
                               ),
                             ),
-                            if (index % 2 == 0)
+                            if (user.type == UserType.normal)
                               Row(
                                 children: [
                                   Expanded(
                                     child: MaterialButton(
-                                      onPressed: () {
-                                        navigate(
-                                            type: PageType.push,
-                                            context: context,
-                                            page: const IngredientsLevelPage());
+                                      onPressed: () async {
+                                        await UserServices().updateType(
+                                            id: user.id,
+                                            type: UserType.chef,
+                                            context: context);
+                                        setState(() {
+                                          updated = Random().toString();
+                                        });
                                       },
                                       color: elementsC,
                                       shape: const RoundedRectangleBorder(
@@ -90,16 +103,19 @@ class _UsersPageState extends State<UsersPage> {
                                   ),
                                 ],
                               ),
-                            if (index % 2 != 0)
+                            if (user.type == UserType.chef)
                               Row(
                                 children: [
                                   Expanded(
                                     child: MaterialButton(
                                       onPressed: () {
-                                        navigate(
-                                            type: PageType.push,
-                                            context: context,
-                                            page: const IngredientsLevelPage());
+                                        UserServices().updateType(
+                                            id: user.id,
+                                            type: UserType.normal,
+                                            context: context);
+                                        setState(() {
+                                          updated = Random().toString();
+                                        });
                                       },
                                       color: elementsC,
                                       shape: const RoundedRectangleBorder(
@@ -126,5 +142,9 @@ class _UsersPageState extends State<UsersPage> {
         ],
       ),
     );
+  }
+
+  getUsers() async {
+    users = await UserServices().getAll();
   }
 }

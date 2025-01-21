@@ -475,7 +475,7 @@ class _RecipeInfoPageState extends State<RecipeInfoPage> {
   }
 
   getIngredientsPrice() async {
-    await IngredientsPricesServices().get().then((value) {
+    await IngredientPriceServices().get().then((value) {
       setState(() {
         ingredientsPrices = value;
         price = widget.recipe.price;

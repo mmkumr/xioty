@@ -1,17 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:xenobot/db/coupons.dart';
+import 'package:xenobot/models/coupon.dart';
 import 'package:xenobot/pages/coupons.dart';
 
 import '../commons.dart';
 
 class NewCouponsPage extends StatefulWidget {
-  const NewCouponsPage({super.key});
+  final CouponModel? coupon;
+  const NewCouponsPage({super.key, this.coupon});
 
   @override
   State<NewCouponsPage> createState() => _NewCouponsPageState();
 }
 
 class _NewCouponsPageState extends State<NewCouponsPage> {
+  @override
+  void initState() {
+    if (widget.coupon != null) {
+      couponName.text = widget.coupon!.name;
+      couponValue.text = widget.coupon!.value.toString();
+      setState(() {});
+    }
+    super.initState();
+  }
+
   TextEditingController couponName = TextEditingController();
   TextEditingController couponValue = TextEditingController();
   GlobalKey<FormState> formKey = GlobalKey<FormState>();
@@ -33,6 +46,7 @@ class _NewCouponsPageState extends State<NewCouponsPage> {
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: TextFormField(
+                  textCapitalization: TextCapitalization.characters,
                   controller: couponName,
                   style: const TextStyle(color: Colors.black),
                   decoration: InputDecoration(
@@ -92,11 +106,26 @@ class _NewCouponsPageState extends State<NewCouponsPage> {
                     borderRadius: BorderRadius.circular(40),
                   ),
                   color: elementsC,
-                  onPressed: () {
-                    navigate(
-                        type: PageType.replace,
-                        context: context,
-                        page: const CouponsPage());
+                  onPressed: () async {
+                    if (formKey.currentState!.validate()) {
+                      CouponServices couponServices = CouponServices();
+                      if (widget.coupon != null) {
+                        await couponServices.update(
+                            name: couponName.text,
+                            value: int.parse(couponValue.text),
+                            id: widget.coupon!.id);
+                      } else {
+                        await couponServices.create(
+                          name: couponName.text,
+                          value: int.parse(couponValue.text),
+                        );
+                      }
+                      if (!context.mounted) return;
+                      navigate(
+                          type: PageType.replace,
+                          context: context,
+                          page: const CouponsPage());
+                    }
                   },
                   child: Padding(
                     padding: const EdgeInsets.only(

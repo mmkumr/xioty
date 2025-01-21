@@ -1,48 +1,34 @@
 import 'package:flutter/material.dart';
-import 'package:xenobot/db/kiosks.dart';
-import 'package:xenobot/db/recipes.dart';
-import 'package:xenobot/models/kiosk.dart';
+import 'package:flutter/services.dart';
 
 import '../commons.dart';
 import '../db/ingredients_prices.dart';
 import '../models/ingredients_price.dart';
 
-class IngredientsLevelPage extends StatefulWidget {
-  final KioskModel kiosk;
-  const IngredientsLevelPage({super.key, required this.kiosk});
+class IngredientsPricePage extends StatefulWidget {
+  const IngredientsPricePage({super.key});
 
   @override
-  State<IngredientsLevelPage> createState() => _IngredientsLevelPageState();
+  State<IngredientsPricePage> createState() => _IngredientsPricePageState();
 }
 
-class _IngredientsLevelPageState extends State<IngredientsLevelPage> {
+class _IngredientsPricePageState extends State<IngredientsPricePage> {
   @override
   void didChangeDependencies() async {
-    await getIngredientsPrice();
     super.didChangeDependencies();
+    getIngredientsPrice();
   }
 
-  @override
-  void initState() {
-    setState(() {
-      bases = widget.kiosk.bases;
-      flavours = widget.kiosk.flavours;
-      sweetners = widget.kiosk.sweetners;
-    });
-    super.initState();
-  }
-
-  List bases = [];
-  List flavours = [];
-  List sweetners = [];
-  int refillCount = 456;
+  List<TextEditingController> bases = [];
+  List<TextEditingController> flavours = [];
+  List<TextEditingController> sweetners = [];
 
   IngredientsPriceModel? ingredientsPrices;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Ingredients Level"),
+        title: const Text("Ingredients Prices"),
         backgroundColor: bgC,
         elevation: 0,
       ),
@@ -51,63 +37,6 @@ class _IngredientsLevelPageState extends State<IngredientsLevelPage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(
-                "Kiosk ID: ${widget.kiosk.id}",
-                softWrap: true,
-                style:
-                    const TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(left: 30.0),
-                child: ListTile(
-                  trailing: IconButton(
-                      onPressed: () {
-                        for (var i = 0;
-                            i < ingredientsPrices!.bases.length;
-                            i++) {
-                          bases[i] = refillCount;
-                        }
-                        for (var i = 0;
-                            i < ingredientsPrices!.sweetners.length;
-                            i++) {
-                          sweetners[i] = refillCount;
-                        }
-                        for (var i = 0;
-                            i < ingredientsPrices!.flavours.length;
-                            i++) {
-                          flavours[i] = refillCount;
-                        }
-                        setState(() {});
-                      },
-                      icon: const Icon(Icons.refresh)),
-                  title: Row(
-                    children: [
-                      Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Container(
-                            color: primaryC,
-                            child: const Padding(
-                              padding: EdgeInsets.only(
-                                top: 8.0,
-                                bottom: 8.0,
-                                left: 15.0,
-                                right: 15.0,
-                              ),
-                              child: Text(
-                                "Refill all",
-                                softWrap: true,
-                                textAlign: TextAlign.center,
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
               const Padding(
                 padding: EdgeInsets.only(left: 30.0),
                 child: Align(
@@ -124,18 +53,11 @@ class _IngredientsLevelPageState extends State<IngredientsLevelPage> {
                 Padding(
                   padding: const EdgeInsets.only(left: 30.0),
                   child: ListTile(
-                    trailing: IconButton(
-                        onPressed: () {
-                          setState(() {
-                            bases[index] = refillCount;
-                          });
-                        },
-                        icon: const Icon(Icons.refresh)),
                     title: Row(
                       children: [
                         Expanded(
                           child: Padding(
-                            padding: const EdgeInsets.all(8.0),
+                            padding: const EdgeInsets.all(5.0),
                             child: Container(
                               color: primaryC,
                               child: Padding(
@@ -156,23 +78,32 @@ class _IngredientsLevelPageState extends State<IngredientsLevelPage> {
                           ),
                         ),
                         Expanded(
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Container(
-                              color: primaryC,
-                              child: Padding(
-                                padding: const EdgeInsets.only(
-                                  top: 8.0,
-                                  bottom: 8.0,
-                                  left: 15.0,
-                                  right: 15.0,
-                                ),
-                                child: Text(
-                                  bases[index].toString(),
-                                  softWrap: true,
-                                ),
+                          child: TextFormField(
+                            controller: bases[index],
+                            style: const TextStyle(color: Colors.black),
+                            decoration: InputDecoration(
+                              filled: true,
+                              fillColor: const Color(0xfff6f2f2),
+                              label: const Text(
+                                "₹/ml",
+                                style: TextStyle(
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10.0),
                               ),
                             ),
+                            keyboardType: TextInputType.number,
+                            inputFormatters: <TextInputFormatter>[
+                              FilteringTextInputFormatter.digitsOnly,
+                            ],
+                            validator: (value) {
+                              if (value!.isEmpty) {
+                                return "Enter valid Price";
+                              }
+                              return null;
+                            },
                           ),
                         ),
                       ],
@@ -195,13 +126,6 @@ class _IngredientsLevelPageState extends State<IngredientsLevelPage> {
                 Padding(
                   padding: const EdgeInsets.only(left: 30.0),
                   child: ListTile(
-                    trailing: IconButton(
-                        onPressed: () {
-                          setState(() {
-                            sweetners[index] = refillCount;
-                          });
-                        },
-                        icon: const Icon(Icons.refresh)),
                     title: Row(
                       children: [
                         Expanded(
@@ -216,34 +140,43 @@ class _IngredientsLevelPageState extends State<IngredientsLevelPage> {
                                   left: 15.0,
                                   right: 15.0,
                                 ),
-                                child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Text(
-                                    ingredientsPrices!.sweetners[index].key,
-                                    softWrap: true,
-                                    style: const TextStyle(
-                                        fontWeight: FontWeight.bold),
-                                  ),
+                                child: Text(
+                                  ingredientsPrices!.sweetners[index].key,
+                                  softWrap: true,
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.bold),
                                 ),
                               ),
                             ),
                           ),
                         ),
                         Expanded(
-                          child: Container(
-                            color: primaryC,
-                            child: Padding(
-                              padding: const EdgeInsets.only(
-                                top: 8.0,
-                                bottom: 8.0,
-                                left: 15.0,
-                                right: 15.0,
+                          child: TextFormField(
+                            controller: sweetners[index],
+                            style: const TextStyle(color: Colors.black),
+                            decoration: InputDecoration(
+                              filled: true,
+                              fillColor: const Color(0xfff6f2f2),
+                              label: const Text(
+                                "₹/ml",
+                                style: TextStyle(
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.bold),
                               ),
-                              child: Text(
-                                sweetners[index].toString(),
-                                softWrap: true,
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10.0),
                               ),
                             ),
+                            keyboardType: TextInputType.number,
+                            inputFormatters: <TextInputFormatter>[
+                              FilteringTextInputFormatter.digitsOnly,
+                            ],
+                            validator: (value) {
+                              if (value!.isEmpty) {
+                                return "Enter valid Price";
+                              }
+                              return null;
+                            },
                           ),
                         ),
                       ],
@@ -266,13 +199,6 @@ class _IngredientsLevelPageState extends State<IngredientsLevelPage> {
                 Padding(
                   padding: const EdgeInsets.only(left: 30.0),
                   child: ListTile(
-                    trailing: IconButton(
-                        onPressed: () {
-                          setState(() {
-                            flavours[index] = refillCount;
-                          });
-                        },
-                        icon: const Icon(Icons.refresh)),
                     title: Row(
                       children: [
                         Expanded(
@@ -298,23 +224,32 @@ class _IngredientsLevelPageState extends State<IngredientsLevelPage> {
                           ),
                         ),
                         Expanded(
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Container(
-                              color: primaryC,
-                              child: Padding(
-                                padding: const EdgeInsets.only(
-                                  top: 8.0,
-                                  bottom: 8.0,
-                                  left: 15.0,
-                                  right: 15.0,
-                                ),
-                                child: Text(
-                                  flavours[index].toString(),
-                                  softWrap: true,
-                                ),
+                          child: TextFormField(
+                            controller: flavours[index],
+                            style: const TextStyle(color: Colors.black),
+                            decoration: InputDecoration(
+                              filled: true,
+                              fillColor: const Color(0xfff6f2f2),
+                              label: const Text(
+                                "₹/ml",
+                                style: TextStyle(
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10.0),
                               ),
                             ),
+                            keyboardType: TextInputType.number,
+                            inputFormatters: <TextInputFormatter>[
+                              FilteringTextInputFormatter.digitsOnly,
+                            ],
+                            validator: (value) {
+                              if (value!.isEmpty) {
+                                return "Enter valid Price";
+                              }
+                              return null;
+                            },
                           ),
                         ),
                       ],
@@ -330,11 +265,29 @@ class _IngredientsLevelPageState extends State<IngredientsLevelPage> {
                   ),
                   color: elementsC,
                   onPressed: () async {
-                    await KioskServices().updateIngredients(
-                        id: widget.kiosk.id,
-                        bases: bases,
-                        flavours: flavours,
-                        sweetners: sweetners);
+                    List<Map<String, int>> basePrices = List.generate(
+                        ingredientsPrices!.bases.length, (int index) {
+                      return {
+                        ingredientsPrices!.bases[index].key:
+                            int.parse(bases[index].text)
+                      };
+                    });
+                    List<Map<String, int>> sweetnerPrices = List.generate(
+                        ingredientsPrices!.sweetners.length, (int index) {
+                      return {
+                        ingredientsPrices!.sweetners[index].key:
+                            int.parse(sweetners[index].text)
+                      };
+                    });
+                    List<Map<String, int>> flavourPrices = List.generate(
+                        ingredientsPrices!.flavours.length, (int index) {
+                      return {
+                        ingredientsPrices!.flavours[index].key:
+                            int.parse(flavours[index].text)
+                      };
+                    });
+                    await IngredientPriceServices()
+                        .update(basePrices, sweetnerPrices, flavourPrices);
                     if (!context.mounted) return;
                     Navigator.of(context).pop();
                   },
@@ -364,6 +317,20 @@ class _IngredientsLevelPageState extends State<IngredientsLevelPage> {
     await IngredientPriceServices().get().then((value) {
       setState(() {
         ingredientsPrices = value;
+        bases = List.generate(ingredientsPrices!.bases.length, (int index) {
+          return TextEditingController(
+              text: ingredientsPrices!.bases[index].value.toString());
+        });
+        sweetners =
+            List.generate(ingredientsPrices!.sweetners.length, (int index) {
+          return TextEditingController(
+              text: ingredientsPrices!.sweetners[index].value.toString());
+        });
+        flavours =
+            List.generate(ingredientsPrices!.flavours.length, (int index) {
+          return TextEditingController(
+              text: ingredientsPrices!.flavours[index].value.toString());
+        });
       });
     });
   }

@@ -15,6 +15,12 @@ class HistoryPage extends StatefulWidget {
 class _HistoryPageState extends State<HistoryPage> {
   List<OrderModel> orders = [];
   @override
+  void didChangeDependencies() {
+    getHistory();
+    super.didChangeDependencies();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: bgC,
@@ -26,7 +32,7 @@ class _HistoryPageState extends State<HistoryPage> {
       ),
       drawer: menu(context),
       body: ListView.builder(
-        itemCount: 10,
+        itemCount: orders.length,
         itemBuilder: (BuildContext context, int index) {
           return Padding(
             padding: const EdgeInsets.only(
@@ -48,14 +54,14 @@ class _HistoryPageState extends State<HistoryPage> {
                       "https://c8.alamy.com/comp/2F1KG86/cup-of-healthy-garlic-tea-on-white-background-2F1KG86.jpg"),
                 ),
               ),
-              title: const Text(
-                "Irani Tea",
-                style: TextStyle(fontWeight: FontWeight.bold),
+              title: Text(
+                orders[index].itemName,
+                style: const TextStyle(fontWeight: FontWeight.bold),
               ),
-              subtitle: const Text("22/12/2022 24:30"),
-              trailing: const Text(
-                "₹34",
-                style: TextStyle(fontWeight: FontWeight.bold),
+              subtitle: Text((orders[index].date.toDate()).toString()),
+              trailing: Text(
+                orders[index].total.toString(),
+                style: const TextStyle(fontWeight: FontWeight.bold),
               ),
             ),
           );
@@ -66,5 +72,6 @@ class _HistoryPageState extends State<HistoryPage> {
 
   getHistory() async {
     orders = await OrderServices().getAll();
+    setState(() {});
   }
 }

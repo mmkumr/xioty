@@ -52,8 +52,7 @@ class UserServices {
       Fluttertoast.showToast(
           msg: "User type updated successfully.",
           backgroundColor: Colors.green);
-      if (!context.mounted) return;
-      var user = Provider.of<UserProvider>(context);
+      var user = Provider.of<UserProvider>(context, listen: false);
       user.updateUserData();
     } catch (e) {
       debugPrint('ERROR: ${e.toString()}');
@@ -75,8 +74,7 @@ class UserServices {
       Fluttertoast.showToast(
           msg: "Payment method updated successfully.",
           backgroundColor: Colors.green);
-      if (!context.mounted) return;
-      var user = Provider.of<UserProvider>(context);
+      var user = Provider.of<UserProvider>(context, listen: false);
       user.updateUserData();
     } catch (e) {
       debugPrint('ERROR: ${e.toString()}');
@@ -95,8 +93,7 @@ class UserServices {
       await _firestore.collection(collection).doc(id).update({
         "wallet": FieldValue.increment(-price),
       });
-      if (!context.mounted) return;
-      var user = Provider.of<UserProvider>(context);
+      var user = Provider.of<UserProvider>(context, listen: false);
       user.updateUserData();
     } catch (e) {
       debugPrint('ERROR: ${e.toString()}');
@@ -109,5 +106,14 @@ class UserServices {
   Future<UserModel> getUserById(String id) =>
       _firestore.collection(collection).doc(id).get().then((doc) {
         return UserModel.fromSnapshot(doc);
+      });
+
+  Future<List<UserModel>> getAll() =>
+      _firestore.collection(collection).get().then((value) {
+        List<UserModel> users = [];
+        for (var recipe in value.docs) {
+          users.add(UserModel.fromSnapshot(recipe));
+        }
+        return users;
       });
 }
