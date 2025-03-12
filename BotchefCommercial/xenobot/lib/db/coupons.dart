@@ -65,6 +65,20 @@ class CouponServices {
       _firestore.collection(collection).doc(id).get().then((doc) {
         return CouponModel.fromSnapshot(doc);
       });
+  Future<int> getByName(String name) {
+    return _firestore
+        .collection(collection)
+        .where("name", isEqualTo: name)
+        .get()
+        .then((doc) {
+      if (doc.docs.isNotEmpty) {
+        return CouponModel.fromSnapshot(doc.docs[0]).value;
+      } else {
+        return 0;
+      }
+    });
+  }
+
   Future<List<CouponModel>> getAll() =>
       _firestore.collection(collection).get().then((value) {
         List<CouponModel> coupons = [];

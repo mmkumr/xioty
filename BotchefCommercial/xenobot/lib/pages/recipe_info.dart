@@ -6,12 +6,18 @@
 */
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:number_inc_dec/number_inc_dec.dart';
+import 'package:provider/provider.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
+import 'package:xenobot/db/edited_recipes.dart';
+import 'package:xenobot/db/kiosks.dart';
 import 'package:xenobot/models/recipe.dart';
 import 'package:xenobot/pages/checkout.dart';
 import 'package:xenobot/partials/appbar.dart';
 import 'package:xenobot/partials/menu.dart';
+import 'package:xenobot/providers/kiosk_provide.dart';
+import 'package:xenobot/providers/user_provider.dart';
 
 import '../commons.dart';
 import '../db/ingredients_prices.dart';
@@ -30,9 +36,9 @@ class _RecipeInfoPageState extends State<RecipeInfoPage> {
   @override
   void initState() {
     super.initState();
-    bases = widget.recipe.base;
+    bases = widget.recipe.bases;
     sweetners = widget.recipe.sweetners;
-    flavours = widget.recipe.flavors;
+    flavours = widget.recipe.flavours;
     nos = bases.length + sweetners.length + flavours.length;
     cupSize = cupSizes[0];
   }
@@ -62,7 +68,8 @@ class _RecipeInfoPageState extends State<RecipeInfoPage> {
   List sweetners = [];
   List flavours = [];
   IngredientsPriceModel? ingredientsPrices;
-
+  TextEditingController name = TextEditingController();
+  bool start = false;
   int price = 0;
   int ingredientsTotalQuantity = 0,
       remainingQuantity = 0,
@@ -169,7 +176,6 @@ class _RecipeInfoPageState extends State<RecipeInfoPage> {
                                     i++;
                                   }
                                   for (var flavour in flavours) {
-                                    debugPrint(quantities[i].text);
                                     quantities[i].text =
                                         ((desiredQuantity / 130) * flavour)
                                             .round()
@@ -196,18 +202,7 @@ class _RecipeInfoPageState extends State<RecipeInfoPage> {
                       ),
                       color: elementsC,
                       onPressed: () {
-                        navigate(
-                            type: PageType.replace,
-                            context: context,
-                            page: CheckoutPage(
-                              image: widget.recipe.imageUrl,
-                              name: widget.recipe.name,
-                              price: price,
-                              bases: bases,
-                              sweetners: sweetners,
-                              flavours: flavours,
-                              recipe: widget.recipe,
-                            ));
+                        buyRegular();
                       },
                       child: Padding(
                         padding: const EdgeInsets.only(
@@ -278,9 +273,11 @@ class _RecipeInfoPageState extends State<RecipeInfoPage> {
                                 initialValue: sweetners[index],
                                 controller: quantities[index + bases.length],
                                 min: 0,
-                                max: int.parse(
-                                        quantities[index + bases.length].text) +
-                                    remainingQuantity,
+                                max: start
+                                    ? int.parse(quantities[index + bases.length]
+                                            .text) +
+                                        remainingQuantity
+                                    : desiredQuantity,
                                 onIncrement: (newValue) {
                                   updateSweetnersText(newValue, index);
                                 },
@@ -336,11 +333,13 @@ class _RecipeInfoPageState extends State<RecipeInfoPage> {
                                 controller: quantities[
                                     index + bases.length + sweetners.length],
                                 min: 0,
-                                max: int.parse(quantities[index +
-                                            bases.length +
-                                            sweetners.length]
-                                        .text) +
-                                    remainingQuantity,
+                                max: start
+                                    ? int.parse(quantities[index +
+                                                bases.length +
+                                                sweetners.length]
+                                            .text) +
+                                        remainingQuantity
+                                    : desiredQuantity,
                                 onIncrement: (newValue) {
                                   updateFlavoursText(newValue, index);
                                 },
@@ -371,17 +370,18 @@ class _RecipeInfoPageState extends State<RecipeInfoPage> {
                         await savePreference();
                         if (context.mounted) {
                           navigate(
-                              type: PageType.replace,
-                              context: context,
-                              page: CheckoutPage(
-                                image: widget.recipe.imageUrl,
-                                name: widget.recipe.name,
-                                price: price,
-                                bases: bases,
-                                sweetners: sweetners,
-                                flavours: flavours,
-                                recipe: widget.recipe,
-                              ));
+                            type: PageType.push,
+                            context: context,
+                            page: CheckoutPage(
+                              image: widget.recipe.imageUrl,
+                              name: widget.recipe.name,
+                              price: price,
+                              bases: bases,
+                              sweetners: sweetners,
+                              flavours: flavours,
+                              recipe: widget.recipe,
+                            ),
+                          );
                         }
                       },
                       child: Padding(
@@ -422,31 +422,93 @@ class _RecipeInfoPageState extends State<RecipeInfoPage> {
     );
   }
 
+  buyRegular() {
+    final kiosk = Provider.of<KioskProvider>(context, listen: false);
+    KioskServices kioskServices = KioskServices();
+    //Check if the kiosk has enough ingredients
+    for (var i = 0; i < kiosk.kioskModel.bases.length; i++) {
+      if (bases[i] > kiosk.kioskModel.bases[i]) {
+        Fluttertoast.showToast(
+            msg: "Insufficient ingredients in the kiosk",
+            backgroundColor: Colors.red);
+        return;
+      }
+    }
+    for (var i = 0; i < kiosk.kioskModel.sweetners.length; i++) {
+      if (sweetners[i] > kiosk.kioskModel.sweetners[i]) {
+        Fluttertoast.showToast(
+            msg: "Insufficient ingredients in the kiosk",
+            backgroundColor: Colors.red);
+        return;
+      }
+    }
+    for (var i = 0; i < kiosk.kioskModel.flavours.length; i++) {
+      if (flavours[i] > kiosk.kioskModel.flavours[i]) {
+        Fluttertoast.showToast(
+            msg: "Insufficient ingredients in the kiosk",
+            backgroundColor: Colors.red);
+        return;
+      }
+    }
+    //End of check if the kiosk has enough ingredients
+    navigate(
+        type: PageType.push,
+        context: context,
+        page: CheckoutPage(
+          image: widget.recipe.imageUrl,
+          name: widget.recipe.name,
+          price: price,
+          bases: bases,
+          sweetners: sweetners,
+          flavours: flavours,
+          recipe: widget.recipe,
+        ));
+  }
+
   savePreference() async {
     await showDialog(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text("Would you like to save your preference"),
-        content: TextFormField(
-          decoration: InputDecoration(
-            filled: true,
-            fillColor: Colors.white,
-            labelText: "Name",
-            hintText: "Name",
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10.0),
+        content: Form(
+          key: formKey,
+          child: TextFormField(
+            controller: name,
+            decoration: InputDecoration(
+              filled: true,
+              fillColor: Colors.white,
+              labelText: "Name",
+              hintText: "Name",
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10.0),
+              ),
             ),
+            validator: (value) {
+              if (value!.isEmpty) {
+                return "Invalid input";
+              }
+              return null;
+            },
           ),
-          validator: (value) {
-            if (value!.isEmpty) {
-              return "Invalid input";
-            }
-            return null;
-          },
         ),
         actions: [
           TextButton(
-              onPressed: () {
+              onPressed: () async {
+                if (formKey.currentState!.validate()) {
+                  final user =
+                      Provider.of<UserProvider>(context, listen: false);
+                  final kiosk =
+                      Provider.of<KioskProvider>(context, listen: false);
+                  EditedRecipeServices().create(
+                      rid: widget.recipe.rid,
+                      uid: user.userModel.id,
+                      kid: kiosk.kioskModel.id,
+                      name: name.text,
+                      price: price,
+                      bases: bases,
+                      sweetners: sweetners,
+                      flavours: flavours);
+                }
                 Navigator.of(context).pop();
               },
               child: const Text("Save")),
@@ -460,26 +522,34 @@ class _RecipeInfoPageState extends State<RecipeInfoPage> {
     );
   }
 
-  // Function for updating the state after any event of the number_inc_dec widget in Sweetners values section to update the ingredientsTotalQuantity variable.
-  updateSweetnersText(num newValue, int index) {
+  // Function for updating the state after any event of the number_inc_dec widget in Base values section to update the ingredientsTotalQuantity variable.
+  updateBaseText(num newValue, int index) {
     setState(() {
       quantities[index].text = newValue.toString();
     });
   }
 
   // Function for updating the state after any event of the number_inc_dec widget in Sweetners values section to update the ingredientsTotalQuantity variable.
+  updateSweetnersText(num newValue, int index) {
+    setState(() {
+      quantities[index + bases.length].text = newValue.toString();
+    });
+  }
+
+  // Function for updating the state after any event of the number_inc_dec widget in Sweetners values section to update the ingredientsTotalQuantity variable.
   updateFlavoursText(num newValue, int index) {
     setState(() {
-      quantities[index + sweetners.length].text = newValue.toString();
+      quantities[index + bases.length + sweetners.length].text =
+          newValue.toString();
     });
   }
 
   getIngredientsPrice() async {
     await IngredientPriceServices().get().then((value) {
       setState(() {
+        quantities = [];
         ingredientsPrices = value;
         price = widget.recipe.price;
-
         for (var base in bases) {
           quantities.add(TextEditingController(text: base.toString()));
         }
@@ -489,6 +559,7 @@ class _RecipeInfoPageState extends State<RecipeInfoPage> {
         for (var flavour in flavours) {
           quantities.add(TextEditingController(text: flavour.toString()));
         }
+        start = true;
       });
     });
   }

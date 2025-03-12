@@ -12,7 +12,7 @@ class RecipeServices {
     required String kid,
     required String name,
     required String description,
-    required List base,
+    required List bases,
     required List sweetners,
     required List flavours,
     required String imageUrl,
@@ -23,9 +23,9 @@ class RecipeServices {
         "kid": kid,
         "name": name,
         "description": description,
-        "base": base,
+        "bases": bases,
         "sweetners": sweetners,
-        "flavors": flavours,
+        "flavours": flavours,
         "imageUrl": imageUrl,
         "price": 0,
         "rating": 0,
@@ -45,9 +45,9 @@ class RecipeServices {
     required String rid,
     required String name,
     required String description,
-    required List base,
+    required List bases,
     required List sweetners,
-    required List flavors,
+    required List flavours,
     required String imageUrl,
     required int price,
   }) async {
@@ -55,9 +55,9 @@ class RecipeServices {
       await _firestore.collection(collection).doc(rid).update({
         "name": name,
         "description": description,
-        "base": base,
+        "bases": bases,
         "sweetners": sweetners,
-        "flavors": flavors,
+        "flavours": flavours,
         "imageUrl": imageUrl,
         "price": price,
       });
@@ -125,6 +125,18 @@ class RecipeServices {
 
       Fluttertoast.showToast(
           msg: "Recipe updation Failed!", backgroundColor: Colors.red);
+    }
+  }
+
+  delete(String id) {
+    try {
+      _firestore.collection(collection).doc(id).delete();
+      Fluttertoast.showToast(
+          msg: "Recipe deleted successfully.", backgroundColor: Colors.green);
+    } catch (e) {
+      debugPrint('ERROR: ${e.toString()}');
+      Fluttertoast.showToast(
+          msg: "Recipe deletion Failed!", backgroundColor: Colors.red);
     }
   }
 }

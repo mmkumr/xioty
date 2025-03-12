@@ -3,10 +3,14 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
 import 'package:xenobot/commons.dart';
+import 'package:xenobot/db/coupons.dart';
+import 'package:xenobot/db/kiosks.dart';
 import 'package:xenobot/db/orders.dart';
 import 'package:xenobot/db/users.dart';
+import 'package:xenobot/models/kiosk.dart';
 import 'package:xenobot/models/recipe.dart';
 import 'package:xenobot/partials/appbar.dart';
+import 'package:xenobot/providers/kiosk_provide.dart';
 import 'package:xenobot/providers/user_provider.dart';
 
 import 'order_preparing.dart';
@@ -50,9 +54,15 @@ class _CheckoutPageState extends State<CheckoutPage> {
   double discount = 0;
   double tax = 0.0;
   double total = 0.0;
+  bool start = true;
 
   @override
   Widget build(BuildContext context) {
+    if (start) {
+      var user = Provider.of<UserProvider>(context);
+      user.updateUserData();
+      start = false;
+    }
     return Scaffold(
       backgroundColor: bgC,
       appBar: appbar,
@@ -83,7 +93,25 @@ class _CheckoutPageState extends State<CheckoutPage> {
                   borderRadius: BorderRadius.circular(40),
                 ),
                 color: elementsC,
-                onPressed: () {},
+                onPressed: () async {
+                  int discountValue =
+                      await CouponServices().getByName(couponName.text);
+                  if (discountValue != 0) {
+                    setState(() {
+                      discount = discountValue.toDouble();
+                      couponName.clear();
+                    });
+                    Fluttertoast.showToast(
+                        msg: "Coupon Applied Successfully",
+                        backgroundColor: Colors.green);
+                  } else {
+                    Fluttertoast.showToast(
+                        msg: "Coupon Not Found", backgroundColor: Colors.red);
+                    setState(() {
+                      couponName.clear();
+                    });
+                  }
+                },
                 child: Text(
                   "Apply",
                   style: TextStyle(
@@ -212,6 +240,8 @@ class _CheckoutPageState extends State<CheckoutPage> {
                 color: elementsC,
                 onPressed: () {
                   var user = Provider.of<UserProvider>(context, listen: false);
+                  var kiosk =
+                      Provider.of<KioskProvider>(context, listen: false);
                   if (user.userModel.paymentMethod == PaymentMethod.online) {
                     var options = {
                       'key': 'rzp_test_2Eh5LSk1v3ujdn',
@@ -226,28 +256,45 @@ class _CheckoutPageState extends State<CheckoutPage> {
                   } else if (user.userModel.paymentMethod ==
                           PaymentMethod.wallet &&
                       user.userModel.wallet > total) {
-                    try {
-                      OrderServices().create(
-                        uid: user.userModel.id,
-                        itemImage: widget.image,
-                        itemName: widget.name,
-                        total: total,
-                        tax: tax,
-                        discount: discount.toDouble(),
-                        subtotal: widget.price.toDouble(),
-                        status: OrderStatus.success.name,
-                        paymentMethod: PaymentMethod.wallet,
-                        context: context,
-                      );
-                      navigate(
-                          type: PageType.replace,
-                          context: context,
-                          page: OrderPreparingPage(
-                            recipe: widget.recipe,
-                          ));
-                    } catch (e) {
-                      debugPrint(e.toString());
+                    OrderServices().create(
+                      uid: user.userModel.id,
+                      itemImage: widget.image,
+                      itemName: widget.name,
+                      total: total,
+                      tax: tax,
+                      discount: discount.toDouble(),
+                      subtotal: widget.price.toDouble(),
+                      status: OrderStatus.success.name,
+                      paymentMethod: PaymentMethod.wallet,
+                      context: context,
+                    );
+                    List basesList = [];
+                    List sweetnersList = [];
+                    List flavoursList = [];
+                    KioskModel kioskModel = kiosk.kioskModel;
+                    for (int i = 0; i < kioskModel.bases.length; i++) {
+                      basesList.add(kioskModel.bases[i] - widget.bases[i]);
                     }
+                    for (int i = 0; i < kioskModel.sweetners.length; i++) {
+                      sweetnersList
+                          .add(kioskModel.sweetners[i] - widget.sweetners[i]);
+                    }
+                    for (int i = 0; i < kioskModel.flavours.length; i++) {
+                      flavoursList
+                          .add(kioskModel.flavours[i] - widget.flavours[i]);
+                    }
+                    KioskServices().updateIngredients(
+                        id: kioskModel.id,
+                        bases: basesList,
+                        flavours: flavoursList,
+                        sweetners: sweetnersList);
+                    navigate(
+                        type: PageType.replace,
+                        context: context,
+                        page: OrderPreparingPage(
+                          recipe: widget.recipe,
+                        ));
+                    user.updateUserData();
                   } else {
                     debugPrint(total.toStringAsFixed(2).replaceAll(".", ""));
                     var options = {
@@ -301,6 +348,25 @@ class _CheckoutPageState extends State<CheckoutPage> {
       paymentMethod: PaymentMethod.online,
       context: context,
     );
+    final kiosk = Provider.of<KioskProvider>(context, listen: false);
+    List basesList = [];
+    List sweetnersList = [];
+    List flavoursList = [];
+    KioskModel kioskModel = kiosk.kioskModel;
+    for (int i = 0; i < kioskModel.bases.length; i++) {
+      basesList.add(widget.bases[i] - kioskModel.bases[i]);
+    }
+    for (int i = 0; i < kioskModel.sweetners.length; i++) {
+      sweetnersList.add(widget.sweetners[i] - kioskModel.sweetners[i]);
+    }
+    for (int i = 0; i < kioskModel.flavours.length; i++) {
+      flavoursList.add(widget.flavours[i] - kioskModel.flavours[i]);
+    }
+    KioskServices().updateIngredients(
+        id: kioskModel.id,
+        bases: kioskModel.bases,
+        flavours: kioskModel.flavours,
+        sweetners: kioskModel.sweetners);
     navigate(
         type: PageType.replace,
         context: context,
@@ -310,7 +376,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
   }
 
   void handlePaymentError(PaymentFailureResponse response) {
-    var user = Provider.of<UserProvider>(context);
+    var user = Provider.of<UserProvider>(context, listen: true);
     OrderServices().create(
         uid: user.userModel.id,
         itemImage: widget.image,

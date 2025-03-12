@@ -1,0 +1,1 @@
+/mnt/MyWorkspace/Projects/xioty/Botchef_V2/Android/botchef_v2/build/app/intermediates/cxx/Debug/301c1u3j/obj/x86_64

@@ -3,7 +3,6 @@ import 'dart:io';
 
 import 'package:botchef_v2/db/recipe.dart';
 import 'package:botchef_v2/models/recipe.dart';
-import 'package:botchef_v2/models/user.dart';
 import 'package:botchef_v2/models/variant.dart';
 import 'package:botchef_v2/pages/home.dart';
 import 'package:botchef_v2/pages/machine_connect.dart';
@@ -15,6 +14,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:mqtt_client/mqtt_client.dart';
 import 'package:mqtt_client/mqtt_server_client.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../commons.dart';
 
@@ -57,7 +57,6 @@ class _CookingPageState extends State<CookingPage> {
   @override
   void didChangeDependencies() async {
     await mqttinit();
-    await createRecipe();
     super.didChangeDependencies();
   }
 
@@ -69,10 +68,12 @@ class _CookingPageState extends State<CookingPage> {
 
   @override
   Widget build(BuildContext context) {
-    if (!start && client.connectionState == MqttConnectionState.connected) {
+    if (!start &&
+        client.connectionStatus!.state == MqttConnectionState.connected) {
       if (receivedMessage == "Done") {
         Fluttertoast.showToast(msg: "Previous Recipe have been cooked");
         receivedMessage = "";
+        runningStatusSet(false);
         sendData('', 'response', true);
       }
       debugPrint("Waiting for machine response");
@@ -85,6 +86,7 @@ class _CookingPageState extends State<CookingPage> {
           startCountdown();
           Fluttertoast.showToast(msg: "Started Cooking");
           receivedMessage = "";
+          runningStatusSet(true);
           sendData('', 'response', true);
         } else {
           setState(() {});
@@ -93,7 +95,9 @@ class _CookingPageState extends State<CookingPage> {
               msg: "Please turn on you machine",
               backgroundColor: Colors.red,
             );
+            runningStatusSet(false);
             sendData('', 'response', true);
+            if (!context.mounted) return;
             navigate(
                 type: PageType.replace,
                 context: context,
@@ -104,8 +108,10 @@ class _CookingPageState extends State<CookingPage> {
       start = true;
     } else if (receivedMessage == "Done" && start) {
       receivedMessage = "";
+      runningStatusSet(false);
       sendData('', 'response', true);
       Future.delayed(Duration.zero, () {
+        if (!context.mounted) return;
         navigate(
             type: PageType.replace,
             context: context,
@@ -195,6 +201,16 @@ class _CookingPageState extends State<CookingPage> {
         ),
       ),
     );
+  }
+
+  Future<bool> runningStatusGet() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool("running") ?? false;
+  }
+
+  runningStatusSet(bool value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool("running", value);
   }
 
   startCountdown() {
@@ -314,6 +330,7 @@ class _CookingPageState extends State<CookingPage> {
     debugPrint(sendingTopic);
     if (sendingTopic.isEmpty) {
       Future(() {
+        if (!mounted) return;
         navigate(
             type: PageType.replace,
             context: context,
@@ -377,10 +394,13 @@ class _CookingPageState extends State<CookingPage> {
     debugPrint('Subscription confirmed for topic $topic');
   }
 
-  void onConnected() {
+  void onConnected() async {
     debugPrint('Client connection was successful');
     subscribe();
-    sendData(instructions.join("\n"), sendingTopic, false);
+    await createRecipe();
+    if (await runningStatusGet() == false) {
+      sendData(instructions.join("\n"), sendingTopic, false);
+    }
     setState(() {});
   }
 

@@ -7,9 +7,9 @@ class RecipeModel {
   static const KID = "kid";
   static const NAME = "name";
   static const DESCRIPTION = "description";
-  static const BASE = "base";
+  static const BASES = "bases";
   static const SWEETNERS = "sweetners";
-  static const FLAVORS = "flavors";
+  static const FLAVOURS = "flavours";
   static const IMAGE_URL = "imageUrl";
   static const PRICE = "price";
   static const RATING = "rating";
@@ -20,9 +20,9 @@ class RecipeModel {
   String? _kid;
   String? _name;
   String? _description;
-  List? _base;
+  List? _bases;
   List? _sweetners;
-  List? _flavors;
+  List? _flavours;
   String? _imageUrl;
   int? _price;
   int? _noOfRatings;
@@ -34,9 +34,9 @@ class RecipeModel {
   String get kid => _kid!;
   String get name => _name!;
   String get description => _description!;
-  List get base => _base!;
+  List get bases => _bases!;
   List get sweetners => _sweetners!;
-  List get flavors => _flavors!;
+  List get flavours => _flavours!;
   String get imageUrl => _imageUrl!;
   int get price => _price!;
   int get noOfRatings => _noOfRatings!;
@@ -49,9 +49,9 @@ class RecipeModel {
     _kid = snapshot[KID];
     _name = snapshot[NAME];
     _description = snapshot[DESCRIPTION];
-    _base = snapshot[BASE];
+    _bases = snapshot[BASES];
     _sweetners = snapshot[SWEETNERS];
-    _flavors = snapshot[FLAVORS];
+    _flavours = snapshot[FLAVOURS];
     _imageUrl = snapshot[IMAGE_URL];
     _price = snapshot[PRICE];
     _rating = snapshot[RATING];

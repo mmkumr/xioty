@@ -25,9 +25,9 @@ class _EditIngredientsPageState extends State<EditIngredientsPage> {
   @override
   void initState() {
     super.initState();
-    bases = widget.recipe.base;
+    bases = widget.recipe.bases;
     sweetners = widget.recipe.sweetners;
-    flavours = widget.recipe.flavors;
+    flavours = widget.recipe.flavours;
     nos = bases.length + sweetners.length + flavours.length;
   }
 
@@ -370,8 +370,8 @@ class _EditIngredientsPageState extends State<EditIngredientsPage> {
                         rid: widget.recipe.rid,
                         name: widget.recipe.name,
                         description: widget.recipe.description,
-                        base: basesList,
-                        flavors: flavoursList,
+                        bases: basesList,
+                        flavours: flavoursList,
                         sweetners: sweetnersList,
                         imageUrl: "",
                         price: price,
@@ -432,7 +432,6 @@ class _EditIngredientsPageState extends State<EditIngredientsPage> {
       setState(() {
         ingredientsPrices = value;
         priceController.text = widget.recipe.price.toString();
-
         for (var base in bases) {
           quantities.add(TextEditingController(text: base.toString()));
         }

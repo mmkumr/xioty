@@ -1,0 +1,1 @@
+/mnt/MyWorkspace/Projects/xioty/BotchefCommercial/xenobot/build/app/intermediates/cxx/Debug/3nv5n175/obj/x86_64

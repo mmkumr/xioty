@@ -1,3 +1,5 @@
+// ignore_for_file: unused_element
+
 /*
 [12:43 pm, 16/09/2024] Eswar Dora(Xioty Solution): 150, 250, 350
 [12:43 pm, 16/09/2024] Eswar Dora(Xioty Solution): ml
@@ -5,13 +7,23 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:number_inc_dec/number_inc_dec.dart';
+import 'package:razorpay_flutter/razorpay_flutter.dart';
+import 'package:xenobot/db/edited_recipes.dart';
+import 'package:xenobot/db/recipes.dart';
+import 'package:xenobot/models/edited_recipe.dart';
+import 'package:xenobot/models/recipe.dart';
+import 'package:xenobot/pages/checkout.dart';
+import 'package:xenobot/pages/my_recipes.dart';
 import 'package:xenobot/partials/appbar.dart';
 import 'package:xenobot/partials/menu.dart';
 
 import '../commons.dart';
+import '../db/ingredients_prices.dart';
+import '../models/ingredients_price.dart';
 
 class CustomizeRecipePage extends StatefulWidget {
-  const CustomizeRecipePage({super.key});
+  final EditedRecipeModel recipe;
+  const CustomizeRecipePage({super.key, required this.recipe});
 
   @override
   State<CustomizeRecipePage> createState() => _CustomizeRecipePageState();
@@ -22,9 +34,23 @@ class _CustomizeRecipePageState extends State<CustomizeRecipePage> {
   @override
   void initState() {
     super.initState();
-    quantities =
-        List.generate(nos, (index) => TextEditingController(text: "0"));
+    bases = widget.recipe.bases;
+    sweetners = widget.recipe.sweetners;
+    flavours = widget.recipe.flavours;
+    nos = bases.length + sweetners.length + flavours.length;
     cupSize = cupSizes[0];
+  }
+
+  @override
+  void didChangeDependencies() async {
+    await getIngredientsPrice();
+    super.didChangeDependencies();
+  }
+
+  @override
+  void dispose() {
+    razorpay.clear(); // Removes all listeners
+    super.dispose();
   }
 
   String cupSize = "";
@@ -36,20 +62,60 @@ class _CustomizeRecipePageState extends State<CustomizeRecipePage> {
 
   GlobalKey<FormState> formKey = GlobalKey<FormState>();
   List<TextEditingController> quantities = [];
-  List sweetners = ["Sugar", "Honey", "Jagery"];
-  List flavours = ["Chocolate", "Masala", "Rose"];
-  int ingredientsTotalQuantity = 0, remainingQuantity = 0;
+  List bases = [];
+  List sweetners = [];
+  List flavours = [];
+  IngredientsPriceModel? ingredientsPrices;
+  TextEditingController name = TextEditingController();
+  int price = 0;
+  int ingredientsTotalQuantity = 0,
+      remainingQuantity = 0,
+      desiredQuantity = 130;
+  Razorpay razorpay = Razorpay();
 
   @override
   Widget build(BuildContext context) {
+    desiredQuantity = int.parse(cupSize.replaceAll(" ml", "")) - 20;
     ingredientsTotalQuantity = 0;
+    price = 0;
     for (var quantity in quantities) {
       ingredientsTotalQuantity += int.parse(quantity.text);
     }
-    remainingQuantity = 130 - ingredientsTotalQuantity;
+    remainingQuantity = desiredQuantity - ingredientsTotalQuantity;
+    int i = 0;
+    for (var base in ingredientsPrices!.bases) {
+      price += base.value * int.parse(quantities[i].text);
+      i++;
+    }
+    for (var sweetner in ingredientsPrices!.sweetners) {
+      price += sweetner.value * int.parse(quantities[i].text);
+      i++;
+    }
+    for (var flavour in ingredientsPrices!.flavours) {
+      price += flavour.value * int.parse(quantities[i].text);
+      i++;
+    }
 
+    setState(() {
+      price;
+    });
     return Scaffold(
-      appBar: appbar,
+      appBar: AppBar(
+        backgroundColor: bgC,
+        elevation: 0,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.delete),
+            onPressed: () {
+              EditedRecipeServices().delete(widget.recipe.id);
+              navigate(
+                  type: PageType.replace,
+                  context: context,
+                  page: const MyRecipes());
+            },
+          ),
+        ],
+      ),
       drawer: menu(context),
       body: Center(
         child: SingleChildScrollView(
@@ -68,10 +134,11 @@ class _CustomizeRecipePageState extends State<CustomizeRecipePage> {
                           "https://c8.alamy.com/comp/2F1KG86/cup-of-healthy-garlic-tea-on-white-background-2F1KG86.jpg"),
                     ),
                   ),
-                  const Text(
-                    "Irani Tea",
+                  Text(
+                    widget.recipe.name,
                     softWrap: true,
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+                    style: const TextStyle(
+                        fontWeight: FontWeight.bold, fontSize: 20),
                   ),
                   Container(
                     width: 250,
@@ -102,6 +169,32 @@ class _CustomizeRecipePageState extends State<CustomizeRecipePage> {
                               onChanged: (String? value) {
                                 setState(() {
                                   cupSize = value!;
+                                  desiredQuantity =
+                                      int.parse(cupSize.replaceAll(" ml", "")) -
+                                          20;
+                                  int i = 0;
+                                  for (var base in bases) {
+                                    quantities[i].text =
+                                        ((desiredQuantity / 130) * base)
+                                            .round()
+                                            .toString();
+                                    i++;
+                                  }
+                                  for (var sweetner in sweetners) {
+                                    quantities[i].text =
+                                        ((desiredQuantity / 130) * sweetner)
+                                            .round()
+                                            .toString();
+                                    i++;
+                                  }
+                                  for (var flavour in flavours) {
+                                    debugPrint(quantities[i].text);
+                                    quantities[i].text =
+                                        ((desiredQuantity / 130) * flavour)
+                                            .round()
+                                            .toString();
+                                    i++;
+                                  }
                                 });
                               },
                               decoration: const InputDecoration(
@@ -157,16 +250,18 @@ class _CustomizeRecipePageState extends State<CustomizeRecipePage> {
                           children: [
                             Expanded(
                               child: Text(
-                                sweetners[index],
+                                ingredientsPrices!.sweetners[index].key,
                                 style: const TextStyle(
                                     fontWeight: FontWeight.bold),
                               ),
                             ),
                             Expanded(
                               child: NumberInputWithIncrementDecrement(
-                                controller: quantities[index],
+                                initialValue: sweetners[index],
+                                controller: quantities[index + bases.length],
                                 min: 0,
-                                max: int.parse(quantities[index].text) +
+                                max: int.parse(
+                                        quantities[index + bases.length].text) +
                                     remainingQuantity,
                                 onIncrement: (newValue) {
                                   updateSweetnersText(newValue, index);
@@ -212,19 +307,21 @@ class _CustomizeRecipePageState extends State<CustomizeRecipePage> {
                           children: [
                             Expanded(
                               child: Text(
-                                flavours[index],
+                                ingredientsPrices!.flavours[index].key,
                                 style: const TextStyle(
                                     fontWeight: FontWeight.bold),
                               ),
                             ),
                             Expanded(
                               child: NumberInputWithIncrementDecrement(
-                                controller:
-                                    quantities[index + sweetners.length],
+                                initialValue: flavours[index],
+                                controller: quantities[
+                                    index + bases.length + sweetners.length],
                                 min: 0,
-                                max: int.parse(
-                                        quantities[index + sweetners.length]
-                                            .text) +
+                                max: int.parse(quantities[index +
+                                            bases.length +
+                                            sweetners.length]
+                                        .text) +
                                     remainingQuantity,
                                 onIncrement: (newValue) {
                                   updateFlavoursText(newValue, index);
@@ -253,13 +350,29 @@ class _CustomizeRecipePageState extends State<CustomizeRecipePage> {
                       ),
                       color: elementsC,
                       onPressed: () async {
-                        await savePreference();
-                        if (context.mounted) {
-                          // navigate(
-                          //     type: PageType.replace,
-                          //     context: context,
-                          //     page: const OrderPreparingPage());
-                        }
+                        RecipeModel recipeData =
+                            await RecipeServices().getById(widget.recipe.rid);
+
+                        await EditedRecipeServices().update(
+                            id: widget.recipe.id,
+                            price: price,
+                            bases: bases,
+                            sweetners: sweetners,
+                            flavours: flavours);
+                        if (!context.mounted) return;
+                        navigate(
+                          type: PageType.push,
+                          context: context,
+                          page: CheckoutPage(
+                            image: recipeData.imageUrl,
+                            name: widget.recipe.name,
+                            price: price,
+                            bases: bases,
+                            sweetners: sweetners,
+                            flavours: flavours,
+                            recipe: recipeData,
+                          ),
+                        );
                       },
                       child: Padding(
                         padding: const EdgeInsets.only(
@@ -282,6 +395,20 @@ class _CustomizeRecipePageState extends State<CustomizeRecipePage> {
           ),
         ),
       ),
+      bottomNavigationBar: Container(
+        color: primaryC,
+        child: Row(
+          children: [
+            Expanded(
+              child: Text(
+                "Total Price: ₹$price",
+                textAlign: TextAlign.center,
+                style: const TextStyle(color: Colors.green, fontSize: 20),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -299,24 +426,22 @@ class _CustomizeRecipePageState extends State<CustomizeRecipePage> {
     });
   }
 
-  savePreference() async {
-    await showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text("Would you like to save your preference"),
-        actions: [
-          TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text("Save")),
-          TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text("Don't Save"))
-        ],
-      ),
-    );
+  getIngredientsPrice() async {
+    await IngredientPriceServices().get().then((value) {
+      setState(() {
+        ingredientsPrices = value;
+        price = widget.recipe.price;
+        quantities = [];
+        for (var base in bases) {
+          quantities.add(TextEditingController(text: base.toString()));
+        }
+        for (var sweetner in sweetners) {
+          quantities.add(TextEditingController(text: sweetner.toString()));
+        }
+        for (var flavour in flavours) {
+          quantities.add(TextEditingController(text: flavour.toString()));
+        }
+      });
+    });
   }
 }

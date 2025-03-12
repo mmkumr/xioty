@@ -27,7 +27,6 @@ dependencies:
   firebase_messaging: any
   flutter_local_notifications: any
   image_picker: ^0.8.7+4
-  image_cropper: ^3.0.3
   fluttertoast: ^8.2.1
   cached_network_image: ^3.3.1
   google_sign_in: ^6.1.0
@@ -36,7 +35,7 @@ dependencies:
   loading_animation_widget: ^1.2.1
   algolia: ^1.1.2
   mqtt_client: ^10.2.1
-  shared_preferences: ^2.2.3
+  shared_preferences: ^2.5.2
 
 dev_dependencies:
   flutter_test:

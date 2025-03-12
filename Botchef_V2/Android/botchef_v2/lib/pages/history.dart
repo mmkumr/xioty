@@ -21,8 +21,6 @@ class _HistoryPageState extends State<HistoryPage> {
   void initState() {
     super.initState();
   }
-  # The following adds the Cupertino Icons font to your application.
-  # Use with the CupertinoIcons class for iOS style icons.
 
   @override
   void didChangeDependencies() async {

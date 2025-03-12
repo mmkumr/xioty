@@ -90,7 +90,7 @@ class UserProvider with ChangeNotifier {
   }
 
   updateUserData() async {
-    _userModel = await _userServices.getUserById(user.uid);
+    _userModel = await _userServices.getUserById(_user.uid);
     notifyListeners();
   }
 

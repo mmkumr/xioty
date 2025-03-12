@@ -1,0 +1,2 @@
+/mnt/MyWorkspace/Projects/xioty/BotchefCommercial/xenobot/android/app/.cxx/Debug/3nv5n175/armeabi-v7a/CMakeFiles/edit_cache.dir
+/mnt/MyWorkspace/Projects/xioty/BotchefCommercial/xenobot/android/app/.cxx/Debug/3nv5n175/armeabi-v7a/CMakeFiles/rebuild_cache.dir

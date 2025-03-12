@@ -11,7 +11,7 @@ import 'package:provider/provider.dart';
 import 'package:xenobot/db/recipes.dart';
 import 'package:xenobot/models/recipe.dart';
 import 'package:xenobot/pages/edit_ingredients.dart';
-import 'package:xenobot/partials/appbar.dart';
+import 'package:xenobot/pages/my_recipes.dart';
 import 'package:xenobot/partials/menu.dart';
 import 'package:xenobot/providers/kiosk_provide.dart';
 import 'package:xenobot/providers/user_provider.dart';
@@ -30,9 +30,7 @@ class _RecipePageState extends State<RecipePage> {
   GlobalKey<FormState> formKey = GlobalKey<FormState>();
   TextEditingController recipeName = TextEditingController();
   TextEditingController description = TextEditingController();
-  List bases = ["Milk", "Evaporated Milk", "Black Tea", "Green Tea"];
-  List sweetners = ["Sugar", "Honey", "Jagery"];
-  List flavours = ["Chocolate", "Masala", "Rose"];
+
   XFile? image;
   String? photoUrl;
   bool loading = false;
@@ -81,7 +79,23 @@ class _RecipePageState extends State<RecipePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: appbar,
+      appBar: AppBar(
+        backgroundColor: bgC,
+        elevation: 0,
+        actions: [
+          if (widget.recipe != null)
+            IconButton(
+              icon: const Icon(Icons.delete),
+              onPressed: () {
+                RecipeServices().delete(widget.recipe!.rid);
+                navigate(
+                    type: PageType.replace,
+                    context: context,
+                    page: const MyRecipes());
+              },
+            ),
+        ],
+      ),
       drawer: menu(context),
       body: loading
           ? Center(
@@ -245,7 +259,7 @@ class _RecipePageState extends State<RecipePage> {
           kid: kiosk.kioskModel.id,
           name: recipeName.text,
           description: description.text,
-          base: basesList,
+          bases: basesList,
           sweetners: sweetnersList,
           flavours: flavoursList,
           imageUrl: "",

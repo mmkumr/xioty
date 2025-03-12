@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:xenobot/db/kiosks.dart';
-import 'package:xenobot/db/recipes.dart';
 import 'package:xenobot/models/kiosk.dart';
 
 import '../commons.dart';

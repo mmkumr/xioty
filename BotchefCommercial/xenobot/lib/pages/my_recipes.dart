@@ -1,11 +1,14 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:xenobot/db/edited_recipes.dart';
 import 'package:xenobot/db/recipes.dart';
+import 'package:xenobot/models/edited_recipe.dart';
 import 'package:xenobot/models/recipe.dart';
 import 'package:xenobot/pages/recipe.dart';
 import 'package:xenobot/pages/recipe_customize.dart';
 import 'package:xenobot/partials/appbar.dart';
+import 'package:xenobot/providers/kiosk_provide.dart';
 
 import '../commons.dart';
 import '../partials/menu.dart';
@@ -20,12 +23,7 @@ class MyRecipes extends StatefulWidget {
 
 class _MyRecipesState extends State<MyRecipes> {
   List<RecipeModel> myRecipes = [];
-  @override
-  void didChangeDependencies() {
-    getMyRecipes();
-    super.didChangeDependencies();
-  }
-
+  List<EditedRecipeModel> editedRecipes = [];
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -79,7 +77,7 @@ class _MyRecipesState extends State<MyRecipes> {
                   ListView.builder(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
-                    itemCount: 4,
+                    itemCount: editedRecipes.length,
                     itemBuilder: (BuildContext context, int index) {
                       return Padding(
                         padding: const EdgeInsets.only(
@@ -89,7 +87,9 @@ class _MyRecipesState extends State<MyRecipes> {
                             navigate(
                                 type: PageType.push,
                                 context: context,
-                                page: const CustomizeRecipePage());
+                                page: CustomizeRecipePage(
+                                  recipe: editedRecipes[index],
+                                ));
                           },
                           tileColor: Colors.black12,
                           shape: const RoundedRectangleBorder(
@@ -107,9 +107,9 @@ class _MyRecipesState extends State<MyRecipes> {
                                   "https://c8.alamy.com/comp/2F1KG86/cup-of-healthy-garlic-tea-on-white-background-2F1KG86.jpg"),
                             ),
                           ),
-                          title: const Text(
-                            "Irani Tea",
-                            style: TextStyle(fontWeight: FontWeight.bold),
+                          title: Text(
+                            editedRecipes[index].name,
+                            style: const TextStyle(fontWeight: FontWeight.bold),
                           ),
                         ),
                       );
@@ -171,6 +171,22 @@ class _MyRecipesState extends State<MyRecipes> {
         ],
       ),
     );
+  }
+
+  @override
+  void didChangeDependencies() {
+    getMyRecipes();
+    getEditedRecipes();
+    super.didChangeDependencies();
+  }
+
+  getEditedRecipes() async {
+    final user = Provider.of<UserProvider>(context);
+    final kiosk = Provider.of<KioskProvider>(context);
+
+    editedRecipes = await EditedRecipeServices()
+        .getRecipes(kid: kiosk.kioskModel.id, uid: user.userModel.id);
+    setState(() {});
   }
 
   getMyRecipes() async {

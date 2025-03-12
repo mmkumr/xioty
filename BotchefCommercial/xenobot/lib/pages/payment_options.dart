@@ -28,6 +28,14 @@ class _PaymentOptionsPageState extends State<PaymentOptionsPage> {
     razorpay.on(Razorpay.EVENT_PAYMENT_ERROR, handlePaymentError);
   }
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final user = Provider.of<UserProvider>(context);
+    _selectedValue = user.userModel.paymentMethod.index + 1;
+    setState(() {});
+  }
+
   int _selectedValue = 1;
   @override
   Widget build(BuildContext context) {
@@ -61,7 +69,8 @@ class _PaymentOptionsPageState extends State<PaymentOptionsPage> {
                 ),
                 subtitle: Row(
                   children: [
-                    Text('Balance: Rs.${user.userModel.wallet}'),
+                    Text(
+                        'Balance: Rs.${user.userModel.wallet.toStringAsFixed(2)}'),
                     TextButton(
                       onPressed: () {
                         addAmmountWallet();
