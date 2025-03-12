@@ -258,6 +258,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                       user.userModel.wallet > total) {
                     OrderServices().create(
                       uid: user.userModel.id,
+                      kid: kiosk.kioskModel.id,
                       itemImage: widget.image,
                       itemName: widget.name,
                       total: total,
@@ -336,8 +337,10 @@ class _CheckoutPageState extends State<CheckoutPage> {
 
   void handlePaymentSuccess(PaymentSuccessResponse response) {
     var user = Provider.of<UserProvider>(context, listen: false);
+    var kiosk = Provider.of<KioskProvider>(context, listen: false);
     OrderServices().create(
       uid: user.userModel.id,
+      kid: kiosk.kioskModel.id,
       itemImage: widget.image,
       itemName: widget.name,
       total: total,
@@ -348,7 +351,6 @@ class _CheckoutPageState extends State<CheckoutPage> {
       paymentMethod: PaymentMethod.online,
       context: context,
     );
-    final kiosk = Provider.of<KioskProvider>(context, listen: false);
     List basesList = [];
     List sweetnersList = [];
     List flavoursList = [];
@@ -376,9 +378,11 @@ class _CheckoutPageState extends State<CheckoutPage> {
   }
 
   void handlePaymentError(PaymentFailureResponse response) {
-    var user = Provider.of<UserProvider>(context, listen: true);
+    var user = Provider.of<UserProvider>(context, listen: false);
+    var kiosk = Provider.of<KioskProvider>(context, listen: false);
     OrderServices().create(
         uid: user.userModel.id,
+        kid: kiosk.kioskModel.id,
         itemImage: widget.image,
         itemName: widget.name,
         total: total,

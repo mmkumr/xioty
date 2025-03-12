@@ -191,7 +191,9 @@ class _MyRecipesState extends State<MyRecipes> {
 
   getMyRecipes() async {
     final user = Provider.of<UserProvider>(context);
-    myRecipes = await RecipeServices().getMyRecipes(uid: user.userModel.id);
+    final kiosk = Provider.of<KioskProvider>(context);
+    myRecipes = await RecipeServices()
+        .getMyRecipes(uid: user.userModel.id, kid: kiosk.kioskModel.id);
     setState(() {});
   }
 }

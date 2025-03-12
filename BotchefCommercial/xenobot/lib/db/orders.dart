@@ -20,6 +20,7 @@ class OrderServices {
     required double total,
     required String itemName,
     required String itemImage,
+    required String kid,
     required BuildContext context,
   }) async {
     try {
@@ -34,6 +35,7 @@ class OrderServices {
         "itemName": itemName,
         "itemImage": itemImage,
         "date": DateTime.now(),
+        "kid": kid
       });
       if (paymentMethod == PaymentMethod.wallet) {
         UserServices().updateWallet(id: uid, price: total, context: context);
@@ -53,7 +55,7 @@ class OrderServices {
         return OrderModel.fromSnapshot(doc);
       });
 
-  Future<List<OrderModel>> getAll() =>
+  Future<List<OrderModel>> getAll(String kid, String) =>
       _firestore.collection(collection).get().then((value) {
         List<OrderModel> orders = [];
         for (var order in value.docs) {

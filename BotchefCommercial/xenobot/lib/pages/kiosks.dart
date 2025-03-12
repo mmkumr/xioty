@@ -5,6 +5,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:xenobot/models/kiosk.dart';
 import 'package:xenobot/pages/coupons.dart';
+import 'package:xenobot/pages/history.dart';
 import 'package:xenobot/pages/ingredients_level.dart';
 import 'package:xenobot/pages/ingredients_price.dart';
 import 'package:xenobot/pages/kiosk.dart';
@@ -180,6 +181,25 @@ class _KiosksPageState extends State<KiosksPage> {
                                   icon: const Icon(Icons.qr_code)),
                               subtitle:
                                   Text((kiosk.createdOn.toDate()).toString()),
+                            ),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: MaterialButton(
+                                    onPressed: () {
+                                      navigate(
+                                          type: PageType.push,
+                                          context: context,
+                                          page: HistoryPage(
+                                            admin: true,
+                                            kioskId: kiosk.id,
+                                          ));
+                                    },
+                                    color: elementsC,
+                                    child: const Text("History"),
+                                  ),
+                                ),
+                              ],
                             ),
                             Row(
                               children: [

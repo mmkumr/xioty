@@ -5,6 +5,7 @@ import 'package:xenobot/db/users.dart';
 
 class OrderModel {
   static const UID = "uid";
+  static const KID = "kid";
   static const PAYMENT_METHOD = "paymentMethod";
   static const STATUS = "status";
   static const SUBTOTAL = "subtotal";
@@ -16,6 +17,7 @@ class OrderModel {
   static const DATE = "date";
 
   String? _uid;
+  String? _kid;
   PaymentMethod? _paymentMethod;
   String? _status;
   double? _subtotal;
@@ -28,6 +30,7 @@ class OrderModel {
 
 //  getters
   String get uid => _uid!;
+  String get kid => _kid!;
   PaymentMethod get paymentMode => _paymentMethod!;
   String get status => _status!;
   double get subtotal => _subtotal!;
@@ -41,6 +44,7 @@ class OrderModel {
   // public variables
   OrderModel.fromSnapshot(DocumentSnapshot snapshot) {
     _uid = snapshot[UID];
+    _kid = snapshot[KID];
     _status = snapshot[STATUS];
     _subtotal = snapshot[SUBTOTAL];
     _tax = snapshot[TAX];

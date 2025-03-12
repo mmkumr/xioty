@@ -72,7 +72,9 @@ Widget menu(BuildContext context) {
             navigate(
                 type: PageType.push,
                 context: context,
-                page: const HistoryPage());
+                page: const HistoryPage(
+                  admin: false,
+                ));
           },
         ),
         ListTile(

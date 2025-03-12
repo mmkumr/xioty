@@ -84,9 +84,10 @@ class RecipeServices {
         }
         return recipes;
       });
-  Future<List<RecipeModel>> getMyRecipes({required String uid}) => _firestore
+  Future<List<RecipeModel>> getMyRecipes({required String uid, required String kid}) => _firestore
           .collection(collection)
           .where("uid", isEqualTo: uid)
+          .where("kid", isEqualTo: kid)
           .get()
           .then((value) {
         List<RecipeModel> recipes = [];

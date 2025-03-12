@@ -1,27 +1,28 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_pagination/firebase_pagination.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:xenobot/commons.dart';
-import 'package:xenobot/db/orders.dart';
 import 'package:xenobot/models/order.dart';
 import 'package:xenobot/partials/menu.dart';
+import 'package:xenobot/providers/kiosk_provide.dart';
+import 'package:xenobot/providers/user_provider.dart';
 
 class HistoryPage extends StatefulWidget {
-  const HistoryPage({super.key});
+  final bool admin;
+  final String? kioskId;
+  const HistoryPage({super.key, required this.admin, this.kioskId});
 
   @override
   State<HistoryPage> createState() => _HistoryPageState();
 }
 
 class _HistoryPageState extends State<HistoryPage> {
-  List<OrderModel> orders = [];
-  @override
-  void didChangeDependencies() {
-    getHistory();
-    super.didChangeDependencies();
-  }
-
   @override
   Widget build(BuildContext context) {
+    final kiosk = Provider.of<KioskProvider>(context);
+    final user = Provider.of<UserProvider>(context);
     return Scaffold(
       backgroundColor: bgC,
       appBar: AppBar(
@@ -31,9 +32,17 @@ class _HistoryPageState extends State<HistoryPage> {
         elevation: 0,
       ),
       drawer: menu(context),
-      body: ListView.builder(
-        itemCount: orders.length,
-        itemBuilder: (BuildContext context, int index) {
+      body: FirestorePagination(
+        query: widget.admin
+            ? FirebaseFirestore.instance
+                .collection("orders")
+                .where("kid", isEqualTo: widget.kioskId)
+            : FirebaseFirestore.instance
+                .collection("orders")
+                .where("kid", isEqualTo: kiosk.kioskModel.id)
+                .where("uid", isEqualTo: user.userModel.id),
+        itemBuilder: (context, documentSnapshot, index) {
+          OrderModel order = OrderModel.fromSnapshot(documentSnapshot);
           return Padding(
             padding: const EdgeInsets.only(
                 top: 8.0, bottom: 8.0, left: 20.0, right: 20.0),
@@ -55,12 +64,12 @@ class _HistoryPageState extends State<HistoryPage> {
                 ),
               ),
               title: Text(
-                orders[index].itemName,
+                order.itemName,
                 style: const TextStyle(fontWeight: FontWeight.bold),
               ),
-              subtitle: Text((orders[index].date.toDate()).toString()),
+              subtitle: Text((order.date.toDate()).toString()),
               trailing: Text(
-                orders[index].total.toString(),
+                order.total.toString(),
                 style: const TextStyle(fontWeight: FontWeight.bold),
               ),
             ),
@@ -68,10 +77,5 @@ class _HistoryPageState extends State<HistoryPage> {
         },
       ),
     );
-  }
-
-  getHistory() async {
-    orders = await OrderServices().getAll();
-    setState(() {});
   }
 }
