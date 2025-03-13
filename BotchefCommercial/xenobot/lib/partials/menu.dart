@@ -99,10 +99,14 @@ Widget menu(BuildContext context) {
           title: const Text('Log Out'),
           onTap: () {
             user.signOut();
-            navigate(
-                type: PageType.replace,
-                context: context,
-                page: const LoginPage());
+            Navigator.pushAndRemoveUntil<dynamic>(
+              context,
+              MaterialPageRoute<dynamic>(
+                builder: (BuildContext context) => const LoginPage(),
+              ),
+              (route) =>
+                  false, //if you want to disable back feature set to false
+            );
           },
           leading: const Icon(FontAwesomeIcons.rightFromBracket),
         ),

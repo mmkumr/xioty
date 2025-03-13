@@ -1,7 +1,10 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
+import 'package:upi_pay/upi_pay.dart';
 import 'package:xenobot/commons.dart';
 import 'package:xenobot/db/coupons.dart';
 import 'package:xenobot/db/kiosks.dart';
@@ -46,6 +49,11 @@ class _CheckoutPageState extends State<CheckoutPage> {
     razorpay.on(Razorpay.EVENT_PAYMENT_ERROR, handlePaymentError);
     tax = widget.price * (5 / 100);
     total = (widget.price + tax) - discount;
+    Future.delayed(const Duration(milliseconds: 0), () async {
+      appMetaList = await upiPay.getInstalledUpiApplications(
+          statusType: UpiApplicationDiscoveryAppStatusType.all);
+      setState(() {});
+    });
   }
 
   TextEditingController couponName = TextEditingController();
@@ -55,12 +63,18 @@ class _CheckoutPageState extends State<CheckoutPage> {
   double tax = 0.0;
   double total = 0.0;
   bool start = true;
+  bool fetched = false; //For checking if the wallet value has been fetched.
+  final upiPay = UpiPay();
+  List<ApplicationMeta>? appMetaList;
 
   @override
   Widget build(BuildContext context) {
     if (start) {
       var user = Provider.of<UserProvider>(context);
-      user.updateUserData();
+      user.updateUserData().then((value) => setState(() {
+            fetched = true;
+          }));
+
       start = false;
     }
     return Scaffold(
@@ -239,79 +253,8 @@ class _CheckoutPageState extends State<CheckoutPage> {
                 ),
                 color: elementsC,
                 onPressed: () {
-                  var user = Provider.of<UserProvider>(context, listen: false);
-                  var kiosk =
-                      Provider.of<KioskProvider>(context, listen: false);
-                  if (user.userModel.paymentMethod == PaymentMethod.online) {
-                    var options = {
-                      'key': 'rzp_test_2Eh5LSk1v3ujdn',
-                      'amount': "${total.toString()}00",
-                      'name': user.userModel.name,
-                      'description': widget.name,
-                      'prefill': {
-                        'email': user.userModel.email,
-                      }
-                    };
-                    razorpay.open(options);
-                  } else if (user.userModel.paymentMethod ==
-                          PaymentMethod.wallet &&
-                      user.userModel.wallet > total) {
-                    OrderServices().create(
-                      uid: user.userModel.id,
-                      kid: kiosk.kioskModel.id,
-                      itemImage: widget.image,
-                      itemName: widget.name,
-                      total: total,
-                      tax: tax,
-                      discount: discount.toDouble(),
-                      subtotal: widget.price.toDouble(),
-                      status: OrderStatus.success.name,
-                      paymentMethod: PaymentMethod.wallet,
-                      context: context,
-                    );
-                    List basesList = [];
-                    List sweetnersList = [];
-                    List flavoursList = [];
-                    KioskModel kioskModel = kiosk.kioskModel;
-                    for (int i = 0; i < kioskModel.bases.length; i++) {
-                      basesList.add(kioskModel.bases[i] - widget.bases[i]);
-                    }
-                    for (int i = 0; i < kioskModel.sweetners.length; i++) {
-                      sweetnersList
-                          .add(kioskModel.sweetners[i] - widget.sweetners[i]);
-                    }
-                    for (int i = 0; i < kioskModel.flavours.length; i++) {
-                      flavoursList
-                          .add(kioskModel.flavours[i] - widget.flavours[i]);
-                    }
-                    KioskServices().updateIngredients(
-                        id: kioskModel.id,
-                        bases: basesList,
-                        flavours: flavoursList,
-                        sweetners: sweetnersList);
-                    navigate(
-                        type: PageType.replace,
-                        context: context,
-                        page: OrderPreparingPage(
-                          recipe: widget.recipe,
-                        ));
-                    user.updateUserData();
-                  } else {
-                    debugPrint(total.toStringAsFixed(2).replaceAll(".", ""));
-                    var options = {
-                      'key': 'rzp_test_2Eh5LSk1v3ujdn',
-                      'amount': total.toStringAsFixed(2).replaceAll(".", ""),
-                      'name': user.userModel.name,
-                      'description': widget.name,
-                      'prefill': {
-                        'email': user.userModel.email,
-                      }
-                    };
-                    Fluttertoast.showToast(
-                        msg:
-                            "Insufficient wallet balance. Switching to online payment method.",
-                        backgroundColor: Colors.red);
-                    razorpay.open(options);
+                  if (fetched) {
+                    buyNow();
                   }
                 },
                 child: Padding(
@@ -335,7 +278,106 @@ class _CheckoutPageState extends State<CheckoutPage> {
     );
   }
 
-  void handlePaymentSuccess(PaymentSuccessResponse response) {
+  buyNow() async {
+    var user = Provider.of<UserProvider>(context, listen: false);
+    var kiosk = Provider.of<KioskProvider>(context, listen: false);
+    if (user.userModel.paymentMethod == PaymentMethod.online) {
+      var options = {
+        'key': 'rzp_test_2Eh5LSk1v3ujdn',
+        'amount': "${total.toString()}00",
+        'name': user.userModel.name,
+        'description': widget.name,
+        'prefill': {
+          'email': user.userModel.email,
+        }
+      };
+      razorpay.open(options);
+    } else if (user.userModel.paymentMethod == PaymentMethod.upi) {
+      upiPayment();
+    } else if (user.userModel.paymentMethod == PaymentMethod.wallet &&
+        user.userModel.wallet > total) {
+      order(PaymentMethod.wallet);
+      user.updateUserData();
+    } else {
+      debugPrint(total.toStringAsFixed(2).replaceAll(".", ""));
+      var options = {
+        'key': 'rzp_test_2Eh5LSk1v3ujdn',
+        'amount': total.toStringAsFixed(2).replaceAll(".", ""),
+        'name': user.userModel.name,
+        'description': widget.name,
+        'prefill': {
+          'email': user.userModel.email,
+        }
+      };
+      Fluttertoast.showToast(
+          msg:
+              "Insufficient wallet balance. Switching to online payment method.",
+          backgroundColor: Colors.red);
+      razorpay.open(options);
+    }
+  }
+
+  upiPayment() async {
+    if (!mounted) return;
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("UPI Payment apps"),
+          content: SizedBox(
+            width: width(context) * 0.9,
+            child: GridView.builder(
+              padding: const EdgeInsets.all(30),
+              itemCount: appMetaList!.length,
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+              ),
+              itemBuilder: (context, index) => Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: InkWell(
+                  onTap: () async {
+                    UpiTransactionResponse status =
+                        await upiPay.initiateTransaction(
+                      amount: widget.price.toString(),
+                      app: appMetaList![index].upiApplication,
+                      receiverName: 'XenoBot',
+                      receiverUpiAddress: "mmkumr@pingpay",
+                      transactionRef:
+                          Random.secure().nextInt(1 << 32).toString(),
+                      transactionNote: widget.name,
+                    );
+                    if (!context.mounted) return;
+                    if (status.status == UpiTransactionStatus.success) {
+                      Navigator.of(context).pop();
+                      order(PaymentMethod.upi);
+                    } else if (status.status == UpiTransactionStatus.failure) {
+                      Fluttertoast.showToast(
+                          msg: "Paymtment Failed", backgroundColor: Colors.red);
+                    } else if (status.status ==
+                        UpiTransactionStatus.submitted) {
+                      Fluttertoast.showToast(
+                          msg: "Paymtment cancelled by the user",
+                          backgroundColor: Colors.red);
+                    }
+                  },
+                  child: GridTile(
+                    footer: Text(
+                      appMetaList![index].upiApplication.getAppName(),
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    child: appMetaList![index].iconImage(48),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  order(PaymentMethod method) {
     var user = Provider.of<UserProvider>(context, listen: false);
     var kiosk = Provider.of<KioskProvider>(context, listen: false);
     OrderServices().create(
@@ -348,7 +390,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
       discount: discount.toDouble(),
       subtotal: widget.price.toDouble(),
       status: OrderStatus.success.name,
-      paymentMethod: PaymentMethod.online,
+      paymentMethod: method,
       context: context,
     );
     List basesList = [];
@@ -377,25 +419,11 @@ class _CheckoutPageState extends State<CheckoutPage> {
         ));
   }
 
+  void handlePaymentSuccess(PaymentSuccessResponse response) {
+    order(PaymentMethod.online);
+  }
+
   void handlePaymentError(PaymentFailureResponse response) {
-    var user = Provider.of<UserProvider>(context, listen: false);
-    var kiosk = Provider.of<KioskProvider>(context, listen: false);
-    OrderServices().create(
-        uid: user.userModel.id,
-        kid: kiosk.kioskModel.id,
-        itemImage: widget.image,
-        itemName: widget.name,
-        total: total,
-        tax: tax,
-        discount: discount.toDouble(),
-        subtotal: widget.price.toDouble(),
-        status: OrderStatus.success.name,
-        paymentMethod: PaymentMethod.online,
-        context: context);
-    navigate(
-        type: PageType.replace,
-        context: context,
-        page: OrderPreparingPage(recipe: widget.recipe));
     Fluttertoast.showToast(
         msg: "Paymtment Failed", backgroundColor: Colors.red);
   }

@@ -51,7 +51,9 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
                   ),
                   validator: (value) {
                     if (value!.isEmpty) {
-                      return "Enter valid username";
+                      return "This Field can't be empty";
+                    } else if (value != "xenobot") {
+                      return "Invalid Username";
                     }
                     return null;
                   },
@@ -78,7 +80,9 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
                   ),
                   validator: (value) {
                     if (value!.isEmpty) {
-                      return "Enter valid password";
+                      return "This Field can't be empty";
+                    } else if (value != "xenobot") {
+                      return "Invalid Password";
                     }
                     return null;
                   },
@@ -93,10 +97,12 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
                   ),
                   color: elementsC,
                   onPressed: () {
-                    navigate(
-                        type: PageType.replace,
-                        context: context,
-                        page: const KiosksPage());
+                    if (formKey.currentState!.validate()) {
+                      navigate(
+                          type: PageType.replace,
+                          context: context,
+                          page: const KiosksPage());
+                    }
                   },
                   child: Text(
                     "Admin Login",

@@ -93,6 +93,30 @@ class _PaymentOptionsPageState extends State<PaymentOptionsPage> {
                     Padding(
                       padding: EdgeInsets.all(8.0),
                       child: Icon(
+                        FontAwesomeIcons.googlePay,
+                        size: 50,
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: Text('UPI Payment'),
+                    ),
+                  ],
+                ),
+                value: 2,
+                groupValue: _selectedValue,
+                onChanged: (value) {
+                  setState(() {
+                    _selectedValue = value!;
+                  });
+                },
+              ),
+              RadioListTile(
+                title: const Row(
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: Icon(
                         FontAwesomeIcons.solidCreditCard,
                         size: 50,
                       ),
@@ -104,7 +128,7 @@ class _PaymentOptionsPageState extends State<PaymentOptionsPage> {
                   'UPI, credit/debit cards, online banking, etc.',
                   softWrap: true,
                 ),
-                value: 2,
+                value: 3,
                 groupValue: _selectedValue,
                 onChanged: (value) {
                   setState(() {

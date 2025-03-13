@@ -8,7 +8,7 @@ import '../models/user.dart';
 
 enum UserType { normal, chef, admin }
 
-enum PaymentMethod { wallet, online }
+enum PaymentMethod { wallet, upi, online }
 
 class UserServices {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
