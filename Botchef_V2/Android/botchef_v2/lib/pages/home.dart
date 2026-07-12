@@ -20,9 +20,9 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   //Algolia setup
   final Algolia _algoliaApp = const Algolia.init(
-    applicationId: 'KWPCAWUHDW', //ApplicationID
+    applicationId: 'JVYQL6PARJ', //ApplicationID
     apiKey:
-        '47c5b7823bb65ab1d4c7d8a4d4440776', //search-only api key in flutter code
+        '46d75cf5091c5a21ffe9522fb3b2fa5f', //search-only api key in flutter code
   );
   String searchTerm = '';
   int pageSize = 20;

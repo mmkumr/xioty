@@ -40,16 +40,6 @@ Widget menu(BuildContext context) {
           ),
         ),
         ListTile(
-          leading: const Icon(Icons.history),
-          title: const Text('History'),
-          onTap: () {
-            navigate(
-                type: PageType.push,
-                context: context,
-                page: const HistoryPage());
-          },
-        ),
-        ListTile(
           title: const Text('Favorites'),
           onTap: () {
             navigate(

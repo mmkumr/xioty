@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:botchef_v2/commons.dart';
-import 'package:botchef_v2/models/user.dart';
+import 'package:botchef_v2/db/save_commands.dart';
 import 'package:botchef_v2/pages/machine_connect.dart';
 import 'package:botchef_v2/providers/user_provider.dart';
 import 'package:flutter/material.dart';
@@ -10,6 +10,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:mqtt_client/mqtt_client.dart';
 import 'package:mqtt_client/mqtt_server_client.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class MQTTPage extends StatefulWidget {
   const MQTTPage({super.key});
@@ -18,6 +19,19 @@ class MQTTPage extends StatefulWidget {
 }
 
 class _MQTTPageState extends State<MQTTPage> {
+  @override
+  void didChangeDependencies() {
+    prefs.containsKey("cmdHist").then((value) async {
+      if (value) {
+        cmdHist = await prefs.getStringList("cmdHist") ?? [];
+      } else {
+        cmdHist = [];
+        prefs.setStringList("cmdHist", []);
+      }
+    });
+    super.didChangeDependencies();
+  }
+
   @override
   void initState() {
     mqttinit();
@@ -43,20 +57,21 @@ class _MQTTPageState extends State<MQTTPage> {
   final MqttServerClient client = MqttServerClient.withPort(
       '6b3b54fa5f4a464fa80e2e0410aec35e.s2.eu.hivemq.cloud', '', 8883);
   String sendingTopic = "/xara/cmds/";
-  List cmdHist = [];
-  int histIndex = -1;
+  List<String> cmdHist = [];
   String receivedMessage = '';
   bool sending = false;
   bool start = false;
   File? file;
   String data = "";
-  List<String> tempData = [];
   int index = 0;
   TextEditingController input = TextEditingController();
+  SharedPreferencesAsync prefs = SharedPreferencesAsync();
+  TextEditingController name = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(
         title: const Text('MQTT Flutter App'),
         actions: [
@@ -69,103 +84,108 @@ class _MQTTPageState extends State<MQTTPage> {
         ],
       ),
       body: Center(
-        child: sending
-            ? const Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  CircularProgressIndicator(),
-                  Text('Sending command(s). Please wait!'),
-                ],
-              )
-            : Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: ElevatedButton(
-                      onPressed: () {
-                        setState(() {
-                          if (histIndex < cmdHist.length - 1) histIndex++;
-                          debugPrint(histIndex.toString());
-                          if (cmdHist.isNotEmpty) {
-                            input.text = cmdHist[histIndex];
-                          }
-                        });
-                      },
-                      style: ElevatedButton.styleFrom(
-                        shape: const CircleBorder(),
-                      ),
-                      child: const Icon(
-                        Icons.keyboard_arrow_up_rounded,
-                        size: 50,
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: TextField(
-                      controller: input,
-                      onEditingComplete: () async {
-                        if (client.connectionStatus!.state ==
-                                MqttConnectionState.connected &&
-                            !start) {
-                          subscribe();
-                          setState(() {
-                            start = true;
-                          });
-                        }
-                        try {
-                          setState(() {
-                            cmdHist.insert(0, input.text);
-                          });
-                          setState(() {
-                            sendData(input.text, sendingTopic, false);
-                            sending = true;
-                          });
-                        } on ConnectionException catch (e) {
-                          debugPrint(e.toString());
-                          Fluttertoast.showToast(
-                            msg: 'MQTT server not connected',
-                            backgroundColor: Colors.red,
-                            textColor: Colors.white,
-                          );
-                        }
-                        debugPrint(input.text);
-                        input.clear();
-                      },
-                      decoration: const InputDecoration(
-                        labelText: "Command", //babel text
-                        hintText: "Enter command", //hint text
-                        prefixIcon: Icon(
-                          Icons.keyboard_arrow_right,
-                          size: 40,
-                        ), //prefix iocn
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: ElevatedButton(
-                      onPressed: () {
-                        setState(() {
-                          if (histIndex > 0) histIndex--;
-                          debugPrint(histIndex.toString());
-                          if (cmdHist.isNotEmpty) {
-                            input.text = cmdHist[histIndex];
-                          }
-                        });
-                      },
-                      style: ElevatedButton.styleFrom(
-                        shape: const CircleBorder(),
-                      ),
-                      child: const Icon(
-                        Icons.keyboard_arrow_down_rounded,
-                        size: 50,
-                      ),
-                    ),
-                  ),
-                ],
+        child:
+            //     sending
+            // ? const Column(
+            //     mainAxisAlignment: MainAxisAlignment.center,
+            //     children: [
+            //       CircularProgressIndicator(),
+            //       Text('Sending command(s). Please wait!'),
+            //     ],
+            //   )
+            // :
+            Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: TextField(
+                controller: input,
+                onEditingComplete: () async {
+                  if (client.connectionStatus!.state ==
+                          MqttConnectionState.connected &&
+                      !start) {
+                    subscribe();
+                    setState(() {
+                      start = true;
+                    });
+                  }
+                  try {
+                    setState(() {
+                      sendData(input.text, sendingTopic, false);
+                      sending = true;
+                      cmdHist.add(input.text);
+                    });
+                    prefs.setStringList('cmdHist', cmdHist);
+                  } on ConnectionException catch (e) {
+                    debugPrint(e.toString());
+                    Fluttertoast.showToast(
+                      msg: 'MQTT server not connected',
+                      backgroundColor: Colors.red,
+                      textColor: Colors.white,
+                    );
+                  }
+                  debugPrint(input.text);
+                  input.clear();
+                },
+                decoration: const InputDecoration(
+                  labelText: "Command", //babel text
+                  hintText: "Enter command", //hint text
+                  prefixIcon: Icon(
+                    Icons.keyboard_arrow_right,
+                    size: 40,
+                  ), //prefix iocn
+                ),
               ),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                MaterialButton(
+                  onPressed: () {
+                    setState(() {
+                      cmdHist.clear();
+                    });
+                  },
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(
+                        12.0), // Adjust this for more/less roundness
+                  ),
+                  color: Colors.blue,
+                  child: const Text("Clear"),
+                ),
+                MaterialButton(
+                  onPressed: () {},
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(
+                        12.0), // Adjust this for more/less roundness
+                  ),
+                  color: Colors.blue,
+                  child: const Text("Save"),
+                ),
+              ],
+            ),
+            SizedBox(
+              height: height(context) * 0.6,
+              child: ListView.builder(
+                scrollDirection: Axis.vertical,
+                itemCount: cmdHist.length,
+                itemBuilder: (BuildContext context, int index) {
+                  return Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: ListTile(
+                      tileColor: Colors.black12,
+                      title: Text(
+                        cmdHist[(cmdHist.length - 1) - index],
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -291,5 +311,30 @@ class _MQTTPageState extends State<MQTTPage> {
   void onReconnect() {
     client.port = 8883;
   }
+
 // end of mqtt callback functions.
+  save() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Save Commands"),
+        content: TextField(
+          controller: name,
+          decoration: const InputDecoration(
+            labelText: "Command Name",
+            hintText: "Enter command name",
+          ),
+          onEditingComplete: () {
+            // Save the command name and commands to Firestore
+            final user = Provider.of<UserProvider>(context, listen: false);
+            SavedCommandsServices().add(
+              uid: user.user.uid,
+              commandName: name.text,
+              commands: cmdHist,
+            );
+          },
+        ),
+      ),
+    );
+  }
 }
