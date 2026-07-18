@@ -65,7 +65,8 @@ class _SavedCommandsState extends State<SavedCommands> {
 
   getSavedCommands() async {
     final user = Provider.of<UserProvider>(context, listen: false);
-    commands = await SavedCommandsServices().get(user.user.uid);
+    commands = await SavedCommandsServices().getAll(user.user.uid);
+    debugPrint(commands[0].id);
     setState(() {});
   }
 }

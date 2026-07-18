@@ -1,4 +1,3 @@
-import 'package:botchef_v2/models/history.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
@@ -22,7 +21,13 @@ class SavedCommandsServices {
     }
   }
 
-  Future<List<QueryDocumentSnapshot>> get(String uid) {
+  Future<DocumentSnapshot> get(String id) {
+    return _firestore.collection(collection).doc(id).get().then((value) {
+      return value;
+    });
+  }
+
+  Future<List<QueryDocumentSnapshot>> getAll(String uid) {
     return _firestore
         .collection(collection)
         .where("uid", isEqualTo: uid)
@@ -34,7 +39,7 @@ class SavedCommandsServices {
 
   Future update({
     required String? id,
-    required String? commands,
+    required List? commands,
   }) async {
     try {
       await _firestore.collection(collection).doc(id).update({

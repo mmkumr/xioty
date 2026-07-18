@@ -114,7 +114,6 @@ class RecipeServices {
 
   Future<RecipeModel> getById(String id) =>
       _firestore.collection(collection).doc(id).get().then((doc) {
-        debugPrint(doc.data().toString());
         return RecipeModel.fromSnapshot(doc);
       });
 }

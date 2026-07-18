@@ -25,9 +25,11 @@ class _MQTTPageState extends State<MQTTPage> {
     prefs.containsKey("cmdHist").then((value) async {
       if (value) {
         cmdHist = await prefs.getStringList("cmdHist") ?? [];
+        setState(() {});
       } else {
         cmdHist = [];
         prefs.setStringList("cmdHist", []);
+        setState(() {});
       }
     });
     super.didChangeDependencies();
@@ -52,6 +54,7 @@ class _MQTTPageState extends State<MQTTPage> {
   @override
   void dispose() {
     client.disconnect();
+    client.unsubscribe("response");
     super.dispose();
   }
 
@@ -101,43 +104,56 @@ class _MQTTPageState extends State<MQTTPage> {
           children: [
             Padding(
               padding: const EdgeInsets.all(8.0),
-              child: TextField(
-                controller: input,
-                onEditingComplete: () async {
-                  if (client.connectionStatus!.state ==
-                          MqttConnectionState.connected &&
-                      !start) {
-                    subscribe();
-                    setState(() {
-                      start = true;
-                    });
-                  }
-                  try {
-                    setState(() {
-                      sendData(input.text, sendingTopic, false);
-                      sending = true;
-                      cmdHist.add(input.text);
-                    });
-                    prefs.setStringList('cmdHist', cmdHist);
-                  } on ConnectionException catch (e) {
-                    debugPrint(e.toString());
-                    Fluttertoast.showToast(
-                      msg: 'MQTT server not connected',
-                      backgroundColor: Colors.red,
-                      textColor: Colors.white,
-                    );
-                  }
-                  debugPrint(input.text);
-                  input.clear();
-                },
-                decoration: const InputDecoration(
-                  labelText: "Command", //babel text
-                  hintText: "Enter command", //hint text
-                  prefixIcon: Icon(
-                    Icons.keyboard_arrow_right,
-                    size: 40,
-                  ), //prefix iocn
-                ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: input,
+                      onEditingComplete: () async {
+                        if (client.connectionStatus!.state ==
+                                MqttConnectionState.connected &&
+                            !start) {
+                          subscribe();
+                          setState(() {
+                            start = true;
+                          });
+                        }
+                        try {
+                          setState(() {
+                            sendData(input.text, sendingTopic, false);
+                            sending = true;
+                          });
+                        } on ConnectionException catch (e) {
+                          debugPrint(e.toString());
+                          Fluttertoast.showToast(
+                            msg: 'MQTT server not connected',
+                            backgroundColor: Colors.red,
+                            textColor: Colors.white,
+                          );
+                        }
+                        debugPrint(input.text);
+                        input.clear();
+                      },
+                      decoration: const InputDecoration(
+                        labelText: "Command", //babel text
+                        hintText: "Enter command", //hint text
+                        prefixIcon: Icon(
+                          Icons.keyboard_arrow_right,
+                          size: 40,
+                        ), //prefix iocn
+                      ),
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: () {
+                      setState(() {
+                        cmdHist.add(input.text);
+                      });
+                      prefs.setStringList('cmdHist', cmdHist);
+                    },
+                    icon: const Icon(Icons.add),
+                  )
+                ],
               ),
             ),
             Row(
@@ -148,6 +164,7 @@ class _MQTTPageState extends State<MQTTPage> {
                     setState(() {
                       cmdHist.clear();
                     });
+                    prefs.setStringList('cmdHist', cmdHist);
                   },
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(

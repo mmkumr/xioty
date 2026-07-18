@@ -71,13 +71,14 @@ Widget menu(BuildContext context) {
           leading: const Icon(FontAwesomeIcons.spoon),
         ),
         ListTile(
-          title: const Text('Manual Mode'),
-          onTap: () {
-            navigate(
-                type: PageType.push, context: context, page: const MQTTPage());
-          },
-          leading: const Icon(Icons.home),
-        ),
+            title: const Text('Manual Mode'),
+            onTap: () {
+              navigate(
+                  type: PageType.push,
+                  context: context,
+                  page: const MQTTPage());
+            },
+            leading: const Icon(Icons.rss_feed)),
         ListTile(
           title: const Text('Saved Commands'),
           onTap: () {
@@ -87,7 +88,7 @@ Widget menu(BuildContext context) {
               page: SavedCommands(uid: user.user.uid),
             );
           },
-          leading: const Icon(Icons.home),
+          leading: const Icon(Icons.save),
         ),
         ListTile(
           title: const Text('Home'),

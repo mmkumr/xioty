@@ -158,75 +158,96 @@ class _VariantsPageState extends State<VariantsPage> {
               ),
             ),
             Flexible(
-              child: ListView.builder(
-                itemCount: variants!.length,
-                itemBuilder: (context, index) {
-                  VariantModel variant = variants![index];
-                  return Padding(
-                    padding: const EdgeInsets.all(10.0),
-                    child: ListTile(
-                      onTap: () async {
-                        variant = await VariantServices().getById(variant.vid!);
-                        if (!context.mounted) return;
-                        navigate(
-                          type: PageType.push,
-                          context: context,
-                          page: VariantPage(
-                            recipe: widget.recipe,
-                            variant: variant,
+              child: variants == null
+                  ? const Center(child: CircularProgressIndicator())
+                  : ListView.builder(
+                      itemCount: variants!.length,
+                      itemBuilder: (context, index) {
+                        VariantModel variant = variants![index];
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16.0, vertical: 8.0),
+                          // FIX 1: Wrap in a Card to enforce strict horizontal boundaries
+                          child: Card(
+                            elevation: 2,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: ListTile(
+                              onTap: () async {
+                                variant = await VariantServices()
+                                    .getById(variant.vid!);
+                                if (!context.mounted) return;
+                                navigate(
+                                  type: PageType.push,
+                                  context: context,
+                                  page: VariantPage(
+                                    recipe: widget.recipe,
+                                    variant: variant,
+                                  ),
+                                );
+                              },
+                              // FIX 2: Restrict the cross-axis sizing configuration
+                              leading: SizedBox(
+                                width: 50,
+                                height: 50,
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(8),
+                                  child: CachedNetworkImage(
+                                    imageUrl: widget.recipe.photoUrl!,
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                              ),
+                              title: Text(
+                                "Variant #${index + 1}",
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold),
+                              ),
+                              subtitle: Padding(
+                                padding: const EdgeInsets.only(top: 8.0),
+                                child: Wrap(
+                                  spacing: 8.0,
+                                  runSpacing: 8.0,
+                                  children: [
+                                    Container(
+                                      decoration: BoxDecoration(
+                                        color: primaryC,
+                                        borderRadius: const BorderRadius.all(
+                                            Radius.circular(60)),
+                                      ),
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 12.0, vertical: 6.0),
+                                        child: Text(
+                                          "Spicy: ${variant.spicy}",
+                                          style: const TextStyle(fontSize: 12),
+                                        ),
+                                      ),
+                                    ),
+                                    Container(
+                                      decoration: BoxDecoration(
+                                        color: primaryC,
+                                        borderRadius: const BorderRadius.all(
+                                            Radius.circular(60)),
+                                      ),
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 12.0, vertical: 6.0),
+                                        child: Text(
+                                          "Portion size: ${variant.portionSize}",
+                                          style: const TextStyle(fontSize: 12),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
                           ),
                         );
                       },
-                      leading: CachedNetworkImage(
-                        imageUrl: widget.recipe.photoUrl!,
-                        fit: BoxFit.fill,
-                      ),
-                      subtitle: Wrap(
-                        children: [
-                          Padding(
-                            padding:
-                                const EdgeInsets.only(left: 8.0, right: 8.0),
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: primaryC,
-                                borderRadius:
-                                    const BorderRadius.all(Radius.circular(60)),
-                              ),
-                              child: Padding(
-                                padding: const EdgeInsets.all(5.0),
-                                child: Text(
-                                  "Spricy: ${variant.spicy}",
-                                  textAlign: TextAlign.center,
-                                  softWrap: true,
-                                ),
-                              ),
-                            ),
-                          ),
-                          Padding(
-                            padding:
-                                const EdgeInsets.only(left: 8.0, right: 8.0),
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: primaryC,
-                                borderRadius:
-                                    const BorderRadius.all(Radius.circular(60)),
-                              ),
-                              child: Padding(
-                                padding: const EdgeInsets.all(5.0),
-                                child: Text(
-                                  "Portion size: ${variant.portionSize}",
-                                  textAlign: TextAlign.center,
-                                  softWrap: true,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
                     ),
-                  );
-                },
-              ),
             ),
           ],
         ),
