@@ -108,21 +108,24 @@ class _ChefMacroPageState extends State<ChefMacroPage> {
                         children: [
                           for (int i = 0; i < nos; i++)
                             Padding(
-                              padding:
-                                  const EdgeInsets.only(top: 8.0, bottom: 8.0),
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: 8.0, horizontal: 4.0),
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  Padding(
-                                    padding: const EdgeInsets.all(5.0),
-                                    child: SizedBox(
-                                      width: width(context) * 0.5,
+                                  Expanded(
+                                    flex:
+                                        5, // Takes up 5 shares of available space
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(5.0),
                                       child: TextFormField(
                                         controller: macros[i],
                                         decoration: InputDecoration(
                                           hintText: "Macro ${i + 1}",
                                           label: Text("Macro ${i + 1}"),
                                           filled: true,
+                                          isDense:
+                                              true, // Shrinks internal vertical padding slightly
                                           border: OutlineInputBorder(
                                             borderRadius:
                                                 BorderRadius.circular(10.0),
@@ -132,16 +135,24 @@ class _ChefMacroPageState extends State<ChefMacroPage> {
                                       ),
                                     ),
                                   ),
-                                  Padding(
-                                    padding: const EdgeInsets.all(5.0),
-                                    child: SizedBox(
-                                      width: width(context) * 0.3,
+
+                                  // FIX 2: Use a smaller flex factor for the dropdown menu
+                                  Expanded(
+                                    flex:
+                                        3, // Takes up 3 shares of available space
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(5.0),
                                       child: DropdownButtonFormField(
                                         value: quantity[i],
+                                        isExpanded:
+                                            true, // Prevents long text from pushing the dropdown box boundary outward
                                         items: quantities.map((String items) {
                                           return DropdownMenuItem(
                                             value: items,
-                                            child: Text(items),
+                                            child: Text(items,
+                                                style: const TextStyle(
+                                                    fontSize:
+                                                        14)), // Tiny text scale optimization
                                           );
                                         }).toList(),
                                         onChanged: (String? value) {
@@ -150,9 +161,11 @@ class _ChefMacroPageState extends State<ChefMacroPage> {
                                           });
                                         },
                                         decoration: InputDecoration(
-                                          hintText: "Quantity",
-                                          label: const Text("Quantity"),
+                                          hintText:
+                                              "Qty", // Shortened from "Quantity" to prevent layout crunch
+                                          label: const Text("Qty"),
                                           filled: true,
+                                          isDense: true,
                                           border: OutlineInputBorder(
                                             borderRadius:
                                                 BorderRadius.circular(10.0),
@@ -162,12 +175,18 @@ class _ChefMacroPageState extends State<ChefMacroPage> {
                                       ),
                                     ),
                                   ),
-                                  InkWell(
-                                    onTap: () async {
-                                      await mimaDescriptionPopup(i);
-                                      setState(() {});
-                                    },
-                                    child: const Icon(Icons.info_rounded),
+
+                                  // FIX 3: Keep the action button wrapped natively without layout stretching
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 4.0),
+                                    child: InkWell(
+                                      onTap: () async {
+                                        await mimaDescriptionPopup(i);
+                                        setState(() {});
+                                      },
+                                      child: const Icon(Icons.info_rounded),
+                                    ),
                                   ),
                                 ],
                               ),
