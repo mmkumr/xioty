@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:botchef_v2/commons.dart';
 import 'package:botchef_v2/db/save_commands.dart';
 import 'package:botchef_v2/pages/machine_connect.dart';
+import 'package:botchef_v2/partials/menu.dart';
 import 'package:botchef_v2/providers/user_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -83,6 +84,7 @@ class _MQTTPageState extends State<MQTTPage> {
           ),
         ],
       ),
+      drawer: menu(context),
       body: Center(
         child:
             //     sending
@@ -155,7 +157,9 @@ class _MQTTPageState extends State<MQTTPage> {
                   child: const Text("Clear"),
                 ),
                 MaterialButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    save();
+                  },
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(
                         12.0), // Adjust this for more/less roundness
@@ -332,6 +336,7 @@ class _MQTTPageState extends State<MQTTPage> {
               commandName: name.text,
               commands: cmdHist,
             );
+            Navigator.of(context).pop();
           },
         ),
       ),

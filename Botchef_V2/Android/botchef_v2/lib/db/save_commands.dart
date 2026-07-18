@@ -22,7 +22,7 @@ class SavedCommandsServices {
     }
   }
 
-  Future<List<QueryDocumentSnapshot>> commandList(String uid) {
+  Future<List<QueryDocumentSnapshot>> get(String uid) {
     return _firestore
         .collection(collection)
         .where("uid", isEqualTo: uid)

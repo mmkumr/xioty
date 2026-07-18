@@ -4,6 +4,7 @@ import 'package:botchef_v2/pages/edited_recipes.dart';
 import 'package:botchef_v2/pages/history.dart';
 import 'package:botchef_v2/pages/home.dart';
 import 'package:botchef_v2/pages/mqtt.dart';
+import 'package:botchef_v2/pages/saved_commands.dart';
 import 'package:botchef_v2/pages/your_recipes.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
@@ -74,6 +75,17 @@ Widget menu(BuildContext context) {
           onTap: () {
             navigate(
                 type: PageType.push, context: context, page: const MQTTPage());
+          },
+          leading: const Icon(Icons.home),
+        ),
+        ListTile(
+          title: const Text('Saved Commands'),
+          onTap: () {
+            navigate(
+              type: PageType.push,
+              context: context,
+              page: SavedCommands(uid: user.user.uid),
+            );
           },
           leading: const Icon(Icons.home),
         ),
