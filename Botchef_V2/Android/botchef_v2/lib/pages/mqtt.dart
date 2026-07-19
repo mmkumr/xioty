@@ -89,124 +89,122 @@ class _MQTTPageState extends State<MQTTPage> {
       ),
       drawer: menu(context),
       body: Center(
-        child:
-            //     sending
-            // ? const Column(
-            //     mainAxisAlignment: MainAxisAlignment.center,
-            //     children: [
-            //       CircularProgressIndicator(),
-            //       Text('Sending command(s). Please wait!'),
-            //     ],
-            //   )
-            // :
-            Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Row(
+        child: sending
+            ? const Column(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Expanded(
-                    child: TextField(
-                      controller: input,
-                      onEditingComplete: () async {
-                        if (client.connectionStatus!.state ==
-                                MqttConnectionState.connected &&
-                            !start) {
-                          subscribe();
-                          setState(() {
-                            start = true;
-                          });
-                        }
-                        try {
-                          setState(() {
-                            sendData(input.text, sendingTopic, false);
-                            sending = true;
-                          });
-                        } on ConnectionException catch (e) {
-                          debugPrint(e.toString());
-                          Fluttertoast.showToast(
-                            msg: 'MQTT server not connected',
-                            backgroundColor: Colors.red,
-                            textColor: Colors.white,
-                          );
-                        }
-                        debugPrint(input.text);
-                        input.clear();
-                      },
-                      decoration: const InputDecoration(
-                        labelText: "Command", //babel text
-                        hintText: "Enter command", //hint text
-                        prefixIcon: Icon(
-                          Icons.keyboard_arrow_right,
-                          size: 40,
-                        ), //prefix iocn
-                      ),
+                  CircularProgressIndicator(),
+                  Text('Sending command(s). Please wait!'),
+                ],
+              )
+            : Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: TextField(
+                            controller: input,
+                            onEditingComplete: () async {
+                              if (client.connectionStatus!.state ==
+                                      MqttConnectionState.connected &&
+                                  !start) {
+                                subscribe();
+                                setState(() {
+                                  start = true;
+                                });
+                              }
+                              try {
+                                setState(() {
+                                  sendData(input.text, sendingTopic, false);
+                                  sending = true;
+                                });
+                              } on ConnectionException catch (e) {
+                                debugPrint(e.toString());
+                                Fluttertoast.showToast(
+                                  msg: 'MQTT server not connected',
+                                  backgroundColor: Colors.red,
+                                  textColor: Colors.white,
+                                );
+                              }
+                              debugPrint(input.text);
+                              input.clear();
+                            },
+                            decoration: const InputDecoration(
+                              labelText: "Command", //babel text
+                              hintText: "Enter command", //hint text
+                              prefixIcon: Icon(
+                                Icons.keyboard_arrow_right,
+                                size: 40,
+                              ), //prefix iocn
+                            ),
+                          ),
+                        ),
+                        IconButton(
+                          onPressed: () {
+                            setState(() {
+                              cmdHist.add(input.text);
+                            });
+                            prefs.setStringList('cmdHist', cmdHist);
+                          },
+                          icon: const Icon(Icons.add),
+                        )
+                      ],
                     ),
                   ),
-                  IconButton(
-                    onPressed: () {
-                      setState(() {
-                        cmdHist.add(input.text);
-                      });
-                      prefs.setStringList('cmdHist', cmdHist);
-                    },
-                    icon: const Icon(Icons.add),
-                  )
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      MaterialButton(
+                        onPressed: () {
+                          setState(() {
+                            cmdHist.clear();
+                          });
+                          prefs.setStringList('cmdHist', cmdHist);
+                        },
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(
+                              12.0), // Adjust this for more/less roundness
+                        ),
+                        color: Colors.blue,
+                        child: const Text("Clear"),
+                      ),
+                      MaterialButton(
+                        onPressed: () {
+                          save();
+                        },
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(
+                              12.0), // Adjust this for more/less roundness
+                        ),
+                        color: Colors.blue,
+                        child: const Text("Save"),
+                      ),
+                    ],
+                  ),
+                  SizedBox(
+                    height: height(context) * 0.6,
+                    child: ListView.builder(
+                      scrollDirection: Axis.vertical,
+                      itemCount: cmdHist.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        return Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: ListTile(
+                            tileColor: Colors.black12,
+                            title: Text(
+                              cmdHist[(cmdHist.length - 1) - index],
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
                 ],
               ),
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                MaterialButton(
-                  onPressed: () {
-                    setState(() {
-                      cmdHist.clear();
-                    });
-                    prefs.setStringList('cmdHist', cmdHist);
-                  },
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(
-                        12.0), // Adjust this for more/less roundness
-                  ),
-                  color: Colors.blue,
-                  child: const Text("Clear"),
-                ),
-                MaterialButton(
-                  onPressed: () {
-                    save();
-                  },
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(
-                        12.0), // Adjust this for more/less roundness
-                  ),
-                  color: Colors.blue,
-                  child: const Text("Save"),
-                ),
-              ],
-            ),
-            SizedBox(
-              height: height(context) * 0.6,
-              child: ListView.builder(
-                scrollDirection: Axis.vertical,
-                itemCount: cmdHist.length,
-                itemBuilder: (BuildContext context, int index) {
-                  return Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: ListTile(
-                      tileColor: Colors.black12,
-                      title: Text(
-                        cmdHist[(cmdHist.length - 1) - index],
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ),
-          ],
-        ),
       ),
     );
   }
