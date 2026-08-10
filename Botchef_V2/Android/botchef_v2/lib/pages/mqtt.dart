@@ -155,35 +155,33 @@ class _MQTTPageState extends State<MQTTPage> {
         ],
       ),
       drawer: menu(context),
-      body:
-          //   sending
-          // ? const Center(
-          //     child: Column(
-          //       mainAxisAlignment: MainAxisAlignment.center,
-          //       children: [
-          //         CircularProgressIndicator(),
-          //         SizedBox(height: 12),
-          //         Text('Sending command(s). Please wait!'),
-          //       ],
-          //     ),
-          //   )
-          // :
-          SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-          child: Column(
-            children: [
-              _statusCard(),
-              const SizedBox(height: 16),
-              _commandCard(),
-              const SizedBox(height: 16),
-              Expanded(child: _historyCard()),
-              const SizedBox(height: 12),
-              _bottomButtons(),
-            ],
-          ),
-        ),
-      ),
+      body: sending
+          ? const Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CircularProgressIndicator(),
+                  SizedBox(height: 12),
+                  Text('Sending command(s). Please wait!'),
+                ],
+              ),
+            )
+          : SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+                child: Column(
+                  children: [
+                    _statusCard(),
+                    const SizedBox(height: 16),
+                    _commandCard(),
+                    const SizedBox(height: 16),
+                    Expanded(child: _historyCard()),
+                    const SizedBox(height: 12),
+                    _bottomButtons(),
+                  ],
+                ),
+              ),
+            ),
     );
   }
 
