@@ -2,8 +2,10 @@ import 'package:botchef_v2/commons.dart';
 import 'package:botchef_v2/db/save_commands.dart';
 import 'package:botchef_v2/partials/menu.dart';
 import 'package:botchef_v2/providers/user_provider.dart';
+import 'package:botchef_v2/services/mqtt_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 
 class SavedCommand extends StatefulWidget {
@@ -24,8 +26,25 @@ class _SavedCommandState extends State<SavedCommand> {
   DocumentSnapshot? command;
   List commands = [];
   TextEditingController cmd = TextEditingController();
+  bool sending = false;
+
+  @override
+  void dispose() {
+    MQTTService.instance.unsubscribe('response');
+    cmd.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
+    if (sending) {
+      return Scaffold(
+        backgroundColor: bgC,
+        body: const Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
     return Scaffold(
       backgroundColor: bgC,
       appBar: AppBar(
@@ -86,19 +105,38 @@ class _SavedCommandState extends State<SavedCommand> {
           ),
           Padding(
             padding: const EdgeInsets.only(bottom: 40.0),
-            child: MaterialButton(
-              color: primaryC,
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20)),
-              onPressed: () {
-                save();
-                Navigator.of(context).pop();
-              },
-              child: const Padding(
-                padding:
-                    EdgeInsets.only(top: 8, bottom: 8, left: 15, right: 15),
-                child: Text("Save"),
-              ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                MaterialButton(
+                  color: Colors.blue,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20)),
+                  onPressed: () {
+                    sendCommands();
+                  },
+                  child: const Padding(
+                    padding:
+                        EdgeInsets.only(top: 8, bottom: 8, left: 15, right: 15),
+                    child: Text("Send"),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                MaterialButton(
+                  color: primaryC,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20)),
+                  onPressed: () {
+                    save();
+                    Navigator.of(context).pop();
+                  },
+                  child: const Padding(
+                    padding:
+                        EdgeInsets.only(top: 8, bottom: 8, left: 15, right: 15),
+                    child: Text("Save"),
+                  ),
+                ),
+              ],
             ),
           )
         ],
@@ -138,4 +176,42 @@ class _SavedCommandState extends State<SavedCommand> {
   save() async {
     SavedCommandsServices().update(id: widget.id, commands: commands);
   }
+
+  sendCommands() async {
+    if (commands.isEmpty || sending) return;
+    final user = Provider.of<UserProvider>(context, listen: false);
+    final topic = "/xara/cmds/${user.userModel.machineId}";
+
+    setState(() {
+      sending = true;
+    });
+
+    await MQTTService.instance.connect(username: 'xioty', password: 'P@ssw0rd');
+    MQTTService.instance.subscribe('response', _onMqttMessage);
+    MQTTService.instance.sendData(commands.join("\n"), topic, false);
+
+    // If nothing comes back in time, stop waiting and let the user know.
+    Future.delayed(const Duration(seconds: 10), () {
+      if (!mounted || !sending) return;
+      setState(() {
+        sending = false;
+      });
+      Fluttertoast.showToast(
+        msg: "No response from the machine - check it's powered on",
+        backgroundColor: Colors.red,
+      );
+    });
+  }
+
+  void _onMqttMessage(String topic, String payload) {
+    if (!sending) return;
+    if (payload == 'Received') {
+      setState(() {
+        sending = false;
+      });
+      Fluttertoast.showToast(msg: "Commands received by the machine");
+      MQTTService.instance.sendData('', 'response', true);
+    }
+  }
 }
+

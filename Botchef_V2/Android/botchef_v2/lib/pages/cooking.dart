@@ -253,7 +253,7 @@ class _CookingPageState extends State<CookingPage> {
       if (operation["label"].contains("sm")) {
         String num = operation["label"][2];
         if (prevType == "M" || prevType == "lm") {
-          instructions.add("itHome");
+          // instructions.add("itHome");
         }
         instructions.add("smu$num");
         for (int i = 0;
@@ -268,7 +268,7 @@ class _CookingPageState extends State<CookingPage> {
       } else if (operation["label"].contains("lm")) {
         String num = operation["label"][2];
         if (prevType == "sm") {
-          instructions.add("itHome");
+          // instructions.add("itHome");
         }
         instructions.add("lmu$num");
         for (int i = 0;
@@ -282,7 +282,7 @@ class _CookingPageState extends State<CookingPage> {
         prevType = "lm";
       } else if (operation["label"][0] == "M") {
         if (prevType == "sm") {
-          instructions.add("itHome");
+          // instructions.add("itHome");
         }
         instructions.add(operation["label"]);
         prevType = "M";

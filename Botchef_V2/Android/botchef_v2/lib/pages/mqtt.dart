@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:botchef_v2/commons.dart';
@@ -20,15 +21,28 @@ class MQTTPage extends StatefulWidget {
 }
 
 class _MQTTPageState extends State<MQTTPage> {
+  // Palette matching the "Robot Controller" design.
+  static const Color _navy = Color(0xFF1B2A4E);
+  static const Color _blue = Color(0xFF2F6FED);
+  static const Color _bg = Color(0xFFF3F6FB);
+  static const Color _cardBg = Colors.white;
+  static const Color _muted = Color(0xFF8A93A6);
+
   @override
   void didChangeDependencies() {
     prefs.containsKey("cmdHist").then((value) async {
       if (value) {
         cmdHist = await prefs.getStringList("cmdHist") ?? [];
+        cmdTimes = await prefs.getStringList("cmdTimes") ?? [];
+        if (cmdTimes.length != cmdHist.length) {
+          cmdTimes = List.generate(cmdHist.length, (_) => '--:--:--');
+        }
         setState(() {});
       } else {
         cmdHist = [];
+        cmdTimes = [];
         prefs.setStringList("cmdHist", []);
+        prefs.setStringList("cmdTimes", []);
         setState(() {});
       }
     });
@@ -55,6 +69,8 @@ class _MQTTPageState extends State<MQTTPage> {
   void dispose() {
     client.disconnect();
     client.unsubscribe("response");
+    input.dispose();
+    name.dispose();
     super.dispose();
   }
 
@@ -62,6 +78,8 @@ class _MQTTPageState extends State<MQTTPage> {
       '6b3b54fa5f4a464fa80e2e0410aec35e.s2.eu.hivemq.cloud', '', 8883);
   String sendingTopic = "/xara/cmds/";
   List<String> cmdHist = [];
+  List<String> cmdTimes = [];
+  List<String> sentHist = [];
   String receivedMessage = '';
   bool sending = false;
   bool start = false;
@@ -72,141 +90,486 @@ class _MQTTPageState extends State<MQTTPage> {
   SharedPreferencesAsync prefs = SharedPreferencesAsync();
   TextEditingController name = TextEditingController();
 
+  // Current machine position, updated from Rpi status payloads. See
+  // _updateStatusFromPayload() below - adjust it to match your Rpi's
+// actual status message format.
+  double posX = 0;
+  double posY = 0;
+  double posZ = 0;
+  double posA = 0;
+  double posB = 0;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: _bg,
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
-        title: const Text('MQTT Flutter App'),
+        backgroundColor: _bg,
+        elevation: 0,
+        titleSpacing: 16,
+        title: const Row(
+          children: [
+            Icon(Icons.precision_manufacturing, color: _navy, size: 30),
+            SizedBox(width: 10),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'Robot Controller',
+                  style: TextStyle(
+                      color: _navy, fontSize: 19, fontWeight: FontWeight.bold),
+                ),
+                Text(
+                  'Send G-code Commands',
+                  style: TextStyle(color: _muted, fontSize: 12),
+                ),
+              ],
+            ),
+          ],
+        ),
         actions: [
-          IconButton(
-            onPressed: () {
-              sendData("Shutdown", sendingTopic, false);
+          PopupMenuButton<String>(
+            icon: const Icon(Icons.power_off, color: _navy),
+            tooltip: 'Settings',
+            onSelected: (value) {
+              if (value == 'shutdown') {
+                sendData("Shutdown", sendingTopic, false);
+              }
             },
-            icon: const Icon(Icons.power_off, color: Colors.red),
+            itemBuilder: (context) => [
+              const PopupMenuItem(
+                value: 'shutdown',
+                child: Row(
+                  children: [
+                    Icon(Icons.power_off, color: Colors.red),
+                    SizedBox(width: 8),
+                    Text('Shutdown Rpi'),
+                  ],
+                ),
+              ),
+            ],
           ),
+          const SizedBox(width: 8),
         ],
       ),
       drawer: menu(context),
-      body: Center(
-        child: sending
-            ? const Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  CircularProgressIndicator(),
-                  Text('Sending command(s). Please wait!'),
-                ],
-              )
-            : Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: TextField(
-                            controller: input,
-                            onEditingComplete: () async {
-                              if (client.connectionStatus!.state ==
-                                      MqttConnectionState.connected &&
-                                  !start) {
-                                subscribe();
-                                setState(() {
-                                  start = true;
-                                });
-                              }
-                              try {
-                                setState(() {
-                                  sendData(input.text, sendingTopic, false);
-                                  sending = true;
-                                });
-                              } on ConnectionException catch (e) {
-                                debugPrint(e.toString());
-                                Fluttertoast.showToast(
-                                  msg: 'MQTT server not connected',
-                                  backgroundColor: Colors.red,
-                                  textColor: Colors.white,
-                                );
-                              }
-                              debugPrint(input.text);
-                              input.clear();
-                            },
-                            decoration: const InputDecoration(
-                              labelText: "Command", //babel text
-                              hintText: "Enter command", //hint text
-                              prefixIcon: Icon(
-                                Icons.keyboard_arrow_right,
-                                size: 40,
-                              ), //prefix iocn
-                            ),
-                          ),
-                        ),
-                        IconButton(
-                          onPressed: () {
-                            setState(() {
-                              cmdHist.add(input.text);
-                            });
-                            prefs.setStringList('cmdHist', cmdHist);
-                          },
-                          icon: const Icon(Icons.add),
-                        )
-                      ],
-                    ),
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      MaterialButton(
-                        onPressed: () {
-                          setState(() {
-                            cmdHist.clear();
-                          });
-                          prefs.setStringList('cmdHist', cmdHist);
-                        },
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(
-                              12.0), // Adjust this for more/less roundness
-                        ),
-                        color: Colors.blue,
-                        child: const Text("Clear"),
-                      ),
-                      MaterialButton(
-                        onPressed: () {
-                          save();
-                        },
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(
-                              12.0), // Adjust this for more/less roundness
-                        ),
-                        color: Colors.blue,
-                        child: const Text("Save"),
-                      ),
-                    ],
-                  ),
-                  SizedBox(
-                    height: height(context) * 0.6,
-                    child: ListView.builder(
-                      scrollDirection: Axis.vertical,
-                      itemCount: cmdHist.length,
-                      itemBuilder: (BuildContext context, int index) {
-                        return Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: ListTile(
-                            tileColor: Colors.black12,
-                            title: Text(
-                              cmdHist[(cmdHist.length - 1) - index],
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                ],
-              ),
+      body:
+          //   sending
+          // ? const Center(
+          //     child: Column(
+          //       mainAxisAlignment: MainAxisAlignment.center,
+          //       children: [
+          //         CircularProgressIndicator(),
+          //         SizedBox(height: 12),
+          //         Text('Sending command(s). Please wait!'),
+          //       ],
+          //     ),
+          //   )
+          // :
+          SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+          child: Column(
+            children: [
+              _statusCard(),
+              const SizedBox(height: 16),
+              _commandCard(),
+              const SizedBox(height: 16),
+              Expanded(child: _historyCard()),
+              const SizedBox(height: 12),
+              _bottomButtons(),
+            ],
+          ),
+        ),
       ),
     );
+  }
+
+  // ---------------- UI building blocks ----------------
+
+  Widget _card({required Widget child}) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: _cardBg,
+        borderRadius: BorderRadius.circular(18),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: child,
+    );
+  }
+
+  Widget _sectionHeader(IconData icon, String title) {
+    return Row(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(6),
+          decoration: BoxDecoration(
+            color: _blue.withOpacity(0.1),
+            shape: BoxShape.circle,
+          ),
+          child: Icon(icon, color: _blue, size: 18),
+        ),
+        const SizedBox(width: 10),
+        Text(
+          title,
+          style: const TextStyle(
+              color: _navy, fontSize: 16, fontWeight: FontWeight.bold),
+        ),
+      ],
+    );
+  }
+
+  Widget _statusCard() {
+    return _card(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _sectionHeader(Icons.sensors, 'Current Position'),
+          const SizedBox(height: 14),
+          Row(
+            children: [
+              _statBox('X', posX),
+              const SizedBox(width: 8),
+              _statBox('Y', posY),
+              const SizedBox(width: 8),
+              _statBox('Z', posZ),
+              const SizedBox(width: 8),
+              _statBox('A', posA),
+              const SizedBox(width: 8),
+              _statBox('B', posB),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _statBox(String label, double value) {
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 12),
+        decoration: BoxDecoration(
+          color: _bg,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Column(
+          children: [
+            Text(
+              label,
+              style: const TextStyle(
+                  color: _blue, fontWeight: FontWeight.bold, fontSize: 13),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              value.toStringAsFixed(2),
+              style: const TextStyle(
+                  color: _navy, fontWeight: FontWeight.bold, fontSize: 14),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _commandCard() {
+    return _card(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _sectionHeader(Icons.keyboard, 'Enter Command'),
+          const SizedBox(height: 14),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Expanded(
+                child: TextField(
+                  controller: input,
+                  onEditingComplete: _handleSend,
+                  decoration: InputDecoration(
+                    hintText: 'Enter G-code command...',
+                    filled: true,
+                    fillColor: _bg,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide.none,
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 14),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Column(
+                children: [
+                  _arrowButton(Icons.keyboard_arrow_up, _historyUp),
+                  const SizedBox(height: 6),
+                  ElevatedButton.icon(
+                    onPressed: _handleSend,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: _blue,
+                      foregroundColor: Colors.white,
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10)),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 14, vertical: 12),
+                    ),
+                    icon: const Icon(Icons.send, size: 18),
+                    label: const Text('Send'),
+                  ),
+                  const SizedBox(height: 6),
+                  _arrowButton(Icons.keyboard_arrow_down, _historyDown),
+                ],
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Align(
+            alignment: Alignment.centerRight,
+            child: OutlinedButton.icon(
+              onPressed: _handleRecord,
+              style: OutlinedButton.styleFrom(
+                foregroundColor: Colors.red,
+                side: const BorderSide(color: Colors.red),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10)),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              ),
+              icon: const Icon(Icons.fiber_manual_record, size: 16),
+              label: const Text('Record'),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _arrowButton(IconData icon, VoidCallback onTap) {
+    return OutlinedButton(
+      onPressed: onTap,
+      style: OutlinedButton.styleFrom(
+        foregroundColor: _blue,
+        side: BorderSide(color: _blue.withOpacity(0.35)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        minimumSize: Size.zero,
+      ),
+      child: Icon(icon, size: 20),
+    );
+  }
+
+  Widget _historyCard() {
+    return _card(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _sectionHeader(Icons.history, 'Recorded Commands'),
+          const SizedBox(height: 8),
+          Expanded(
+            child: cmdHist.isEmpty
+                ? const Center(
+                    child: Text('No commands yet',
+                        style: TextStyle(color: _muted)),
+                  )
+                : ListView.separated(
+                    itemCount: cmdHist.length,
+                    separatorBuilder: (context, i) =>
+                        Divider(height: 1, color: Colors.grey.shade200),
+                    itemBuilder: (context, i) {
+                      final revIndex = (cmdHist.length - 1) - i;
+                      final time =
+                          revIndex < cmdTimes.length ? cmdTimes[revIndex] : '';
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 10),
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 8,
+                              height: 8,
+                              decoration: const BoxDecoration(
+                                  color: _blue, shape: BoxShape.circle),
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: Text(
+                                cmdHist[revIndex],
+                                style: const TextStyle(
+                                    color: _navy, fontWeight: FontWeight.w600),
+                              ),
+                            ),
+                            Text(
+                              time,
+                              style:
+                                  const TextStyle(color: _muted, fontSize: 12),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _bottomButtons() {
+    return Row(
+      children: [
+        Expanded(
+          child: OutlinedButton.icon(
+            onPressed: () {
+              setState(() {
+                cmdHist.clear();
+                cmdTimes.clear();
+                index = 0;
+              });
+              prefs.setStringList('cmdHist', cmdHist);
+              prefs.setStringList('cmdTimes', cmdTimes);
+            },
+            style: OutlinedButton.styleFrom(
+              foregroundColor: Colors.red,
+              side: const BorderSide(color: Colors.red),
+              padding: const EdgeInsets.symmetric(vertical: 14),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12)),
+            ),
+            icon: const Icon(Icons.delete_outline),
+            label: const Text('Clear'),
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: ElevatedButton.icon(
+            onPressed: () => save(),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: _blue,
+              foregroundColor: Colors.white,
+              elevation: 0,
+              padding: const EdgeInsets.symmetric(vertical: 14),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12)),
+            ),
+            icon: const Icon(Icons.save_outlined),
+            label: const Text('Save'),
+          ),
+        ),
+      ],
+    );
+  }
+
+  // ---------------- Actions ----------------
+
+  void updateAxesFromCommand(String command) {
+    final regex =
+        RegExp(r'([XYZAB])\s*(-?\d+(?:\.\d+)?)', caseSensitive: false);
+
+    for (final match in regex.allMatches(command)) {
+      final axis = match.group(1)!.toUpperCase();
+      final value = double.parse(match.group(2)!);
+
+      switch (axis) {
+        case 'X':
+          posX = value;
+          break;
+        case 'Y':
+          posY = value;
+          break;
+        case 'Z':
+          posZ = value;
+          break;
+        case 'A':
+          posA = value;
+          break;
+        case 'B':
+          posB = value;
+          break;
+      }
+    }
+
+    setState(() {});
+  }
+
+  void _handleSend() {
+    if (input.text.trim().isEmpty) return;
+    if (client.connectionStatus!.state == MqttConnectionState.connected &&
+        !start) {
+      subscribe();
+      setState(() {
+        start = true;
+      });
+    }
+    final cmd = input.text;
+    sentHist.add(input.text);
+    try {
+      setState(() {
+        sendData(cmd, sendingTopic, false);
+        sending = true;
+      });
+    } on ConnectionException catch (e) {
+      debugPrint(e.toString());
+      Fluttertoast.showToast(
+        msg: 'MQTT server not connected',
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+      );
+    }
+    debugPrint(cmd);
+    updateAxesFromCommand(input.text);
+    input.clear();
+  }
+
+  void _handleRecord() {
+    if (input.text.trim().isEmpty) return;
+    setState(() {
+      cmdHist.add(input.text);
+      cmdTimes.add(_timestamp());
+      index = 0;
+    });
+    prefs.setStringList('cmdHist', cmdHist);
+    prefs.setStringList('cmdTimes', cmdTimes);
+    Fluttertoast.showToast(
+      msg: 'Command recorded',
+      backgroundColor: _blue,
+      textColor: Colors.white,
+    );
+  }
+
+  void _historyUp() {
+    if (sentHist.isEmpty) return;
+    setState(() {
+      if (index < sentHist.length) index++;
+      input.text = sentHist[sentHist.length - index];
+    });
+  }
+
+  void _historyDown() {
+    if (sentHist.isEmpty) return;
+    setState(() {
+      if (index > 1) {
+        index--;
+        input.text = sentHist[sentHist.length - index];
+      } else {
+        index = 0;
+        input.text = '';
+      }
+    });
+  }
+
+  String _timestamp() {
+    final now = DateTime.now();
+    String two(int n) => n.toString().padLeft(2, '0');
+    return '${two(now.hour)}:${two(now.minute)}:${two(now.second)}';
   }
 
   mqttinit() async {
@@ -344,7 +707,6 @@ class _MQTTPageState extends State<MQTTPage> {
             hintText: "Enter command name",
           ),
           onEditingComplete: () {
-            // Save the command name and commands to Firestore
             final user = Provider.of<UserProvider>(context, listen: false);
             SavedCommandsServices().add(
               uid: user.user.uid,
