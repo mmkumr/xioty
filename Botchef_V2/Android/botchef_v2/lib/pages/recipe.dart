@@ -47,18 +47,28 @@ class _RecipePageState extends State<RecipePage> {
     if (widget.data != null) {
       RecipeModel recipe = widget.data!;
       debugPrint(recipe.rid);
-      setState(() {
-        description.text = recipe.description!;
-        recipeName.text = recipe.recipeName!;
-        chefName.text = recipe.chefName!;
-        calories.text = recipe.calories!;
-        photoUrl = recipe.photoUrl;
-        category = recipe.type;
-      });
+      description.text = recipe.description ?? '';
+      recipeName.text = recipe.recipeName ?? '';
+      chefName.text = recipe.chefName ?? '';
+      calories.text = recipe.calories ?? '';
+      photoUrl = recipe.photoUrl;
+      // Guard against stored category values that no longer exist in
+      // `categories` (e.g. legacy data), which would otherwise crash
+      // DropdownButtonFormField at build time.
+      category = categories.contains(recipe.type) ? recipe.type : categories[0];
     } else {
       category = categories[0];
     }
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    description.dispose();
+    recipeName.dispose();
+    chefName.dispose();
+    calories.dispose();
+    super.dispose();
   }
 
   @override
@@ -85,10 +95,15 @@ class _RecipePageState extends State<RecipePage> {
                   children: [
                     InkWell(
                       onTap: () async {
-                        image = await ImagePicker()
-                            .pickImage(source: ImageSource.gallery);
+                        final pickedImage = await ImagePicker().pickImage(
+                          source: ImageSource.gallery,
+                          maxWidth: 1600,
+                          maxHeight: 1600,
+                          imageQuality: 70,
+                        );
+                        if (!mounted) return;
                         setState(() {
-                          image;
+                          image = pickedImage;
                         });
                       },
                       child: photoUrl != null && image == null
@@ -192,7 +207,9 @@ class _RecipePageState extends State<RecipePage> {
                           Padding(
                             padding: const EdgeInsets.all(20.0),
                             child: TextFormField(
-                              maxLines: (height(context) * 0.015).round(),
+                              maxLines: (height(context) * 0.015)
+                                  .round()
+                                  .clamp(1, 10),
                               controller: description,
                               validator: (value) {
                                 if (value!.isEmpty) {
@@ -249,48 +266,64 @@ class _RecipePageState extends State<RecipePage> {
                         ),
                         color: elementsC,
                         onPressed: () async {
-                          if (form.currentState!.validate() &&
-                              (image != null || photoUrl != null)) {
+                          if (form.currentState!
+                              .validate() /* && (image != null || photoUrl != null) */) {
                             setState(() {
                               loading = true;
                             });
-                            if (image != null) {
-                              await uploadPic();
-                            }
-                            if (widget.data == null) {
-                              recipeServices.create(
-                                photoUrl: photoUrl!,
-                                uid: user.user.uid,
-                                recipeName: recipeName.text,
-                                chefName: chefName.text,
-                                description: description.text,
-                                calories: calories.text,
-                                type: category!,
+                            try {
+                              if (image != null) {
+                                await uploadPic();
+                                //Comment after fixing the google account verification
+                                // setState(() {
+                                //   photoUrl = "";
+                                // });
+                              }
+                              if (widget.data == null) {
+                                await recipeServices.create(
+                                  photoUrl: photoUrl!,
+                                  uid: user.user.uid,
+                                  recipeName: recipeName.text,
+                                  chefName: chefName.text,
+                                  description: description.text,
+                                  calories: calories.text,
+                                  type: category!,
+                                );
+                                Fluttertoast.showToast(
+                                    msg: "successfully created new recipe");
+                              } else {
+                                await recipeServices.update(
+                                  id: widget.data!.rid!,
+                                  photoUrl: photoUrl!,
+                                  recipeName: recipeName.text,
+                                  chefName: chefName.text,
+                                  description: description.text,
+                                  calories: calories.text,
+                                  type: category!,
+                                );
+                                Fluttertoast.showToast(
+                                    msg: "successfully updated new recipe");
+                              }
+                              if (!mounted) return;
+                              setState(() {
+                                loading = false;
+                              });
+                              if (!context.mounted) return;
+                              navigate(
+                                type: PageType.replace,
+                                context: context,
+                                page: const YourRecipesPage(),
                               );
+                            } catch (e) {
+                              debugPrint("Failed to save recipe: $e.toString");
+                              if (!mounted) return;
+                              setState(() {
+                                loading = false;
+                              });
                               Fluttertoast.showToast(
-                                  msg: "successfully created new recipe");
-                            } else {
-                              recipeServices.update(
-                                id: widget.data!.rid!,
-                                photoUrl: photoUrl!,
-                                recipeName: recipeName.text,
-                                chefName: chefName.text,
-                                description: description.text,
-                                calories: calories.text,
-                                type: category!,
-                              );
-                              Fluttertoast.showToast(
-                                  msg: "successfully updated new recipe");
+                                  msg:
+                                      "failed to save recipe, please try again");
                             }
-                            setState(() {
-                              loading = false;
-                            });
-                            if (!context.mounted) return;
-                            navigate(
-                              type: PageType.replace,
-                              context: context,
-                              page: const YourRecipesPage(),
-                            );
                           }
                         },
                         child: Padding(
@@ -316,16 +349,27 @@ class _RecipePageState extends State<RecipePage> {
 
   uploadPic() async {
     FirebaseStorage storage = FirebaseStorage.instance;
-    //Create a reference to the location you want to upload to in firebase
     Reference reference = storage.ref().child("recipes/${image!.name}");
 
-    //Upload the file to firebase
-    await reference.putFile(File(image!.path));
-    // Waits till the file is uploaded then stores the download url
-    await reference.getDownloadURL().then((value) {
+    try {
+      await reference
+          .putFile(
+            File(image!.path),
+            SettableMetadata(
+                contentType: 'image/jpeg'), // <-- this avoids the null NPE
+          )
+          .timeout(const Duration(seconds: 20));
+
+      final value =
+          await reference.getDownloadURL().timeout(const Duration(seconds: 10));
+
+      if (!mounted) return;
       setState(() {
         photoUrl = value;
       });
-    });
+    } catch (e) {
+      debugPrint('ERROR uploading recipe photo: ${e.toString()}');
+      rethrow;
+    }
   }
 }

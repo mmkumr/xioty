@@ -38,7 +38,7 @@ class _ChefMacroPageState extends State<ChefMacroPage> {
   ];
   List<String> quantity = [];
   bool loading = false;
-  int nos = 4;
+  int nos = 5;
   @override
   void initState() {
     if (widget.variant.macros!.isEmpty) {

@@ -71,7 +71,7 @@ class _ContactUsPageState extends State<ContactUsPage> {
                       Uri.parse("https://xara.com"),
                     );
                   },
-                  leading: const Icon(
+                  leading: const FaIcon(
                     FontAwesomeIcons.globe,
                     color: Colors.blue,
                   ),

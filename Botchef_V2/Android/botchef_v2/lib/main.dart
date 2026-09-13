@@ -1,5 +1,6 @@
 import 'package:botchef_v2/firebase_options.dart';
 import 'package:botchef_v2/pages/machine_connect.dart';
+import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
@@ -14,6 +15,10 @@ import 'providers/user_provider.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.android);
+// NEW: activate App Check right here
+  await FirebaseAppCheck.instance.activate(
+    androidProvider: AndroidProvider.debug,
+  );
   runApp(
     ChangeNotifierProvider(
       create: (_) => UserProvider.initialize(),
@@ -51,16 +56,33 @@ class ScreensController extends StatefulWidget {
 
 class _ScreensControllerState extends State<ScreensController> {
   StatefulWidget? page;
+
   @override
-  void didChangeDependencies() async {
+  void didChangeDependencies() {
     final user = Provider.of<UserProvider>(context);
-    if (user.userModel.machineId!.isEmpty) {
-      page = const MachineConnectPage();
-    } else {
-      page = await firstTime();
+    // userModel is only populated once Firebase's auth state listener has
+    // resolved and UserProvider has flipped to Status.authenticated. Reading
+    // it any earlier (e.g. while still uninitialized/authenticating) throws
+    // a LateInitializationError, so only resolve `page` once we know it's
+    // safe to read.
+    if (user.status == Status.authenticated) {
+      _resolvePage(user);
     }
-    setState(() {});
     super.didChangeDependencies();
+  }
+
+  Future<void> _resolvePage(UserProvider user) async {
+    final machineId = user.userModel.machineId;
+    StatefulWidget resolved;
+    if (machineId == null || machineId.isEmpty) {
+      resolved = const MachineConnectPage();
+    } else {
+      resolved = await firstTime();
+    }
+    if (!mounted) return;
+    setState(() {
+      page = resolved;
+    });
   }
 
   @override
@@ -81,7 +103,19 @@ class _ScreensControllerState extends State<ScreensController> {
           ),
         );
       case Status.authenticated:
-        return page!;
+        // `page` is resolved asynchronously in _resolvePage(), so there's a
+        // brief window where status is already authenticated but page
+        // hasn't been set yet. Show a loader instead of force-unwrapping
+        // page! and crashing.
+        return page ??
+            Scaffold(
+              body: Center(
+                child: LoadingAnimationWidget.inkDrop(
+                  color: Colors.blue,
+                  size: 200,
+                ),
+              ),
+            );
     }
   }
 

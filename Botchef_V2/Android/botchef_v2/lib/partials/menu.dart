@@ -58,7 +58,7 @@ Widget menu(BuildContext context) {
                 context: context,
                 page: const YourRecipesPage());
           },
-          leading: const Icon(FontAwesomeIcons.utensils),
+          leading: const FaIcon(FontAwesomeIcons.utensils),
         ),
         ListTile(
           title: const Text('Edited recipes'),
@@ -68,7 +68,7 @@ Widget menu(BuildContext context) {
                 context: context,
                 page: const EditedRecipesPage());
           },
-          leading: const Icon(FontAwesomeIcons.spoon),
+          leading: const FaIcon(FontAwesomeIcons.spoon),
         ),
         ListTile(
             title: const Text('Manual Mode'),

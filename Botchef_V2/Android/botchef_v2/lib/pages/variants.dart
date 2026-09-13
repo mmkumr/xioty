@@ -46,7 +46,7 @@ class _VariantsPageState extends State<VariantsPage> {
             },
             child: const Padding(
               padding: EdgeInsets.all(15.0),
-              child: Icon(FontAwesomeIcons.pen),
+              child: FaIcon(FontAwesomeIcons.pen),
             ),
           ),
           InkWell(
@@ -61,7 +61,7 @@ class _VariantsPageState extends State<VariantsPage> {
             },
             child: const Padding(
               padding: EdgeInsets.all(15.0),
-              child: Icon(
+              child: FaIcon(
                 FontAwesomeIcons.trash,
                 color: Colors.red,
               ),

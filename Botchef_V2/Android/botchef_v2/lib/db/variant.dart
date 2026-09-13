@@ -1,4 +1,5 @@
 import 'package:algolia/algolia.dart';
+import 'package:botchef_v2/commons.dart';
 import 'package:botchef_v2/models/recipe.dart';
 import 'package:botchef_v2/models/variant.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -7,9 +8,9 @@ import 'package:flutter/material.dart';
 class VariantServices {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   String collection = "variants";
-  Algolia algoliaApp = const Algolia.init(
-    applicationId: 'KWPCAWUHDW', //ApplicationID,
-    apiKey: 'bf30ae35483ea194e02366cd3bf0737e', //Admin api key in flutter code
+  Algolia algoliaApp = Algolia.init(
+    applicationId: algoliaAppId, //ApplicationID,
+    apiKey: algoliaWriteAPIKey, //Admin api key in flutter code
   );
 
   fill() async {

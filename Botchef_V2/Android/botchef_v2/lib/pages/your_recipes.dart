@@ -29,6 +29,18 @@ class _YourRecipesPageState extends State<YourRecipesPage> {
   List<RecipeModel>? recipes;
   @override
   Widget build(BuildContext context) {
+    // getRecipes() is async and hasn't necessarily completed by the first
+    // build, so `recipes` can still be null here. Show a loader instead of
+    // force-unwrapping it, which previously crashed with a null-check error.
+    if (recipes == null) {
+      return Scaffold(
+        backgroundColor: bgC,
+        appBar: appbar,
+        drawer: menu(context),
+        body: const Center(child: CircularProgressIndicator()),
+      );
+    }
+    final recipeList = recipes!;
     return Scaffold(
       backgroundColor: bgC,
       appBar: appbar,
@@ -69,7 +81,7 @@ class _YourRecipesPageState extends State<YourRecipesPage> {
                     onTap: () {},
                     child: const Column(
                       children: [
-                        Icon(FontAwesomeIcons.cloudArrowUp,
+                        FaIcon(FontAwesomeIcons.cloudArrowUp,
                             color: Colors.grey, size: 40),
                         Text(
                           "Publish",
@@ -96,7 +108,7 @@ class _YourRecipesPageState extends State<YourRecipesPage> {
                         ),
                       ),
                       GridView.builder(
-                        itemCount: recipes!.length,
+                        itemCount: recipeList.length,
                         shrinkWrap: true,
                         physics: const NeverScrollableScrollPhysics(),
                         gridDelegate:
@@ -104,13 +116,13 @@ class _YourRecipesPageState extends State<YourRecipesPage> {
                           crossAxisCount: 2,
                         ),
                         itemBuilder: (context, index) {
-                          RecipeModel recipe = recipes![index];
+                          RecipeModel recipe = recipeList[index];
                           return Padding(
                             padding: const EdgeInsets.all(10.0),
                             child: InkWell(
                               onTap: () {
                                 navigate(
-                                    type: PageType.push,
+                                    type: PageType.replace,
                                     context: context,
                                     page: VariantsPage(recipe: recipe));
                               },
@@ -118,16 +130,18 @@ class _YourRecipesPageState extends State<YourRecipesPage> {
                                 footer: Container(
                                   color: Colors.white,
                                   child: Text(
-                                    recipe.recipeName!,
+                                    recipe.recipeName ?? '',
                                     style: const TextStyle(
                                         fontWeight: FontWeight.bold),
                                     textAlign: TextAlign.center,
                                   ),
                                 ),
-                                child: CachedNetworkImage(
-                                  imageUrl: recipe.photoUrl!,
-                                  fit: BoxFit.fill,
-                                ),
+                                child: recipe.photoUrl != null
+                                    ? CachedNetworkImage(
+                                        imageUrl: recipe.photoUrl!,
+                                        fit: BoxFit.fill,
+                                      )
+                                    : const Icon(Icons.image_not_supported),
                               ),
                             ),
                           );
@@ -154,7 +168,7 @@ class _YourRecipesPageState extends State<YourRecipesPage> {
                           crossAxisCount: 2,
                         ),
                         itemBuilder: (context, index) {
-                          RecipeModel recipe = recipes![index];
+                          RecipeModel recipe = recipeList[index];
                           return Padding(
                             padding: const EdgeInsets.all(10.0),
                             child: InkWell(
@@ -197,11 +211,12 @@ class _YourRecipesPageState extends State<YourRecipesPage> {
   }
 
   getRecipes() async {
-    final user = Provider.of<UserProvider>(context);
+    final user = Provider.of<UserProvider>(context, listen: false);
     RecipeServices recipeServices = RecipeServices();
-    recipes = await recipeServices.myRecipes(user.user.uid);
+    final fetched = await recipeServices.myRecipes(user.user.uid);
+    if (!mounted) return;
     setState(() {
-      recipes;
+      recipes = fetched;
     });
   }
 }

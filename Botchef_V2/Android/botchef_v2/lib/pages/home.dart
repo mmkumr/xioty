@@ -19,10 +19,9 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   //Algolia setup
-  final Algolia _algoliaApp = const Algolia.init(
-    applicationId: 'JVYQL6PARJ', //ApplicationID
-    apiKey:
-        '46d75cf5091c5a21ffe9522fb3b2fa5f', //search-only api key in flutter code
+  final Algolia _algoliaApp = Algolia.init(
+    applicationId: algoliaAppId, //ApplicationID
+    apiKey: algoliaSearchAPIKey, //search-only api key in flutter code
   );
   String searchTerm = '';
   int pageSize = 20;
@@ -172,7 +171,7 @@ class _HomePageState extends State<HomePage> {
                       focusedBorder: InputBorder.none,
                       hintText: "Search by Macro, Chef name, Recipe name",
                       hintMaxLines: 2,
-                      icon: Icon(FontAwesomeIcons.magnifyingGlass),
+                      icon: FaIcon(FontAwesomeIcons.magnifyingGlass),
                       enabledBorder: InputBorder.none,
                     ),
                   ),

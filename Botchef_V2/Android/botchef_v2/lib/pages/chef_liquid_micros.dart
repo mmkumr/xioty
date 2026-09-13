@@ -33,7 +33,7 @@ class _ChefLiquidMicroState extends State<ChefLiquidMicro> {
   GlobalKey<FormState> popUpForm = GlobalKey<FormState>();
   List<XFile?> image = [];
   List<String> photoUrl = [];
-  int nos = 4;
+  int nos = 1;
   bool loading = false;
   @override
   void initState() {
@@ -44,8 +44,6 @@ class _ChefLiquidMicroState extends State<ChefLiquidMicro> {
       photoUrl = List.generate(nos, (index) => "");
       description = List.generate(nos, (index) => TextEditingController());
       liquidMicros[0] = TextEditingController(text: "Refined Oil");
-      liquidMicros[1] = TextEditingController(text: "Tomato Sauce");
-      liquidMicros[2] = TextEditingController(text: "Chilli Sauce");
     } else {
       for (var e in widget.variant.liquidMicros!) {
         liquidMicros.add(TextEditingController(text: e["name"]));

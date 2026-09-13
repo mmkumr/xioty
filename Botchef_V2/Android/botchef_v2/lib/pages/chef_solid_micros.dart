@@ -33,7 +33,7 @@ class _ChefSolidMicroState extends State<ChefSolidMicro> {
   GlobalKey<FormState> popUpForm = GlobalKey<FormState>();
   List<XFile?> image = [];
   List<String> photoUrl = [];
-  int nos = 8;
+  int sNos = 7;
   ScrollController scrollController = ScrollController();
   bool loading = false;
   @override
@@ -47,11 +47,11 @@ class _ChefSolidMicroState extends State<ChefSolidMicro> {
     });
 
     if (widget.variant.solidMicros!.isEmpty) {
-      solidMicros = List.generate(nos, (index) => TextEditingController());
+      solidMicros = List.generate(sNos, (index) => TextEditingController());
       quantity =
-          List.generate(nos, (index) => TextEditingController(text: "0"));
-      photoUrl = List.generate(nos, (index) => "");
-      description = List.generate(nos, (index) => TextEditingController());
+          List.generate(sNos, (index) => TextEditingController(text: "0"));
+      photoUrl = List.generate(sNos, (index) => "");
+      description = List.generate(sNos, (index) => TextEditingController());
       //Jeera, Salt, turmeric powder, chilli powder, garam masala powder
       solidMicros[0] = TextEditingController(text: "Salt");
       solidMicros[1] = TextEditingController(text: "Turmeric Powder");
@@ -65,7 +65,7 @@ class _ChefSolidMicroState extends State<ChefSolidMicro> {
         description.add(TextEditingController(text: e["description"]));
       }
     }
-    image = List.generate(nos, (index) => XFile(""));
+    image = List.generate(sNos, (index) => XFile(""));
     super.initState();
   }
 
@@ -117,7 +117,7 @@ class _ChefSolidMicroState extends State<ChefSolidMicro> {
                       key: form,
                       child: Column(
                         children: [
-                          for (int i = 0; i < nos; i++)
+                          for (int i = 0; i < sNos; i++)
                             Padding(
                               padding:
                                   const EdgeInsets.only(top: 8.0, bottom: 8.0),

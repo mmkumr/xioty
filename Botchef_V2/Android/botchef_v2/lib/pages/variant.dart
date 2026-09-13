@@ -71,7 +71,7 @@ class _VariantPageState extends State<VariantPage> {
             },
             child: const Padding(
               padding: EdgeInsets.all(15.0),
-              child: Icon(
+              child: FaIcon(
                 FontAwesomeIcons.trash,
                 color: Colors.red,
               ),

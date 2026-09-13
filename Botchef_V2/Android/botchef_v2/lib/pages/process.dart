@@ -41,11 +41,15 @@ class _ProcessPageState extends State<ProcessPage> {
     "220",
     "240",
   ];
-  String? heatLevel = "160";
   List<String> waterLevels = ["1cup", "1/4cup", "1/2cup", "3/4cup"];
-  String? waterLevel = "1cup";
   int selected = 0;
-  List<String> changeableParam = ["Induction", "Water", "Wait"];
+  List<String> changeableParam = ["Induction", "Water", "Wait", "Fry"];
+  List<String> fryParams = [
+    "Short Open",
+    "Long Open",
+    "Short Close",
+    "Long Close"
+  ];
   List<String> others = [
     "Lid up",
     "Lid down",
@@ -56,6 +60,7 @@ class _ProcessPageState extends State<ProcessPage> {
     "Preset",
     "Arm home",
     "Disable arm",
+    "Fry",
   ];
   bool loading = false;
   @override
@@ -224,10 +229,14 @@ class _ProcessPageState extends State<ProcessPage> {
                       setState(() {
                         loading = false;
                       });
-                      navigate(
-                          type: PageType.replace,
-                          context: context,
-                          page: const HomePage());
+
+                      Navigator.pushAndRemoveUntil(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const HomePage()),
+                        (Route<dynamic> route) =>
+                            false, // This condition clears all routes
+                      );
                     },
                     child: Padding(
                       padding: const EdgeInsets.only(top: 10, bottom: 10),
@@ -340,6 +349,37 @@ class _ProcessPageState extends State<ProcessPage> {
                 decoration: InputDecoration(
                   hintText: "Delay in secs",
                   label: const Text("Delay in secs"),
+                  filled: true,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10.0),
+                  ),
+                  fillColor: primaryC,
+                ),
+              ),
+            ),
+          );
+        } else if (operations[index].label!.contains("o") &&
+            operations[index].name == "Fry") {
+          content = Form(
+            key: form,
+            child: Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: DropdownButtonFormField(
+                value: operations[index].param,
+                items: fryParams.map((String items) {
+                  return DropdownMenuItem(
+                    value: items,
+                    child: Text(items),
+                  );
+                }).toList(),
+                onChanged: (String? value) {
+                  setState(() {
+                    operations[index].param = value;
+                  });
+                },
+                decoration: InputDecoration(
+                  hintText: "Select Fry Mode",
+                  label: const Text("Fry Mode"),
                   filled: true,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10.0),
@@ -592,11 +632,13 @@ class _ProcessPageState extends State<ProcessPage> {
                                 onTap: () {
                                   String param = "0";
                                   if (others[i] == "Induction") {
-                                    param = "160";
+                                    param = heatLevels[0];
                                   } else if (others[i] == "Water") {
-                                    param = "1cup";
+                                    param = waterLevels[0];
                                   } else if (others[i] == "Wait") {
                                     param = "1";
+                                  } else if (others[i] == "Fry") {
+                                    param = fryParams[0];
                                   }
                                   int index = selected + 1;
                                   if (operations.isEmpty) {

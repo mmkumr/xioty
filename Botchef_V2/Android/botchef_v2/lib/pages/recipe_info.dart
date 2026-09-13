@@ -139,7 +139,7 @@ class _RecipeInfoPageState extends State<RecipeInfoPage> {
                         const WidgetSpan(
                           child: Padding(
                             padding: EdgeInsets.only(left: 20.0, right: 5.0),
-                            child: Icon(
+                            child: FaIcon(
                               FontAwesomeIcons.fireFlameCurved,
                               color: Colors.red,
                             ),

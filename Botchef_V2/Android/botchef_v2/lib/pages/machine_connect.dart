@@ -82,7 +82,7 @@ class _MachineConnectPageState extends State<MachineConnectPage> {
                   },
                   decoration: InputDecoration(
                     hintText: "Enter the scratch code",
-                    icon: const Icon(FontAwesomeIcons.robot),
+                    icon: const FaIcon(FontAwesomeIcons.robot),
                     filled: true,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10.0),
